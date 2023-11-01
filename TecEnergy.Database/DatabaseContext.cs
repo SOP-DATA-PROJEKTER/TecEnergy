@@ -20,8 +20,8 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //modelBuilder.Entity<EnergyData>()
-        //    .Property(e => e.Value)
-        //    .HasColumnType("decimal(18, 2)"); // 18 is the precision, and 2 is the scale
+        modelBuilder.Entity<EnergyData>()
+            .Property(e => e.Value)
+            .HasColumnType("decimal(18, 2)"); // 18 is the precision, and 2 is the scale
     }
 }
