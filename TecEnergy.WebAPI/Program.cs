@@ -1,11 +1,16 @@
-
-namespace TecEnergy.WebApi;
+namespace TecEnergy.WebAPI;
 
 public class Program
 {
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        //var cs = builder.Configuration.GetConnectionString("SqlServer");
+
+
+        //builder.Services.AddDbContext<DatabaseContext>(
+        //         o => o.UseSqlServer(cs));
 
         // Add services to the container.
 

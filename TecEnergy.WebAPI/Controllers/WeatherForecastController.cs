@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TecEnergy.WebApi.Controllers;
+namespace TecEnergy.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase

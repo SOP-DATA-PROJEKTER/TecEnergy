@@ -1,4 +1,4 @@
-namespace TecEnergy.WebApi;
+namespace TecEnergy.WebAPI;
 
 public class WeatherForecast
 {
