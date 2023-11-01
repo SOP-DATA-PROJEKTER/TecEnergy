@@ -9,10 +9,12 @@ namespace TecEnergy.WebAPI.Controllers;
 public class RoomController : ControllerBase
 {
     private readonly IRoomRepository _repository;
+    private readonly IBuildingRepository _buildingRepository;
 
-    public RoomController(IRoomRepository repository)
+    public RoomController(IRoomRepository repository, IBuildingRepository buildingRepository)
     {
         _repository = repository;
+        _buildingRepository = buildingRepository;
     }
 
     [HttpGet]
@@ -38,6 +40,10 @@ public class RoomController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Room>> CreateAsync(Room room)
     {
+        if (room.BuildingID == Guid.Empty) return BadRequest("Missing Building Id.");
+        var building = await _buildingRepository.GetByIdAsync(room.BuildingID);
+        //if (!await _buildingRepository.(room.BuildingID)) return NotFound("Building not found.");
+
         await _repository.AddAsync(room);
         return CreatedAtAction("GetBuilding", new { id = room.Id }, room);
     }

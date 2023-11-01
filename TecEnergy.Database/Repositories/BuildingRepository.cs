@@ -48,4 +48,9 @@ public class BuildingRepository : IBuildingRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<bool> BuildingExistsAsync(Guid buildingId)
+    {
+        return await _context.Buildings.AnyAsync(b => b.Id == buildingId);
+    }
 }
