@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TecEnergy.Database;
 
@@ -11,9 +12,11 @@ using TecEnergy.Database;
 namespace TecEnergy.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20231103072842_energymetermodelremovedonlyId")]
+    partial class energymetermodelremovedonlyId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,9 +91,6 @@ namespace TecEnergy.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoomID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.ToTable("EnergyMeters");
@@ -114,7 +114,20 @@ namespace TecEnergy.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BuildingID");
+
                     b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+                {
+                    b.HasOne("TecEnergy.Database.DataModels.Building", "Building")
+                        .WithMany()
+                        .HasForeignKey("BuildingID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Building");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using TecEnergy.Database;
 namespace TecEnergy.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231101112446_Init")]
-    partial class Init
+    [Migration("20231103065400_RemovedRoomIdEnergyMeter")]
+    partial class RemovedRoomIdEnergyMeter
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,12 +93,7 @@ namespace TecEnergy.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoomID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RoomID");
 
                     b.ToTable("EnergyMeters");
                 });
@@ -135,17 +130,6 @@ namespace TecEnergy.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("EnergyMeter");
-                });
-
-            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
-                {
-                    b.HasOne("TecEnergy.Database.DataModels.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>

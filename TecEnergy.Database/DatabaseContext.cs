@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using TecEnergy.Database.DataModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TecEnergy.Database;
 public class DatabaseContext : DbContext

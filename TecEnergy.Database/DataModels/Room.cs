@@ -8,8 +8,8 @@ namespace TecEnergy.Database.DataModels;
 public class Room
 {
     public Guid Id { get; set; }
+    public Guid BuildingID { get; set; }
     public string RoomName { get; set; }// E213
     public string? RoomComment { get; set; } //specify rooms purpose, department etc..
-    public Guid BuildingID { get; set; }
-    public Building? Building { get; set; }
+    //public Building? Building { get; set; }
 }

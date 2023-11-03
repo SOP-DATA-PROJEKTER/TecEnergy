@@ -25,26 +25,6 @@ namespace TecEnergy.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rooms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoomName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoomComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuildingID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rooms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Rooms_Buildings_BuildingID",
-                        column: x => x.BuildingID,
-                        principalTable: "Buildings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EnergyMeters",
                 columns: table => new
                 {
@@ -60,10 +40,24 @@ namespace TecEnergy.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EnergyMeters", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rooms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoomName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuildingID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rooms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EnergyMeters_Rooms_RoomID",
-                        column: x => x.RoomID,
-                        principalTable: "Rooms",
+                        name: "FK_Rooms_Buildings_BuildingID",
+                        column: x => x.BuildingID,
+                        principalTable: "Buildings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -94,11 +88,6 @@ namespace TecEnergy.Database.Migrations
                 column: "EnergyMeterID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EnergyMeters_RoomID",
-                table: "EnergyMeters",
-                column: "RoomID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Rooms_BuildingID",
                 table: "Rooms",
                 column: "BuildingID");
@@ -111,10 +100,10 @@ namespace TecEnergy.Database.Migrations
                 name: "EnergyData");
 
             migrationBuilder.DropTable(
-                name: "EnergyMeters");
+                name: "Rooms");
 
             migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "EnergyMeters");
 
             migrationBuilder.DropTable(
                 name: "Buildings");

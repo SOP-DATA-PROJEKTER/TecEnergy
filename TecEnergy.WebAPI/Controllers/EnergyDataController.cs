@@ -39,7 +39,8 @@ public class EnergyDataController : ControllerBase
     public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData createResource)
     {
         await _repository.AddAsync(createResource);
-        return CreatedAtAction("GetBuilding", new { id = createResource.Id }, createResource);
+        //return CreatedAtAction("GetByIdAsync", new { id = createResource.Id }, createResource);
+        return Ok(createResource);
     }
 
     [HttpPut("{id}")]

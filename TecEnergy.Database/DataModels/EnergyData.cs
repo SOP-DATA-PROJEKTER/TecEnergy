@@ -12,5 +12,5 @@ public class EnergyData
     //public string MeasurementUnit { get; set; } //fx J, kW, kWh, Lm/W
     public decimal Value { get; set; } //measured value
     public DateTime DateTime { get; set; }
-    public EnergyMeter EnergyMeter { get; set; }
+    //public EnergyMeter? EnergyMeter { get; set; }
 }

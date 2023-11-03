@@ -43,9 +43,9 @@ public class RoomController : ControllerBase
         if (room.BuildingID == Guid.Empty) return BadRequest("Missing Building Id.");
         var building = await _buildingRepository.GetByIdAsync(room.BuildingID);
         //if (!await _buildingRepository.(room.BuildingID)) return NotFound("Building not found.");
-
         await _repository.AddAsync(room);
-        return CreatedAtAction("GetBuilding", new { id = room.Id }, room);
+        //return CreatedAtAction("GetBuilding", new { id = room.Id }, room);
+        return Ok(room);
     }
 
     [HttpPut("{id}")]

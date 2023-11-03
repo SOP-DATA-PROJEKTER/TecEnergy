@@ -26,30 +26,24 @@ public class EnergyMeterController : ControllerBase
     public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id)
     {
         var result = await _repository.GetByIdAsync(id);
-
-        if (result == null)
-        {
-            return NotFound();
-        }
-
+        if (result is null) return NotFound();
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<EnergyMeter>> CreateAsync(EnergyMeter createResource)
+    public async Task<ActionResult<EnergyMeter>> CreateAsync(EnergyMeter energyMeter)
     {
-        await _repository.AddAsync(createResource);
-        return CreatedAtAction("GetBuilding", new { id = createResource.Id }, createResource);
+        if (energyMeter is null) return BadRequest("Invalid input data.");
+        await _repository.AddAsync(energyMeter);
+        //return CreatedAtAction(nameof(GetByIdAsync), new { id = energyMeter.Id }, energyMeter);
+        return Ok(energyMeter);
     }
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, EnergyMeter updateResource)
     {
-        if (id != updateResource.Id)
-        {
-            return BadRequest();
-        }
-
+        if (id != updateResource.Id) return BadRequest();
         await _repository.UpdateAsync(updateResource);
         return NoContent();
     }

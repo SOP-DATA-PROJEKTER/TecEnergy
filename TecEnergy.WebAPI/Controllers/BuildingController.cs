@@ -39,7 +39,8 @@ public class BuildingController : ControllerBase
     public async Task<ActionResult<Building>> CreateAsync(Building createResource)
     {
         await _repository.AddAsync(createResource);
-        return CreatedAtAction("GetBuilding", new { id = createResource.Id }, createResource);
+        //return CreatedAtAction("GetBuilding", new { id = createResource.Id }, createResource);
+        return Ok(createResource);
     }
 
     [HttpPut("{id}")]
