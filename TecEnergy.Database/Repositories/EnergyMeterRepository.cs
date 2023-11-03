@@ -35,7 +35,8 @@ public class EnergyMeterRepository : IEnergyMeterRepository
 
     public async Task UpdateAsync(EnergyMeter energyMeter)
     {
-        _context.Entry(energyMeter).State = EntityState.Modified;
+        //_context.Entry(energyMeter).State = EntityState.Modified;
+        _context.Update(energyMeter);
         await _context.SaveChangesAsync();
     }
 

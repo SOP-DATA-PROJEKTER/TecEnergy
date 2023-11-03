@@ -36,11 +36,11 @@ public class EnergyDataController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData createResource)
+    public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
     {
-        await _repository.AddAsync(createResource);
+        await _repository.AddAsync(energyData);
         //return CreatedAtAction("GetByIdAsync", new { id = createResource.Id }, createResource);
-        return Ok(createResource);
+        return Ok(energyData);
     }
 
     [HttpPut("{id}")]

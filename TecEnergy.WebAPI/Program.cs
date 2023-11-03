@@ -19,8 +19,8 @@ public class Program
         builder.Services.AddDbContext<DatabaseContext>(
                  o => o.UseSqlServer(cs));
 
-        builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
-        builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+        //builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
+        //builder.Services.AddScoped<IRoomRepository, RoomRepository>();
         builder.Services.AddScoped<IEnergyMeterRepository, EnergyMeterRepository>();
         builder.Services.AddScoped<IEnergyDataRepository, EnergyDataRepository>();
 

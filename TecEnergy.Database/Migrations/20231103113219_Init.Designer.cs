@@ -12,8 +12,8 @@ using TecEnergy.Database;
 namespace TecEnergy.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231103065400_RemovedRoomIdEnergyMeter")]
-    partial class RemovedRoomIdEnergyMeter
+    [Migration("20231103113219_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,24 +25,6 @@ namespace TecEnergy.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Building", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BuildingName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Buildings");
-                });
-
             modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyData", b =>
                 {
                     b.Property<Guid>("Id")
@@ -52,7 +34,7 @@ namespace TecEnergy.Database.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("EnergyMeterID")
+                    b.Property<Guid?>("EnergyMeterID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Value")
@@ -98,49 +80,18 @@ namespace TecEnergy.Database.Migrations
                     b.ToTable("EnergyMeters");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BuildingID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RoomComment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RoomName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildingID");
-
-                    b.ToTable("Rooms");
-                });
-
             modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyData", b =>
                 {
                     b.HasOne("TecEnergy.Database.DataModels.EnergyMeter", "EnergyMeter")
-                        .WithMany()
-                        .HasForeignKey("EnergyMeterID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("EnergyDatas")
+                        .HasForeignKey("EnergyMeterID");
 
                     b.Navigation("EnergyMeter");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
                 {
-                    b.HasOne("TecEnergy.Database.DataModels.Building", "Building")
-                        .WithMany()
-                        .HasForeignKey("BuildingID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Building");
+                    b.Navigation("EnergyDatas");
                 });
 #pragma warning restore 612, 618
         }

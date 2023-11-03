@@ -8,6 +8,7 @@ namespace TecEnergy.Database.DataModels;
 public class Building
 {
     public Guid Id { get; set; }
-    public string BuildingName { get; set; } // Ballerup, Hvidovre, frederiksberg
+    public string? BuildingName { get; set; } // Ballerup, Hvidovre, frederiksberg
     public string? Address { get; set; }
+    public List<Room>? Rooms { get; set; } 
 }

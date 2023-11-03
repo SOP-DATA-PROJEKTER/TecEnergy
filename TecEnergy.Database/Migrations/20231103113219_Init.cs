@@ -12,24 +12,10 @@ namespace TecEnergy.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Buildings",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BuildingName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Buildings", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EnergyMeters",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoomID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ConnectionState = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReadingFrequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MeasurementPointName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -43,31 +29,11 @@ namespace TecEnergy.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rooms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoomName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoomComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuildingID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rooms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Rooms_Buildings_BuildingID",
-                        column: x => x.BuildingID,
-                        principalTable: "Buildings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EnergyData",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EnergyMeterID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EnergyMeterID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -78,19 +44,13 @@ namespace TecEnergy.Database.Migrations
                         name: "FK_EnergyData_EnergyMeters_EnergyMeterID",
                         column: x => x.EnergyMeterID,
                         principalTable: "EnergyMeters",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EnergyData_EnergyMeterID",
                 table: "EnergyData",
                 column: "EnergyMeterID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Rooms_BuildingID",
-                table: "Rooms",
-                column: "BuildingID");
         }
 
         /// <inheritdoc />
@@ -100,13 +60,7 @@ namespace TecEnergy.Database.Migrations
                 name: "EnergyData");
 
             migrationBuilder.DropTable(
-                name: "Rooms");
-
-            migrationBuilder.DropTable(
                 name: "EnergyMeters");
-
-            migrationBuilder.DropTable(
-                name: "Buildings");
         }
     }
 }

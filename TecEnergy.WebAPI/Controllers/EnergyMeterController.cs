@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Repositories;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -43,7 +44,10 @@ public class EnergyMeterController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, EnergyMeter updateResource)
     {
-        if (id != updateResource.Id) return BadRequest();
+        if (id != updateResource.Id) return BadRequest(); 
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var existingEnergyMeter = await _repository.GetByIdAsync(id);
+        if (existingEnergyMeter is null) return NotFound("EnergyMeter Not Found");
         await _repository.UpdateAsync(updateResource);
         return NoContent();
     }
