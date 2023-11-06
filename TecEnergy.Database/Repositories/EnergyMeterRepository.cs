@@ -27,6 +27,13 @@ public class EnergyMeterRepository : IEnergyMeterRepository
         return await _context.EnergyMeters.FindAsync(id);
     }
 
+    public async Task<EnergyMeter> GetByIdWithDataAsync(Guid id)
+    {
+        return await _context.EnergyMeters.
+            Include(x => x.EnergyDatas)
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task AddAsync(EnergyMeter energyMeter)
     {
         _context.EnergyMeters.Add(energyMeter);

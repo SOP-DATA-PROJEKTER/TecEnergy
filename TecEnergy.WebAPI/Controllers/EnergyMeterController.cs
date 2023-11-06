@@ -31,6 +31,14 @@ public class EnergyMeterController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("WithData/{id}")]
+    public async Task<ActionResult<EnergyMeter>> GetByIdWtihDataAsync(Guid id)
+    {
+        var result = await _repository.GetByIdWithDataAsync(id);
+        if (result is null) return NotFound();
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<ActionResult<EnergyMeter>> CreateAsync(EnergyMeter energyMeter)
     {
