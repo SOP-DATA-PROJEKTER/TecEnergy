@@ -38,6 +38,7 @@ public class EnergyDataController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
     {
+        energyData.DateTime = DateTimeOffset.UtcNow.UtcDateTime;
         await _repository.AddAsync(energyData);
         //return CreatedAtAction("GetByIdAsync", new { id = createResource.Id }, createResource);
         return Ok(energyData);
