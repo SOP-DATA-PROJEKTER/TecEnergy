@@ -26,32 +26,21 @@ public class EnergyDataController : ControllerBase
     public async Task<ActionResult<EnergyData>> GetByIdAsync(Guid id)
     {
         var result = await _repository.GetByIdAsync(id);
-
-        if (result == null)
-        {
-            return NotFound();
-        }
-
+        if (result is null) return NotFound();
         return Ok(result);
     }
 
     [HttpPost]
     public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
     {
-        energyData.DateTime = DateTimeOffset.UtcNow.UtcDateTime;
         await _repository.AddAsync(energyData);
-        //return CreatedAtAction("GetByIdAsync", new { id = createResource.Id }, createResource);
         return Ok(energyData);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(Guid id, EnergyData updateResource)
     {
-        if (id != updateResource.Id)
-        {
-            return BadRequest();
-        }
-
+        if (id != updateResource.Id) return BadRequest();
         await _repository.UpdateAsync(updateResource);
         return NoContent();
     }

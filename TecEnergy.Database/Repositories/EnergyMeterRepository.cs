@@ -29,21 +29,21 @@ public class EnergyMeterRepository : IEnergyMeterRepository
 
     public async Task<EnergyMeter> GetByIdWithDataAsync(Guid id)
     {
-        return await _context.EnergyMeters.
-            Include(x => x.EnergyDatas)
+        return await _context.EnergyMeters
+            .Include(x => x.EnergyDatas)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task AddAsync(EnergyMeter energyMeter)
     {
-        _context.EnergyMeters.Add(energyMeter);
+        await _context.EnergyMeters.AddAsync(energyMeter);
         await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(EnergyMeter energyMeter)
     {
-        //_context.Entry(energyMeter).State = EntityState.Modified;
-        _context.Update(energyMeter);
+        _context.Entry(energyMeter).State = EntityState.Modified;
+        //_context.Update(energyMeter);
         await _context.SaveChangesAsync();
     }
 

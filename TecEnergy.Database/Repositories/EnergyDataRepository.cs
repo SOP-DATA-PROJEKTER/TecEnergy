@@ -11,11 +11,7 @@ namespace TecEnergy.Database.Repositories;
 public class EnergyDataRepository : IEnergyDataRepository
 {
     private readonly DatabaseContext _context;
-
-    public EnergyDataRepository(DatabaseContext context)
-    {
-        _context = context;
-    }
+    public EnergyDataRepository(DatabaseContext context) => _context = context;
 
     public async Task<IEnumerable<EnergyData>> GetAllAsync()
     {
@@ -29,7 +25,8 @@ public class EnergyDataRepository : IEnergyDataRepository
 
     public async Task AddAsync(EnergyData energyData)
     {
-        _context.EnergyData.Add(energyData);
+        energyData.DateTime = DateTimeOffset.UtcNow.UtcDateTime;
+        await _context.EnergyData.AddAsync(energyData);
         await _context.SaveChangesAsync();
     }
 
@@ -42,7 +39,7 @@ public class EnergyDataRepository : IEnergyDataRepository
     public async Task DeleteAsync(Guid id)
     {
         var energyData = await _context.EnergyData.FindAsync(id);
-        if (energyData != null)
+        if (energyData is not null)
         {
             _context.EnergyData.Remove(energyData);
             await _context.SaveChangesAsync();
