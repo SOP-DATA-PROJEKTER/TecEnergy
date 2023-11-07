@@ -21,8 +21,8 @@ public class Program
         builder.Services.AddDbContext<DatabaseContext>(
                  o => o.UseSqlServer(cs));
 
-        //builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
-        //builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+        builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
+        builder.Services.AddScoped<IRoomRepository, RoomRepository>();
         builder.Services.AddScoped<IEnergyMeterRepository, EnergyMeterRepository>();
         builder.Services.AddScoped<IEnergyDataRepository, EnergyDataRepository>();
 
@@ -41,12 +41,11 @@ public class Program
 
         var app = builder.Build();
 
+       
         // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         app.UseHttpsRedirection();
 

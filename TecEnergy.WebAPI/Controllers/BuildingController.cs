@@ -35,6 +35,19 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("WithRooms/{id}")]
+    public async Task<ActionResult<Building>> GetByIdWithRoomsAsync(Guid id)
+    {
+        var result = await _repository.GetByIdWithRoomsAsync(id);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Building>> CreateAsync(Building createResource)
     {

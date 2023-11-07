@@ -28,12 +28,15 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<Room>> GetByIdAsync(Guid id)
     {
         var result = await _repository.GetByIdAsync(id);
+        if (result is null) return NotFound();
+        return Ok(result);
+    }
 
-        if (result == null)
-        {
-            return NotFound();
-        }
-
+    [HttpGet("WithEnergyMeters/{id}")]
+    public async Task<ActionResult<Room>> GetByIdWithEnergyMetersAsync(Guid id)
+    {
+        var result = await _repository.GetByIdWithEnergyMetersAsync(id);
+        if (result is null) return NotFound();
         return Ok(result);
     }
 

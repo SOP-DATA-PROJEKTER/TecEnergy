@@ -12,5 +12,5 @@ public class Room
     public string? RoomName { get; set; }// E213
     public string? RoomComment { get; set; } //specify rooms purpose, department etc..
     public Building? Building { get; set; }
-    //public List<EnergyMeter>? EnergyMeters { get; set; }
+    public List<EnergyMeter>? EnergyMeters { get; set; }
 }

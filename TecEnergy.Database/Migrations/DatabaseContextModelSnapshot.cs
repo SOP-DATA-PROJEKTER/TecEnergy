@@ -22,6 +22,23 @@ namespace TecEnergy.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("TecEnergy.Database.DataModels.Building", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BuildingName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Buildings");
+                });
+
             modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyData", b =>
                 {
                     b.Property<Guid>("Id")
@@ -68,9 +85,36 @@ namespace TecEnergy.Database.Migrations
                     b.Property<string>("ReadingFrequency")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("RoomID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("RoomID");
+
                     b.ToTable("EnergyMeters");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BuildingID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoomComment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoomName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildingID");
+
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyData", b =>
@@ -86,7 +130,35 @@ namespace TecEnergy.Database.Migrations
 
             modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
                 {
+                    b.HasOne("TecEnergy.Database.DataModels.Room", "Room")
+                        .WithMany("EnergyMeters")
+                        .HasForeignKey("RoomID");
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+                {
+                    b.HasOne("TecEnergy.Database.DataModels.Building", "Building")
+                        .WithMany("Rooms")
+                        .HasForeignKey("BuildingID");
+
+                    b.Navigation("Building");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.DataModels.Building", b =>
+                {
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
+                {
                     b.Navigation("EnergyDatas");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+                {
+                    b.Navigation("EnergyMeters");
                 });
 #pragma warning restore 612, 618
         }
