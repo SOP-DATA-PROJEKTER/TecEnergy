@@ -57,7 +57,7 @@ public class BuildingController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, Building updateResource)
+    public async Task<IActionResult> PutAsync(Guid id, Building updateResource)
     {
         if (id != updateResource.Id)
         {
@@ -69,7 +69,7 @@ public class BuildingController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
         return NoContent();

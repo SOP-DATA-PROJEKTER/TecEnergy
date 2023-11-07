@@ -44,27 +44,24 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<Room>> CreateAsync(Room room)
     {
         if (room.BuildingID == Guid.Empty) return BadRequest("Missing Building Id.");
-        var building = await _buildingRepository.GetByIdAsync(room.BuildingID);
-        //if (!await _buildingRepository.(room.BuildingID)) return NotFound("Building not found.");
+        if (_buildingRepository.GetByIdAsync(room.BuildingID) is null) return NotFound("Building Id for room does not exists");
         await _repository.AddAsync(room);
-        //return CreatedAtAction("GetBuilding", new { id = room.Id }, room);
         return Ok(room);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, Room updateResource)
+    public async Task<IActionResult> PutAsync(Guid id, Room updateResource)
     {
-        if (id != updateResource.Id)
-        {
-            return BadRequest();
-        }
-
+        if (id != updateResource.Id) return BadRequest();
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var existingEnergyMeter = await _repository.GetByIdAsync(id);
+        if (existingEnergyMeter is null) return NotFound("Room Not Found");
         await _repository.UpdateAsync(updateResource);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
         return NoContent();

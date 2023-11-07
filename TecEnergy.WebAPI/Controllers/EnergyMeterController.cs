@@ -50,7 +50,7 @@ public class EnergyMeterController : ControllerBase
 
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, EnergyMeter updateResource)
+    public async Task<IActionResult> PutAsync(Guid id, EnergyMeter updateResource)
     {
         if (id != updateResource.Id) return BadRequest(); 
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -61,7 +61,7 @@ public class EnergyMeterController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
         return NoContent();

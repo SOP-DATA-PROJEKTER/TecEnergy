@@ -33,12 +33,14 @@ public class EnergyDataController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
     {
+        if (energyData.EnergyMeterID == Guid.Empty) return BadRequest("Missing Energy Meter Id.");
+        //another check here missing for if the energymeter exists
         await _repository.AddAsync(energyData);
         return Ok(energyData);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, EnergyData updateResource)
+    public async Task<IActionResult> PutAsync(Guid id, EnergyData updateResource)
     {
         if (id != updateResource.Id) return BadRequest();
         await _repository.UpdateAsync(updateResource);
@@ -46,7 +48,7 @@ public class EnergyDataController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
         return NoContent();
