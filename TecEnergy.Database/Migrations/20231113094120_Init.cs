@@ -48,20 +48,20 @@ namespace TecEnergy.Database.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoomID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ConnectionState = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReadingFrequency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MeasurementPointName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MeasurementType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstallmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    MeasurementPointComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    MeasurementPointComment = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EnergyMeters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EnergyMeters_Rooms_RoomId",
-                        column: x => x.RoomId,
+                        name: "FK_EnergyMeters_Rooms_RoomID",
+                        column: x => x.RoomID,
                         principalTable: "Rooms",
                         principalColumn: "Id");
                 });
@@ -92,9 +92,9 @@ namespace TecEnergy.Database.Migrations
                 column: "EnergyMeterID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EnergyMeters_RoomId",
+                name: "IX_EnergyMeters_RoomID",
                 table: "EnergyMeters",
-                column: "RoomId");
+                column: "RoomID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_BuildingID",

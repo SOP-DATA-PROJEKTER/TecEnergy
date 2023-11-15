@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TecEnergy.Database.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
@@ -31,12 +34,33 @@ public class EnergyDataController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
+    //public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
+    //{
+    //    if (energyData.EnergyMeterID == Guid.Empty) return BadRequest("Missing Energy Meter Id.");
+    //    //another check here missing for if the energymeter exists
+    //    await _repository.AddAsync(energyData);
+    //    return Ok(energyData);
+    //}
+    public async Task<ActionResult<IEnumerable<EnergyData>>> CreateAsync([FromBody] IEnumerable<EnergyData> energyDataList)
     {
-        if (energyData.EnergyMeterID == Guid.Empty) return BadRequest("Missing Energy Meter Id.");
-        //another check here missing for if the energymeter exists
-        await _repository.AddAsync(energyData);
-        return Ok(energyData);
+        if (energyDataList == null || !ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        foreach (var energyData in energyDataList)
+        {
+            if (energyData.EnergyMeterID == Guid.Empty)
+            {
+                ModelState.AddModelError(nameof(EnergyData.EnergyMeterID), "Missing Energy Meter Id.");
+                return BadRequest(ModelState);
+            }
+
+            // Another check here missing for if the energymeter exists
+            await _repository.AddAsync(energyData);
+        }
+
+        return Ok(energyDataList);
     }
 
     [HttpPut("{id}")]

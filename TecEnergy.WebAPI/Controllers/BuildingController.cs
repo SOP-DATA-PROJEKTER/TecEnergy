@@ -22,6 +22,7 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
+
     [HttpGet("{id}")]
     public async Task<ActionResult<Building>> GetByIdAsync(Guid id)
     {
@@ -48,7 +49,7 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
+    [HttpPost("LOL")]
     public async Task<ActionResult<Building>> CreateAsync(Building createResource)
     {
         await _repository.AddAsync(createResource);

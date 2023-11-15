@@ -12,7 +12,7 @@ using TecEnergy.Database;
 namespace TecEnergy.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231107095508_Init")]
+    [Migration("20231113094120_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -88,12 +88,12 @@ namespace TecEnergy.Database.Migrations
                     b.Property<string>("ReadingFrequency")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("RoomId")
+                    b.Property<Guid?>("RoomID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("RoomID");
 
                     b.ToTable("EnergyMeters");
                 });
@@ -135,7 +135,7 @@ namespace TecEnergy.Database.Migrations
                 {
                     b.HasOne("TecEnergy.Database.DataModels.Room", "Room")
                         .WithMany("EnergyMeters")
-                        .HasForeignKey("RoomId");
+                        .HasForeignKey("RoomID");
 
                     b.Navigation("Room");
                 });
