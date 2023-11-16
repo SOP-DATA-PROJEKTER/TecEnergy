@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecEnergy.WepApi", "TecEnergy.WepApi\TecEnergy.WepApi.csproj", "{8A1E0655-F9B0-4611-9FD4-88F19EB289DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecEnergy.Database", "TecEnergy.Database\TecEnergy.Database.csproj", "{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecEnergy.WebAPI", "TecEnergy.WebAPI\TecEnergy.WebAPI.csproj", "{49F801A3-D2E9-4777-85D7-227E7F82CFD4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8A1E0655-F9B0-4611-9FD4-88F19EB289DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A1E0655-F9B0-4611-9FD4-88F19EB289DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A1E0655-F9B0-4611-9FD4-88F19EB289DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A1E0655-F9B0-4611-9FD4-88F19EB289DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
