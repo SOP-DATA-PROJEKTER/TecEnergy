@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+nav{
+    background-color: gray;
+    height: 50px;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navItem{
+    margin: 5%;
+    height: 5vh;
+    width: 10vw;
+}
+
+body{
+    background-color: darkgray;
+}

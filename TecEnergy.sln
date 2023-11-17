@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecEnergy.Database", "TecEnergy.Database\TecEnergy.Database.csproj", "{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TecEnergy.Database", "TecEnergy.Database\TecEnergy.Database.csproj", "{8EAFB9CC-2C75-42DC-9B22-FE969AB3494B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecEnergy.WebAPI", "TecEnergy.WebAPI\TecEnergy.WebAPI.csproj", "{49F801A3-D2E9-4777-85D7-227E7F82CFD4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TecEnergy.WebAPI", "TecEnergy.WebAPI\TecEnergy.WebAPI.csproj", "{49F801A3-D2E9-4777-85D7-227E7F82CFD4}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TecEnergy.Raspberry", "TecEnergy.Raspberry\TecEnergy.Raspberry.pyproj", "{77996AE6-5890-467D-9DFF-555423839A00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,8 @@ Global
 		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77996AE6-5890-467D-9DFF-555423839A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77996AE6-5890-467D-9DFF-555423839A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
