@@ -56,4 +56,11 @@ public class EnergyMeterRepository : IEnergyMeterRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<IEnumerable<EnergyMeter>> SearchAsync(string searchInput)
+    {
+        return await _context.EnergyMeters
+            .Where(x => x.MeasurementPointName.Contains(searchInput) || x.MeasurementPointComment.Contains(searchInput))
+            .ToListAsync();
+    }
 }

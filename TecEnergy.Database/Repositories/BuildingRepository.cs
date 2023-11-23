@@ -23,6 +23,7 @@ public class BuildingRepository : IBuildingRepository
     {
         return await _context.Buildings.FindAsync(id);
     }
+
     public async Task<Building> GetByIdWithRoomsAsync(Guid? id)
     {
         return await _context.Buildings.Include(r => r.Rooms).FirstOrDefaultAsync(x => x.Id == id);
@@ -53,5 +54,12 @@ public class BuildingRepository : IBuildingRepository
     public async Task<bool> BuildingExistsAsync(Guid buildingId)
     {
         return await _context.Buildings.AnyAsync(b => b.Id == buildingId);
+    }
+
+    public async Task<IEnumerable<Building>> SearchAsync(string searchInput)
+    {
+        return await _context.Buildings
+            .Where(x => x.BuildingName.Contains(searchInput) || x.Address.Contains(searchInput))
+            .ToListAsync();
     }
 }

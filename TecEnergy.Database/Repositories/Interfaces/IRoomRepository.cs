@@ -10,4 +10,5 @@ public interface IRoomRepository
     Task AddAsync(Room room);
     Task UpdateAsync(Room room);
     Task DeleteAsync(Guid id);
+    Task<IEnumerable<Room>> SearchAsync(string searchInput);
 }
