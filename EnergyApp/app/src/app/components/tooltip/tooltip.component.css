@@ -10,6 +10,8 @@
     transform: translate(-50%,-100%);
     padding: 10px;
     border-radius: 5px;
+    opacity: 0;
+    transition: opacity .3s ease-in-out .5s;
 }
 
 .tooltip::after

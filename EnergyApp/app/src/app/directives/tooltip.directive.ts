@@ -29,6 +29,7 @@ export class TooltipDirective {
     this.tooltipComponent.instance.text = this.tooltipText;
   }
 
+  @HostListener('click')
   @HostListener('mouseleave')
   onMouseLeave():void
   {
@@ -40,6 +41,7 @@ export class TooltipDirective {
     this.viewContainerRef.clear();
     this.tooltipComponent = undefined;
   }
+
 
   constructor(
     private viewContainerRef: ViewContainerRef,
