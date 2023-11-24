@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,900&display=swap');
+
+nav
+{
+    width: 100%;
+    height: 100px;
+    background-color: rgb(36, 36, 36);
+    box-shadow: 0 0 20px black;
+    display: flex;
+    align-items: center;
+    padding: 0 25px;
+    color: whitesmoke;
+    font-family: 'Poppins', sans-serif;
+    position: fixed;
+    top: 0;
+}
+
+#Logo
+{
+    width: 30%;
+}
+
+#Title
+{
+    font-size: 36px;
+    line-height: 1;
+    width:60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#Menu
+{
+    width: 30%;
+    display: flex;
+    justify-content: end;
+    font-size: 18px;
+}

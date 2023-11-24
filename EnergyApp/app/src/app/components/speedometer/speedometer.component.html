@@ -1,0 +1,30 @@
+<!-- <div class="Container">
+    <div #inner class="Inner">
+        <div *ngFor="let Tick of Ticks; index as i;" class="Tick" 
+        [style]="SetTick(Tick,inner.offsetHeight)">
+        </div>
+        <div class="Display">
+            <div class="Current">
+                <div [style]="'font-size:'+ fontSize +'px;'"></div>
+                <div [style]="'font-size:'+ fontSize / 2 +'px;'">kWh</div>
+            </div>
+            <h2 [style.fontSize.px]="fontSize / 3">{{Data.Name}}</h2>
+            <h3 [style.fontSize.px]="fontSize / 5">{{Data.Accumulated.toLocaleString()}}kWh</h3>
+        </div>
+    </div>
+    <div *ngIf="HasNote()" id="Note">{{Data.Note}}</div>
+</div>  -->
+
+<div id="Container">
+    <div #Circle id="Circle">
+        <div *ngFor="let Tick of Ticks; index as i;"
+        [ngStyle]="SetTick(Tick)">
+        </div>
+    </div>
+    <div #Display id="Display">
+        <h2 tooltip tooltipText="Gå til grafer for måleren" [ngStyle]="getFontSize(1)">{{Data.Current.toLocaleString()}}</h2>
+        <div [ngStyle]="getLineHeight()"  id="Line"></div>
+        <h3 [ngStyle]="getFontSize(4)">{{Data.Accumulated.toLocaleString()}}</h3>
+    </div>
+    <h1 id="Name" [ngStyle]="getFontSize(3)">{{Data.Name}}</h1>
+</div> 

@@ -1,0 +1,29 @@
+<div id="Board">
+    <!-- speedomterView -->
+    <div id="SubMeters" *ngIf="!ShowListView()">
+        <div class="SubMeter" *ngFor="let meter of SubMeters; index as i;">
+            <div tooltip class="Light"></div>
+            <img tooltip tooltipText="Gå til grafer for måleren" class="GraphButton" src="assets\GraphIcon.png" (click)="TestGoToDetails()">
+            <app-speedometer [Data]="meter"></app-speedometer>
+        </div>
+    </div>
+    <!-- ListView -->
+    <div id="ListMeters" *ngIf="ShowListView()">
+        <div id="ListHeaders">
+            <h2>NAVN</h2>
+            <h2>SAMLET</h2>
+            <h2>NUVÆRENDE</h2>
+        </div>
+        <div id="ListScroll">
+            <div *ngFor="let meter of SubMeters; index as i;">
+                <app-meterlist-item [Data]="meter"></app-meterlist-item>
+            </div>
+        </div>
+    </div>
+    <!-- MainMeter -->
+    <div id="MainMeter">
+        <div tooltip tooltipText="Tændt" class="Light" ></div>
+        <img tooltip tooltipText="Gå til grafer for måleren" class="GraphButton" src="assets\GraphIcon.png" (click)="TestGoToDetails()">
+        <app-speedometer [Data]="MainMeter"></app-speedometer>
+    </div>
+</div>

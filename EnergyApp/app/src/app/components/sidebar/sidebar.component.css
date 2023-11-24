@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,900&display=swap');
+
+nav
+{
+    width: 125px;
+    height: 100%;
+    background-color: rgb(24, 24, 24);
+    box-shadow: 0 0 20px black;
+    display: flex;
+    flex-direction: column;
+    align-items: top;
+    color: whitesmoke;
+    font-family: 'Poppins', sans-serif;
+    position: fixed;
+    top: 100px;
+    left: 0;
+}
+
+.Wrapper
+{
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 10%;
+}
+
+.Active
+{
+    color: greenyellow;
+}
+
+.Circle
+{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: radial-gradient(#444, #222);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    box-shadow: 0 0 10px rgba(0, 0,0, 0.5);
+    z-index: 1;
+    cursor: pointer;
+}
+
+/* Pseudo element trick to achieve a trasition in the background and boxshadow */
+.Circle::before
+{
+    position: absolute;
+    content: '';
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: radial-gradient(rgb(90, 90, 90), rgb(56, 56, 56));
+    box-shadow: 0 0 30px rgba(0, 0,0, 0.8);
+    border-radius: 50%;
+    z-index: -1;
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0;
+}
+
+.Circle:hover::before 
+{
+    opacity: 1;
+}

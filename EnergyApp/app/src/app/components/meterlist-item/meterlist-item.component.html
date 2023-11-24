@@ -1,0 +1,10 @@
+
+<div id="Container">
+    <h3>{{Data.Name}}</h3>
+    <h3>{{Data.Accumulated}}kWh</h3>
+    <h3>{{Data.Current}}kWh</h3>
+    <div id="TickContainer">
+        <div [ngClass]="{'Active' : Tick < Data.Current}" *ngFor="let Tick of Ticks; index as i;" class="Tick"></div>
+    </div>
+    <div *ngIf="HasNote()" id="Note">{{Data.Note}}</div>
+</div>
