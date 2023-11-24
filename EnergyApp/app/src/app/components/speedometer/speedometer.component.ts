@@ -7,6 +7,7 @@ import { TooltipDirective } from 'src/app/directives/tooltip.directive';
 interface Tick
 {
   rotation : number;
+  index : number;
   value : number;
 }
 
@@ -19,6 +20,8 @@ interface Tick
 })
 export class SpeedometerComponent
 {
+  @Input() TopValue = 60;
+
   Ticks : Tick[] = [];
 
   fontSize : number = 110;
@@ -40,9 +43,11 @@ export class SpeedometerComponent
   
   constructor() 
   {
+    var tickInterval = this.TopValue / 60;
+
     for ( var i = 0; i < 61; i++)
     {
-      this.Ticks.push({ rotation:4 * i - 120, value: i});
+      this.Ticks.push({ rotation:4 * i - 120, index : i , value: i * tickInterval});
     }
   }
 
@@ -80,12 +85,12 @@ export class SpeedometerComponent
       'left': '50%',
       'top': '0',
       'width': `${this.tickWidth}px`,
-      'height': `${tick.value % 10 === 0 ? 15 : 10}%`,
+      'height': `${tick.index % 10 === 0 ? 15 : 10}%`,
       'transform-origin': `0 ${this.halfCircleHeight}px`,
       'transform': `rotate(${tick.rotation}deg)`
     };
 
-    if(this.Data.Current >= 60)
+    if(this.Data.Current >= this.TopValue)
     {
       baseStyles['background-color'] = this.maxColor;
       (baseStyles as any)['box-shadow'] = `0 0 25px ${this.maxColor}, 0 0 50px ${this.maxColor}`;
@@ -98,13 +103,5 @@ export class SpeedometerComponent
     }
 
     return baseStyles;
-  }
-
-  HasNote() : boolean
-  {
-    if(this.Data.Note != undefined && this.Data.Note != "")
-      return true;
-
-    return false;
   }
 }
