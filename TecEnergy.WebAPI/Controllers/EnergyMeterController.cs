@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories;
 using TecEnergy.Database.Repositories.Interfaces;
 
@@ -24,12 +25,20 @@ public class EnergyMeterController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id)
+    public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id, DateTime startDate, DateTime endTime)
     {
-        var result = await _repository.GetByIdAsync(id);
+        var result = await _repository.GetByIdDatetimeAsync(id, startDate, endTime);
         if (result is null) return NotFound();
         return Ok(result);
     }
+
+    //[HttpGet("{id}")]
+    //public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id, DateTime startDate, DateTime endTime)
+    //{
+    //    var result = await _repository.GetByIdDatetimeAsync(id, startDate, endTime);
+    //    if (result is null) return NotFound();
+    //    return Ok(result);
+    //}
 
     [HttpGet("WithData/{id}")]
     public async Task<ActionResult<EnergyMeter>> GetByIdWtihDataAsync(Guid id)

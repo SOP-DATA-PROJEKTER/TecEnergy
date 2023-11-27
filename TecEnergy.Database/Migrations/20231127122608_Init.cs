@@ -49,7 +49,8 @@ namespace TecEnergy.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ConnectionState = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConnectionState = table.Column<bool>(type: "bit", nullable: true),
+                    LastConnectionStateChange = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ReadingFrequency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MeasurementPointName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MeasurementType = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -72,8 +73,8 @@ namespace TecEnergy.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EnergyMeterID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AccumulatedValue = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

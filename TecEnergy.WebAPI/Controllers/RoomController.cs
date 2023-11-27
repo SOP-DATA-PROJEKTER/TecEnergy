@@ -44,7 +44,7 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<Room>> CreateAsync(Room room)
     {
         if (room.BuildingID == Guid.Empty) return BadRequest("Missing Building Id.");
-        if (_buildingRepository.GetByIdAsync(room.BuildingID) is null) return NotFound("Building Id for room does not exists");
+        if (await _buildingRepository.GetByIdAsync(room.BuildingID) is null) return NotFound("Building Id for room does not exists");
         await _repository.AddAsync(room);
         return Ok(room);
     }
