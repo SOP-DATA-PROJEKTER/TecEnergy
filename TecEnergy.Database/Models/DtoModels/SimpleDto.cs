@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TecEnergy.Database.Models.DtoModels;
-public class SimpleSourceDto
+public class SimpleDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
