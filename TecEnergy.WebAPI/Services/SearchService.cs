@@ -31,6 +31,7 @@ public class SearchService
         {
             Id = x.Id,
             Name = x.BuildingName,
+            Description = x.Address,
             ModelType = ModelType.Building
         }));
 
@@ -39,6 +40,7 @@ public class SearchService
         {
             Id = x.Id,
             Name = x.RoomName,
+            Description = x.RoomComment,
             ModelType = ModelType.Room
         }));
 
@@ -47,6 +49,7 @@ public class SearchService
         {
             Id = x.Id,
             Name = x.MeasurementPointName,
+            Description = x.MeasurementPointComment,
             ModelType = ModelType.EnergyMeter
         }));
 
