@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MeterData } from 'src/app/models/MeterData';
 import { TooltipDirective } from 'src/app/directives/tooltip.directive';
