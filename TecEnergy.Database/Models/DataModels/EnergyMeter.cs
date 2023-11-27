@@ -9,7 +9,8 @@ public class EnergyMeter
 {
     public Guid Id { get; set; }
     public Guid? RoomID { get; set; }
-    public string? ConnectionState { get; set; } //connected, Not connected, error 
+    public bool? ConnectionState { get; set; } //connected, Not connected 
+    public DateTime? LastConnectionStateChange { get; set; }
     public string? ReadingFrequency { get; set; } //how oftens it reads impulses (realtime or accumulated)
     public string? MeasurementPointName { get; set; } //f.x. GPIO4 or position in energycabin
     public string? MeasurementType { get; set; } //real-time or accumulated
