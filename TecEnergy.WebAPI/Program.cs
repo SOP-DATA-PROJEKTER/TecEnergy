@@ -1,11 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TecEnergy.Database;
-using TecEnergy.Database.DataModels;
 using TecEnergy.Database.Repositories;
 using TecEnergy.Database.Repositories.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using TecEnergy.WebAPI.Services;
 
 namespace TecEnergy.WebAPI;

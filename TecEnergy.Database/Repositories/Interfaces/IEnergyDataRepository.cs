@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 
 namespace TecEnergy.Database.Repositories.Interfaces;
 public interface IEnergyDataRepository

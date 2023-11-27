@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -49,7 +49,7 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("LOL")]
+    [HttpPost]
     public async Task<ActionResult<Building>> CreateAsync(Building createResource)
     {
         await _repository.AddAsync(createResource);

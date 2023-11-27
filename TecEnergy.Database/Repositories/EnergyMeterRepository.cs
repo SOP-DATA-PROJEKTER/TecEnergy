@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -56,7 +56,6 @@ public class EnergyMeterRepository : IEnergyMeterRepository
             await _context.SaveChangesAsync();
         }
     }
-
     public async Task<IEnumerable<EnergyMeter>> SearchAsync(string searchInput)
     {
         return await _context.EnergyMeters

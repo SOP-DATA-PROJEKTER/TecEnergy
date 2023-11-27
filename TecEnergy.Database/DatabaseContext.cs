@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TecEnergy.Database;

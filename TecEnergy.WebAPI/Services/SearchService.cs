@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Services;
 using System.ComponentModel;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories;
 using TecEnergy.Database.Repositories.Interfaces;
 

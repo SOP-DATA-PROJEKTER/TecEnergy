@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;

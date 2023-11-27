@@ -1,4 +1,4 @@
-﻿using TecEnergy.Database.DataModels;
+﻿using TecEnergy.Database.Models.DataModels;
 
 namespace TecEnergy.Database.Repositories.Interfaces;
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TecEnergy.Database.DataModels;
+namespace TecEnergy.Database.Models.DataModels;
 public class EnergyMeter
 {
     public Guid Id { get; set; }

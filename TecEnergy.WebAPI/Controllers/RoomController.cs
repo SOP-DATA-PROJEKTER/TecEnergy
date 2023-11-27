@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;
