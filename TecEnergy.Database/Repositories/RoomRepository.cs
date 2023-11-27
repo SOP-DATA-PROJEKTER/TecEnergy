@@ -53,4 +53,11 @@ public class RoomRepository : IRoomRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<IEnumerable<Room>> SearchAsync(string searchInput)
+    {
+        return await _context.Rooms
+            .Where(x => x.RoomName.Contains(searchInput) || x.RoomComment.Contains(searchInput))
+            .ToListAsync();
+    }
 }

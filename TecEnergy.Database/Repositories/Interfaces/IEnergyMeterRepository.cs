@@ -10,4 +10,5 @@ public interface IEnergyMeterRepository
     Task AddAsync(EnergyMeter building);
     Task UpdateAsync(EnergyMeter building);
     Task DeleteAsync(Guid id);
+    Task<IEnumerable<EnergyMeter>> SearchAsync(string searchInput);
 }

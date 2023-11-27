@@ -22,4 +22,8 @@
     <ProjectReference Include="..\TecEnergy.Database\TecEnergy.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Interfaces\" />
+  </ItemGroup>
+
 </Project>
