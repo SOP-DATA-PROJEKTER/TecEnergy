@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Services;
+using TecEnergy.Database.DataModels;
 using TecEnergy.WebAPI.Services;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -16,7 +16,7 @@ public class SearchController : ControllerBase
     }
 
     [HttpGet("{searchInput}")]
-    public async Task<ActionResult<IEnumerable<SearchResult>>> GetBySearch(string searchInput)
+    public async Task<ActionResult<IEnumerable<SearchResultDto>>> GetBySearch(string searchInput)
     {
         if (string.IsNullOrEmpty(searchInput)) return BadRequest("Search request is empty or not filled");
         var result = await _searchService.PerformSearch(searchInput);

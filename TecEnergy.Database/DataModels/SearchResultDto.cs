@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TecEnergy.Database.DataModels;
-public class SearchResult
+public class SearchResultDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
