@@ -4,33 +4,41 @@ using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories;
 using TecEnergy.Database.Repositories.Interfaces;
+using TecEnergy.WebAPI.Services;
 
 namespace TecEnergy.WebAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class EnergyMeterController : ControllerBase
 {
-    private readonly IEnergyMeterRepository _repository;
-
-    public EnergyMeterController(IEnergyMeterRepository repository)
+    //private readonly IEnergyMeterRepository _repository;
+    private readonly EnergyMeterService _service;
+    public EnergyMeterController(EnergyMeterService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnergyMeter>>> GetAllAsync()
     {
-        var result = await _repository.GetAllAsync();
+        var result = await _service.GetAllAsync();
         return Ok(result);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id, DateTime startDate, DateTime endTime)
-    {
-        var result = await _repository.GetByIdDatetimeAsync(id, startDate, endTime);
-        if (result is null) return NotFound();
-        return Ok(result);
-    }
+    //[HttpGet("{id}")]
+    //public async Task<ActionResult<EnergyMeter>> GetByIdDateTimeAsync(Guid id, DateTime startDate, DateTime endTime)
+    //{
+    //    var result = await _service.GetByIdDatetimeAsync(id, startDate, endTime);
+    //    if (result is null) return NotFound();
+    //    return Ok(result);
+    //}
+
+    //[HttpGet("EnergyModel/{id}")]
+    //public async Task<ActionResult<EnergyDto>> GetById(Guid id, DateTime startDateTime, DateTime endDateTime)
+    //{
+    //    var result = await _service.GetByIdDatetimeAsync(id, startDateTime, endDateTime);
+
+    //}
 
     //[HttpGet("{id}")]
     //public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id, DateTime startDate, DateTime endTime)
@@ -43,7 +51,7 @@ public class EnergyMeterController : ControllerBase
     [HttpGet("WithData/{id}")]
     public async Task<ActionResult<EnergyMeter>> GetByIdWtihDataAsync(Guid id)
     {
-        var result = await _repository.GetByIdWithDataAsync(id);
+        var result = await _service.GetByIdWithDataAsync(id);
         if (result is null) return NotFound();
         return Ok(result);
     }
@@ -52,7 +60,7 @@ public class EnergyMeterController : ControllerBase
     public async Task<ActionResult<EnergyMeter>> CreateAsync(EnergyMeter energyMeter)
     {
         if (energyMeter is null) return BadRequest("Invalid input data.");
-        await _repository.AddAsync(energyMeter);
+        await _service.CreateAsync(energyMeter);
         //return CreatedAtAction(nameof(GetByIdAsync), new { id = energyMeter.Id }, energyMeter);
         return Ok(energyMeter);
     }
@@ -63,16 +71,16 @@ public class EnergyMeterController : ControllerBase
     {
         if (id != updateResource.Id) return BadRequest(); 
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var existingEnergyMeter = await _repository.GetByIdAsync(id);
+        var existingEnergyMeter = await _service.GetByIdAsync(id);
         if (existingEnergyMeter is null) return NotFound("EnergyMeter Not Found");
-        await _repository.UpdateAsync(updateResource);
+        await _service.UpdateAsync(id, updateResource);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        await _repository.DeleteAsync(id);
+        await _service.DeleteAsync(id);
         return NoContent();
     }
 }
