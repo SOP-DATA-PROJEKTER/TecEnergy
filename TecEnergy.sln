@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TecEnergy.WebAPI", "TecEner
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TecEnergy.Raspberry", "TecEnergy.Raspberry\TecEnergy.Raspberry.pyproj", "{77996AE6-5890-467D-9DFF-555423839A00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecEnergy.EnergySimulation", "TecEnergy.EnergySimulation\TecEnergy.EnergySimulation.csproj", "{6635C8CF-5B04-434E-A151-911099661306}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{49F801A3-D2E9-4777-85D7-227E7F82CFD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77996AE6-5890-467D-9DFF-555423839A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77996AE6-5890-467D-9DFF-555423839A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6635C8CF-5B04-434E-A151-911099661306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6635C8CF-5B04-434E-A151-911099661306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6635C8CF-5B04-434E-A151-911099661306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6635C8CF-5B04-434E-A151-911099661306}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -10,4 +10,12 @@ public class EnergyMeterMappings
         Id = energyMeter?.Id ?? Guid.Empty,
         Name = energyMeter?.MeasurementPointName ?? string.Empty
     };
+
+    public static EnergyDto EnergyMeterToEnergyDto(EnergyMeter energyMeter, double realtime, long accumulated) => new EnergyDto
+    {
+        Id = energyMeter.Id,
+        Name = energyMeter.MeasurementPointName,
+        RealTime = realtime,
+        Accumulated = accumulated
+    };
 }
