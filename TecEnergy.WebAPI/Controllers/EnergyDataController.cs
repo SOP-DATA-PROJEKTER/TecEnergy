@@ -33,6 +33,15 @@ public class EnergyDataController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("latest")]
+    public async Task<ActionResult<EnergyData>> GetLatestEnergyData()
+    {
+        var result = await _repository.GetLatestEnergyDataAsync();
+        await Console.Out.WriteLineAsync(   "32");
+        if (result is null) return NotFound();
+        return Ok(result);
+    }
+
     [HttpPost]
     //public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
     //{

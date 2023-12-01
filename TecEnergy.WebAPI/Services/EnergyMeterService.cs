@@ -42,6 +42,8 @@ public class EnergyMeterService
         return result;
     }
 
+
+
     public async Task CreateAsync(EnergyMeter energyMeter)
     {
         await _repository.AddAsync(energyMeter);
