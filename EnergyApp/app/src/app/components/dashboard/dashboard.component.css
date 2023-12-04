@@ -158,3 +158,28 @@
     background-position: center;
     cursor: pointer;
 }
+
+/* width */
+::-webkit-scrollbar 
+{
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track 
+{
+    background: rgb(20, 20, 20);
+}
+    
+/* Handle */
+::-webkit-scrollbar-thumb 
+{
+    background: rgb(100, 100, 100);
+    border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover 
+{
+    background: #c0c0c0;
+}
