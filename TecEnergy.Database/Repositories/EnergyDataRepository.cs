@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -21,6 +21,12 @@ public class EnergyDataRepository : IEnergyDataRepository
     public async Task<EnergyData> GetByIdAsync(Guid id)
     {
         return await _context.EnergyData.FindAsync(id);
+    }
+
+    //For the simulation to get the highest datetime and read the accumulatedvalue to set the appsettings configuration
+    public async Task<EnergyData> GetLatestEnergyDataAsync()
+    {
+        return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).LastOrDefaultAsync();
     }
 
     public async Task AddAsync(EnergyData energyData)
