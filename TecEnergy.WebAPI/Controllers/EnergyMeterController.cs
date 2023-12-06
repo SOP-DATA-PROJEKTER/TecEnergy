@@ -25,29 +25,6 @@ public class EnergyMeterController : ControllerBase
         return Ok(result);
     }
 
-    //[HttpGet("{id}")]
-    //public async Task<ActionResult<EnergyMeter>> GetByIdDateTimeAsync(Guid id, DateTime startDate, DateTime endTime)
-    //{
-    //    var result = await _service.GetByIdDatetimeAsync(id, startDate, endTime);
-    //    if (result is null) return NotFound();
-    //    return Ok(result);
-    //}
-
-    //[HttpGet("EnergyModel/{id}")]
-    //public async Task<ActionResult<EnergyDto>> GetById(Guid id, DateTime startDateTime, DateTime endDateTime)
-    //{
-    //    var result = await _service.GetByIdDatetimeAsync(id, startDateTime, endDateTime);
-
-    //}
-
-    //[HttpGet("{id}")]
-    //public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id, DateTime startDate, DateTime endTime)
-    //{
-    //    var result = await _repository.GetByIdDatetimeAsync(id, startDate, endTime);
-    //    if (result is null) return NotFound();
-    //    return Ok(result);
-    //}
-
     [HttpGet("WithData/{id}")]
     public async Task<ActionResult<EnergyMeter>> GetByIdWtihDataAsync(Guid id)
     {

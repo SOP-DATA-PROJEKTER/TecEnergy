@@ -38,7 +38,6 @@ public class EnergyMeterRepository : IEnergyMeterRepository
         energyMeter.EnergyDatas = datemeter;
         return energyMeter;
     }
-
     public async Task<EnergyMeter> GetByIdWithDataAsync(Guid id)
     {
         return await _context.EnergyMeters
