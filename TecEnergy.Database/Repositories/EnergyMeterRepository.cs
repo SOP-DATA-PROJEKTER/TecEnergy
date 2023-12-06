@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -31,8 +32,8 @@ public class EnergyMeterRepository : IEnergyMeterRepository
     public async Task<EnergyMeter> GetByIdDatetimeAsync(Guid id, DateTime startDate, DateTime endTime)
     {
         EnergyMeter energyMeter = new();
-        var meter = await _context.EnergyMeters.FindAsync(id);
-        var datemeter = meter.EnergyDatas.Where(x => x.DateTime < startDate && x.DateTime > endTime).ToList();
+        var meter = await _context.EnergyMeters.Include(x => x.EnergyDatas).Where(x => x.Id == id).FirstOrDefaultAsync();
+        var datemeter = meter.EnergyDatas.Where(x => x.DateTime > startDate && x.DateTime < endTime).ToList();
         energyMeter = meter;
         energyMeter.EnergyDatas = datemeter;
         return energyMeter;

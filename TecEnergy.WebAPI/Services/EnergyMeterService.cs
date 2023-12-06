@@ -24,18 +24,27 @@ public class EnergyMeterService
         var result = await _repository.GetByIdAsync(id);
         return result;
     }
-
     public async Task<EnergyDto> GetByIdDatetimeAsync(Guid id, DateTime startDateTime, DateTime endDateTime)
     {
         var result = await _repository.GetByIdDatetimeAsync(id, startDateTime, endDateTime);
         var energyDataAmount = result.EnergyDatas.Count();
-        var realtime = CalculationHelper.GetRealTimeKilowattsInHours(energyDataAmount, startDateTime, endDateTime);
-        var accumulated = 0;
+
+        var hoursInDouble = CalculationHelper.CalculateHoursToDouble(startDateTime, endDateTime);
+        var realtime = CalculationHelper.GetRealTimeKilowattsInHours(energyDataAmount, hoursInDouble);
+        //Func<DateTime, double> powerFunction = time => 50.0 * (time - DateTime.Now).TotalSeconds + 20.0;
+        //var accumulated = CalculationHelper.GetAccumulatedKilowattsInHours(powerFunction, startDateTime, endDateTime);
+        var energyDateAccumulated = GetByIdWithDataAsync(id).Result;
+        var energyDateAccumulatedCount = energyDateAccumulated.EnergyDatas.Count();
+        var accumulatedStartDateTime = energyDateAccumulated.EnergyDatas.OrderBy(x => x.AccumulatedValue).First().DateTime;
+        var accumulatedEndDateTime = energyDateAccumulated.EnergyDatas.OrderBy(x => x.AccumulatedValue).Last().DateTime;
+        var hoursInDoubleAcc = CalculationHelper.CalculateHoursToDouble(accumulatedStartDateTime, accumulatedEndDateTime);
+        var accumulated = CalculationHelper.GetRealTimeKilowattsInHours(energyDateAccumulatedCount, hoursInDoubleAcc);
+
+
         var energyDto = EnergyMeterMappings.EnergyMeterToEnergyDto(result, realtime, accumulated);
         return energyDto;
         //return result;
     }
-
     public async Task<EnergyMeter> GetByIdWithDataAsync(Guid id)
     {
         var result = await _repository.GetByIdWithDataAsync(id);

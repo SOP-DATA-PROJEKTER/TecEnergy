@@ -10,5 +10,5 @@ public class EnergyDto
     public Guid Id { get; set; }
     public string Name { get; set; }
     public double RealTime { get; set; }
-    public long Accumulated { get; set; }
+    public double Accumulated { get; set; }
 }

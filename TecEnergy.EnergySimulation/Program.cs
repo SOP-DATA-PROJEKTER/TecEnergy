@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Identity.Client;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -12,9 +13,11 @@ internal class Program
 {
     private static Timer _timer;
     private static readonly Random RandomGenerator = new Random();
+    private static int accCount;
 
     static void Main(string[] args)
     {
+        accCount = 0;
         Console.WriteLine("Background service started.");
 
         // Set up a timer to trigger the SendPostRequest method every 10 seconds
@@ -72,7 +75,7 @@ internal class Program
             Guid energyMeterId = Guid.Parse("CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB");
 
             // Simulate energy accumulation
-            long accumulatedValue = RandomGenerator.Next(1000, 5000);
+            long accumulatedValue = accCount++;
 
             // Create an object in the required format
             var energyDataObject = new
