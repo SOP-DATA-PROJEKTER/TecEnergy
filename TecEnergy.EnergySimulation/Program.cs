@@ -12,12 +12,11 @@ namespace TecEnergy.EnergySimulation;
 internal class Program
 {
     private static Timer _timer;
-    private static readonly Random RandomGenerator = new Random();
     private static int accCount;
 
     static void Main(string[] args)
     {
-        accCount = 0;
+        accCount = LoadAccCount();
         Console.WriteLine("Background service started.");
 
         // Set up a timer to trigger the SendPostRequest method every 10 seconds
@@ -49,7 +48,8 @@ internal class Program
                 // Check the response if needed
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"POST request sent successfully at {DateTime.Now}");
+                    Console.WriteLine($"POST request sent successfully at {DateTime.Now}, AccCount: {accCount}");
+                    SaveAccCount(accCount);
                 }
                 else
                 {
@@ -88,5 +88,38 @@ internal class Program
         }
 
         return energyDataBatch;
+    }
+
+    private static int LoadAccCount()
+    {
+        try
+        {
+            // Read the accCount value from a file
+            if (File.Exists("accCount.txt"))
+            {
+                string accCountStr = File.ReadAllText("accCount.txt");
+                return int.Parse(accCountStr);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading accCount: {ex.Message}");
+        }
+
+        // Return a default value if loading fails
+        return 0;
+    }
+
+    private static void SaveAccCount(int accCount)
+    {
+        try
+        {
+            // Save the accCount value to a file
+            File.WriteAllText("accCount.txt", accCount.ToString());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving accCount: {ex.Message}");
+        }
     }
 }
