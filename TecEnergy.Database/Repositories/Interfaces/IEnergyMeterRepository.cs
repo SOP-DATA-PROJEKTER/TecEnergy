@@ -1,4 +1,5 @@
-﻿using TecEnergy.Database.DataModels;
+﻿using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 
 namespace TecEnergy.Database.Repositories.Interfaces;
 
@@ -10,4 +11,6 @@ public interface IEnergyMeterRepository
     Task AddAsync(EnergyMeter building);
     Task UpdateAsync(EnergyMeter building);
     Task DeleteAsync(Guid id);
+    Task<IEnumerable<EnergyMeter>> SearchAsync(string searchInput);
+    Task<EnergyMeter> GetByIdDatetimeAsync(Guid id, DateTime startDate, DateTime endTime);
 }

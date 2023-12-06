@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -29,6 +29,15 @@ public class EnergyDataController : ControllerBase
     public async Task<ActionResult<EnergyData>> GetByIdAsync(Guid id)
     {
         var result = await _repository.GetByIdAsync(id);
+        if (result is null) return NotFound();
+        return Ok(result);
+    }
+
+    [HttpGet("latest")]
+    public async Task<ActionResult<EnergyData>> GetLatestEnergyData()
+    {
+        var result = await _repository.GetLatestEnergyDataAsync();
+        await Console.Out.WriteLineAsync(   "32");
         if (result is null) return NotFound();
         return Ok(result);
     }

@@ -12,8 +12,8 @@ using TecEnergy.Database;
 namespace TecEnergy.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231113094120_Init")]
-    partial class Init
+    [Migration("20231129063904_2nd")]
+    partial class _2nd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace TecEnergy.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Building", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.Building", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -42,20 +42,20 @@ namespace TecEnergy.Database.Migrations
                     b.ToTable("Buildings");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyData", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("AccumulatedValue")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("EnergyMeterID")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 
@@ -64,16 +64,19 @@ namespace TecEnergy.Database.Migrations
                     b.ToTable("EnergyData");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyMeter", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ConnectionState")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool?>("ConnectionState")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("InstallmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastConnectionStateChange")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("MeasurementPointComment")
@@ -98,7 +101,7 @@ namespace TecEnergy.Database.Migrations
                     b.ToTable("EnergyMeters");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.Room", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -120,9 +123,9 @@ namespace TecEnergy.Database.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyData", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyData", b =>
                 {
-                    b.HasOne("TecEnergy.Database.DataModels.EnergyMeter", "EnergyMeter")
+                    b.HasOne("TecEnergy.Database.Models.DataModels.EnergyMeter", "EnergyMeter")
                         .WithMany("EnergyDatas")
                         .HasForeignKey("EnergyMeterID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -131,35 +134,35 @@ namespace TecEnergy.Database.Migrations
                     b.Navigation("EnergyMeter");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyMeter", b =>
                 {
-                    b.HasOne("TecEnergy.Database.DataModels.Room", "Room")
+                    b.HasOne("TecEnergy.Database.Models.DataModels.Room", "Room")
                         .WithMany("EnergyMeters")
                         .HasForeignKey("RoomID");
 
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.Room", b =>
                 {
-                    b.HasOne("TecEnergy.Database.DataModels.Building", "Building")
+                    b.HasOne("TecEnergy.Database.Models.DataModels.Building", "Building")
                         .WithMany("Rooms")
                         .HasForeignKey("BuildingID");
 
                     b.Navigation("Building");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Building", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.Building", b =>
                 {
                     b.Navigation("Rooms");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.EnergyMeter", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyMeter", b =>
                 {
                     b.Navigation("EnergyDatas");
                 });
 
-            modelBuilder.Entity("TecEnergy.Database.DataModels.Room", b =>
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.Room", b =>
                 {
                     b.Navigation("EnergyMeters");
                 });

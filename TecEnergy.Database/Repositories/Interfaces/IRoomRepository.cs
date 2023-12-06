@@ -1,4 +1,4 @@
-﻿using TecEnergy.Database.DataModels;
+﻿using TecEnergy.Database.Models.DataModels;
 
 namespace TecEnergy.Database.Repositories.Interfaces;
 
@@ -10,4 +10,5 @@ public interface IRoomRepository
     Task AddAsync(Room room);
     Task UpdateAsync(Room room);
     Task DeleteAsync(Guid id);
+    Task<IEnumerable<Room>> SearchAsync(string searchInput);
 }

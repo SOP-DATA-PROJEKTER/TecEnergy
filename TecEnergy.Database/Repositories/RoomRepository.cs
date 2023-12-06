@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TecEnergy.Database.DataModels;
+using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -52,5 +52,12 @@ public class RoomRepository : IRoomRepository
             _context.Rooms.Remove(room);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<IEnumerable<Room>> SearchAsync(string searchInput)
+    {
+        return await _context.Rooms
+            .Where(x => x.RoomName.Contains(searchInput) || x.RoomComment.Contains(searchInput))
+            .ToListAsync();
     }
 }
