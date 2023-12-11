@@ -56,10 +56,10 @@ public class RoomService
 
         // Calculate the sum of AccumulatedValue from all EnergyDatas
         var impulseCount = result.EnergyMeters
-    .SelectMany(em => em.EnergyDatas)
-    .GroupBy(ed => ed.EnergyMeterID)
-    .Select(group => group.Max(ed => ed.AccumulatedValue))
-    .Sum();
+            .SelectMany(em => em.EnergyDatas)
+            .GroupBy(ed => ed.EnergyMeterID)
+            .Select(group => group.Max(ed => ed.AccumulatedValue))
+            .Sum();
 
         var accumulated = CalculationHelper.CalculateAccumulatedEnergy(impulseCount, 0.001);
 

@@ -34,6 +34,7 @@ public class Program
         builder.Services.AddScoped<SearchService>();
         builder.Services.AddScoped<EnergyMeterService>();
         builder.Services.AddScoped<RoomService>();
+        builder.Services.AddScoped<BuildingService>();
 
         //Ensures that many to many models does not loop into each other lists.
         builder.Services.AddControllers()
