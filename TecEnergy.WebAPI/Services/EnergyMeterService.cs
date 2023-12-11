@@ -19,11 +19,14 @@ public class EnergyMeterService
         var result = await _repository.GetAllAsync();
         return result;
     }
-    public async Task<EnergyMeter> GetByIdAsync(Guid id)
+
+    public async Task<SimpleDto> GetByIdAsync(Guid id)
     {
         var result = await _repository.GetByIdAsync(id);
-        return result;
+        var dto = EnergyMeterMappings.EnergyMeterToSimpleDto(result);
+        return dto;
     }
+
     public async Task<EnergyDto> GetByIdDatetimeAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
         var result = _repository.GetByIdDatetimeAsync(id, startDateTime, endDateTime).Result;
@@ -34,13 +37,6 @@ public class EnergyMeterService
         var energyDto = EnergyMeterMappings.EnergyMeterToEnergyDto(result, realtime, accumulated);
         return energyDto;
     }
-    public async Task<EnergyMeter> GetByIdWithDataAsync(Guid id)
-    {
-        var result = await _repository.GetByIdWithDataAsync(id);
-        return result;
-    }
-
-
 
     public async Task CreateAsync(EnergyMeter energyMeter)
     {

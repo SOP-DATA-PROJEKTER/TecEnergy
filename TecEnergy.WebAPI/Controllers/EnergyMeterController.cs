@@ -24,16 +24,18 @@ public class EnergyMeterController : ControllerBase
         var result = await _service.GetAllAsync();
         return Ok(result);
     }
-
-    [HttpGet("WithData/{id}")]
-    public async Task<ActionResult<EnergyMeter>> GetByIdWtihDataAsync(Guid id)
+    
+    //SimpleDTO
+    [HttpGet("{id}")]
+    public async Task<ActionResult<EnergyMeter>> GetByIdAsync(Guid id)
     {
-        var result = await _service.GetByIdWithDataAsync(id);
+        var result = await _service.GetByIdAsync(id);
         if (result is null) return NotFound();
         return Ok(result);
     }
 
-    [HttpGet("dto/{id}")]
+    //EnergyDTO
+    [HttpGet("EnergyDto/{id}")]
     public async Task<ActionResult<EnergyDto>> GetDtoById(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
         if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);

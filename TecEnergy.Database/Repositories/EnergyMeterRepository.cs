@@ -28,7 +28,6 @@ public class EnergyMeterRepository : IEnergyMeterRepository
         return await _context.EnergyMeters.FindAsync(id);
     }
 
-
     public async Task<EnergyMeter> GetByIdDatetimeAsync(Guid id, DateTime? startDate, DateTime? endTime)
     {
         EnergyMeter energyMeter = new();
@@ -37,12 +36,6 @@ public class EnergyMeterRepository : IEnergyMeterRepository
         energyMeter = meter;
         if(datemeter.Count != 0) energyMeter.EnergyDatas = datemeter;
         return energyMeter;
-    }
-    public async Task<EnergyMeter> GetByIdWithDataAsync(Guid id)
-    {
-        return await _context.EnergyMeters
-            .Include(x => x.EnergyDatas)
-            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task AddAsync(EnergyMeter energyMeter)
@@ -67,6 +60,7 @@ public class EnergyMeterRepository : IEnergyMeterRepository
             await _context.SaveChangesAsync();
         }
     }
+
     public async Task<IEnumerable<EnergyMeter>> SearchAsync(string searchInput)
     {
         return await _context.EnergyMeters
