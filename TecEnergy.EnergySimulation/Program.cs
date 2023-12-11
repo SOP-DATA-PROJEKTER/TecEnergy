@@ -12,11 +12,13 @@ namespace TecEnergy.EnergySimulation;
 internal class Program
 {
     private static Timer _timer;
-    private static int accCount;
+    private static int accCount1;
+    private static int accCount2;
 
     static void Main(string[] args)
     {
-        accCount = LoadAccCount();
+        accCount1 = LoadAccCount(1);
+        accCount2 = LoadAccCount(2);
         Console.WriteLine("Background service started.");
 
         // Set up a timer to trigger the SendPostRequest method every 10 seconds
@@ -48,8 +50,9 @@ internal class Program
                 // Check the response if needed
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"POST request sent successfully at {DateTime.Now}, AccCount: {accCount}");
-                    SaveAccCount(accCount);
+                    Console.WriteLine($"POST request sent successfully at {DateTime.Now}, AccCount: {accCount1}");
+                    SaveAccCount(accCount1, 1);
+                    SaveAccCount(accCount2, 2);
                 }
                 else
                 {
@@ -75,7 +78,24 @@ internal class Program
             Guid energyMeterId = Guid.Parse("CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB");
 
             // Simulate energy accumulation
-            long accumulatedValue = accCount++;
+            long accumulatedValue = accCount1++;
+
+            // Create an object in the required format
+            var energyDataObject = new
+            {
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
+
+            energyDataBatch.Add(energyDataObject);
+        }
+        for (int i = 0; i < 10; i++)
+        {
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("FC8FBF56-46D7-47D9-E486-08DBFA459D3E");
+
+            // Simulate energy accumulation
+            long accumulatedValue = accCount2++;
 
             // Create an object in the required format
             var energyDataObject = new
@@ -87,17 +107,18 @@ internal class Program
             energyDataBatch.Add(energyDataObject);
         }
 
+
         return energyDataBatch;
     }
 
-    private static int LoadAccCount()
+    private static int LoadAccCount(int countId)
     {
         try
         {
             // Read the accCount value from a file
-            if (File.Exists("accCount.txt"))
+            if (File.Exists($"accCount{countId}.txt"))
             {
-                string accCountStr = File.ReadAllText("accCount.txt");
+                string accCountStr = File.ReadAllText($"accCount{countId}.txt");
                 return int.Parse(accCountStr);
             }
         }
@@ -110,12 +131,12 @@ internal class Program
         return 0;
     }
 
-    private static void SaveAccCount(int accCount)
+    private static void SaveAccCount(int accCount, int countId)
     {
         try
         {
             // Save the accCount value to a file
-            File.WriteAllText("accCount.txt", accCount.ToString());
+            File.WriteAllText($"accCount{countId}.txt", accCount.ToString());
         }
         catch (Exception ex)
         {

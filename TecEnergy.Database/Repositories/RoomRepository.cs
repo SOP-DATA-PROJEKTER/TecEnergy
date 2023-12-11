@@ -29,7 +29,7 @@ public class RoomRepository : IRoomRepository
     }
     public async Task<Room> GetByIdWithEnergyMetersAsync(Guid id)
     {
-        return await _context.Rooms.Include(x => x.EnergyMeters).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Rooms.Include(x => x.EnergyMeters).ThenInclude(x => x.EnergyDatas).FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task AddAsync(Room room)

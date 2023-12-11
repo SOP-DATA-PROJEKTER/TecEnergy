@@ -33,6 +33,7 @@ public class Program
         builder.Services.AddScoped<IEnergyDataRepository, EnergyDataRepository>();
         builder.Services.AddScoped<SearchService>();
         builder.Services.AddScoped<EnergyMeterService>();
+        builder.Services.AddScoped<RoomService>();
 
         //Ensures that many to many models does not loop into each other lists.
         builder.Services.AddControllers()
