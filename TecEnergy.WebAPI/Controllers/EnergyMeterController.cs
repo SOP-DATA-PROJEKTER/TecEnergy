@@ -34,8 +34,9 @@ public class EnergyMeterController : ControllerBase
     }
 
     [HttpGet("dto/{id}")]
-    public async Task<ActionResult<EnergyDto>> GetDtoById(Guid id, DateTime startDateTime, DateTime endDateTime)
+    public async Task<ActionResult<EnergyDto>> GetDtoById(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
+        if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);
         var result = await _service.GetByIdDatetimeAsync(id, startDateTime, endDateTime);
         if(result is null) return NotFound();
         return Ok(result);
