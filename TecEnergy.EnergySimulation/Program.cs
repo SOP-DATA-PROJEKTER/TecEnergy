@@ -14,11 +14,15 @@ internal class Program
     private static Timer _timer;
     private static int accCount1;
     private static int accCount2;
+    private static int accCount3;
+    private static int accCount4;
 
     static void Main(string[] args)
     {
         accCount1 = LoadAccCount(1);
         accCount2 = LoadAccCount(2);
+        accCount3 = LoadAccCount(3);
+        accCount4 = LoadAccCount(4);
         Console.WriteLine("Background service started.");
 
         // Set up a timer to trigger the SendPostRequest method every 10 seconds
@@ -33,7 +37,9 @@ internal class Program
         try
         {
             // Adjust the URL based on your API endpoint
-            string apiUrl = "https://localhost:7141/api/energydata";
+            //string apiUrl = "https://localhost:7141/api/energydata";
+
+            string apiUrl = "http://192.168.21.7:2050/api/EnergyData";
 
             // Create a batch of EnergyData for the last 10 seconds
             var energyDataBatch = GenerateEnergyDataBatch();
@@ -50,9 +56,12 @@ internal class Program
                 // Check the response if needed
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"POST request sent successfully at {DateTime.Now}, AccCount: {accCount1}");
+                    Console.WriteLine($"POST request sent successfully at {DateTime.Now},\n " +
+                        $"AccCount1: {accCount1}, AccCount2: {accCount2}, AccCount3: {accCount3}, AccCount4: {accCount4},");
                     SaveAccCount(accCount1, 1);
                     SaveAccCount(accCount2, 2);
+                    SaveAccCount(accCount3, 3);
+                    SaveAccCount(accCount4, 4);
                 }
                 else
                 {
@@ -88,6 +97,7 @@ internal class Program
             };
 
             energyDataBatch.Add(energyDataObject);
+            Thread.Sleep(80);
         }
         for (int i = 0; i < 10; i++)
         {
@@ -105,9 +115,44 @@ internal class Program
             };
 
             energyDataBatch.Add(energyDataObject);
+            Thread.Sleep(80);
         }
+        for (int i = 0; i < 10; i++)
+        {
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("815EE1F1-F9CA-4040-1402-08DBFAF0C92B");
 
+            // Simulate energy accumulation
+            long accumulatedValue = accCount3++;
 
+            // Create an object in the required format
+            var energyDataObject = new
+            {
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
+
+            energyDataBatch.Add(energyDataObject);
+            Thread.Sleep(80);
+        }
+        for (int i = 0; i < 10; i++)
+        {
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("49D6F102-380A-401F-1403-08DBFAF0C92B");
+
+            // Simulate energy accumulation
+            long accumulatedValue = accCount4++;
+
+            // Create an object in the required format
+            var energyDataObject = new
+            {
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
+
+            energyDataBatch.Add(energyDataObject);
+            Thread.Sleep(80);
+        }
         return energyDataBatch;
     }
 
