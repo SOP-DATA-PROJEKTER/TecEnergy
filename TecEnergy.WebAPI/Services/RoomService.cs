@@ -77,6 +77,12 @@ public class RoomService
         return energyDto;
     }
 
+    public async Task<List<EnergyMeter>> GetEnergyMeterListDtoByRoomId(Guid roomId)
+    {
+        var result = await _repository.GetByIdWithEnergyMetersAsync(roomId);
+        return result.EnergyMeters;
+    }
+
     public async Task AddAsync(Room room)
     {
         await _repository.AddAsync(room);

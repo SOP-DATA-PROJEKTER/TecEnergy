@@ -27,6 +27,7 @@ public class RoomRepository : IRoomRepository
     {
         return await _context.Rooms.FindAsync(id);
     }
+
     public async Task<Building> GetBuildingByIdAsync(Guid buildingId)
     {
         return await _context.Buildings.Include(x => x.Rooms).FirstOrDefaultAsync(x => x.Id == buildingId);

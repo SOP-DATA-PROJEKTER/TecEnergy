@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using TecEnergy.Database.Models.DataModels;
 using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
+using TecEnergy.WebAPI.Helpers;
+using TecEnergy.WebAPI.Mapping;
 using TecEnergy.WebAPI.Services;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -49,6 +51,25 @@ public class RoomController : ControllerBase
         var result = await _service.GetEnergyDtoAsync(id, startDateTime, endDateTime);
         if (result is null) return NotFound();
         return Ok(result);
+    }
+
+    [HttpGet("EnergyMeterListDto/{roomId}")]
+    public async Task<List<EnergyDto>> GetEnergyMeterListByRoomId(Guid roomId)
+    {
+        List<EnergyDto> list = new();
+        var result = _service.GetEnergyMeterListDtoByRoomId(roomId).Result;
+        foreach (var item in result)
+        {
+            var firstPoint = item.EnergyDatas.OrderBy(x => x.DateTime).FirstOrDefault();
+            var lastPoint = item.EnergyDatas.OrderByDescending(x => x.DateTime).FirstOrDefault();
+
+            var accumulated = CalculationHelper.CalculateAccumulatedEnergy(lastPoint.AccumulatedValue, 0.001);
+            var hoursInDouble = CalculationHelper.CalculateHoursToDouble(firstPoint.DateTime, lastPoint.DateTime);
+            var realTime = CalculationHelper.GetKilowattsInHours((int)lastPoint.AccumulatedValue, hoursInDouble);
+            var dto = EnergyMeterMappings.EnergyMeterToEnergyDto(item, realTime, accumulated);
+            list.Add(dto);
+        }
+        return list;
     }
 
     [HttpPost]
