@@ -41,7 +41,7 @@ public class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null; // Preserve property names as-is
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Handle reference loops
+                //options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Handle reference loops
 
             });
 
