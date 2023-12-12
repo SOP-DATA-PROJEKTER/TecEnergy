@@ -27,6 +27,19 @@ public class EnergyMeterService
         return dto;
     }
 
+    public async Task<List<SimpleDto>> GetSimpleListByRoomIdAsync(Guid id)
+    {
+        List<SimpleDto> dtoList = new();
+        var result = await _repository.GetRoomByIdAsync(id);
+        var rooms = result.EnergyMeters.ToList();
+        foreach (var item in rooms)
+        {
+            var dto = EnergyMeterMappings.EnergyMeterToSimpleDto(item);
+            dtoList.Add(dto);
+        }
+        return dtoList;
+    }
+
     public async Task<EnergyDto> GetByIdDatetimeAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
         var result = _repository.GetByIdDatetimeAsync(id, startDateTime, endDateTime).Result;

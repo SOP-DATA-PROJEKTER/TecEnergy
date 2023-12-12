@@ -29,16 +29,21 @@ public class RoomService
         return dto;
     }
 
+    public async Task<List<SimpleDto>> GetSimpleListByBuildingIdAsync(Guid buildingId)
+    {
+        List<SimpleDto> dtoList = new();
+        var result = await _repository.GetBuildingByIdAsync(buildingId);
+        var rooms = result.Rooms.ToList();
+        foreach (var item in rooms)
+        {
+            var dto = RoomMapping.RoomToSimpleDto(item);
+            dtoList.Add(dto);
+        }
+        return dtoList;
+    }
+
     public async Task<EnergyDto> GetEnergyDtoAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
-        //var result = await _repository.GetByIdWithEnergyMetersAsync(id);
-        //var hoursInDouble = CalculationHelper.CalculateHoursToDouble(startDateTime, endDateTime);
-        //var realtime = CalculationHelper.GetKilowattsInHours(result.EnergyMeters.First().EnergyDatas.Count(), hoursInDouble);
-        //var accumulated = 0;
-        //var energyDto = RoomMapping.RoomToEnergyDto(result, realtime, accumulated);
-        ////var dto = result.EnergyMeters.ForEach(x => x.EnergyDatas.OrderByDescending())
-        //return energyDto;
-
         var result = await _repository.GetByIdWithEnergyMetersAsync(id);
 
         // Flatten the nested EnergyDatas from all EnergyMeters

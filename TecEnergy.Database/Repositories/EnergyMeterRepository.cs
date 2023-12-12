@@ -28,6 +28,12 @@ public class EnergyMeterRepository : IEnergyMeterRepository
         return await _context.EnergyMeters.FindAsync(id);
     }
 
+    public async Task<Room> GetRoomByIdAsync(Guid roomId)
+    {
+        return await _context.Rooms.Include(x => x.EnergyMeters).FirstOrDefaultAsync(x => x.Id == roomId);
+    }
+
+
     public async Task<EnergyMeter> GetByIdDatetimeAsync(Guid id, DateTime? startDate, DateTime? endTime)
     {
         EnergyMeter energyMeter = new();

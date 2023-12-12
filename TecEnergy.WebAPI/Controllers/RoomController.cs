@@ -33,6 +33,14 @@ public class RoomController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("SimpleList/{buildingId}")]
+    public async Task<ActionResult<List<SimpleDto>>> GetSimpleRoomListByBuildingId(Guid buildingId)
+    {
+        var result = await _service.GetSimpleListByBuildingIdAsync(buildingId);
+        if (result is null) return NotFound();
+        return Ok(result);
+    }
+
     //EnergyDTO
     [HttpGet("EnergyDto/{id}")]
     public async Task<ActionResult<EnergyDto>> GetByIdWithEnergyMetersAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
