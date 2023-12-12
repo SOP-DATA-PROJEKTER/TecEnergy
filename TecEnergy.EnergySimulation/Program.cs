@@ -73,140 +73,140 @@ internal class Program
         }
     }
 
-    //private static List<object> GenerateEnergyDataBatch()
-    //{
-    //    // Simulate generating a batch of EnergyData for the last 10 seconds
-    //    DateTime currentDateTime = DateTime.UtcNow;
-    //    List<object> energyDataBatch = new List<object>();
-
-    //        Random rnd = new Random();
-    //        var n = rnd.Next(0, 125);
-    //        for (int i = 0; i < n; i++)
-    //        {
-    //            // Generate a random EnergyMeterID for demonstration purposes
-    //            Guid energyMeterId = Guid.Parse("CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB");
-
-    //            // Simulate energy accumulation
-    //            long accumulatedValue = accCount1++;
-
-    //            // Create an object in the required format
-    //            var energyDataObject = new
-    //            {
-    //                EnergyMeterID = energyMeterId,
-    //                AccumulatedValue = accumulatedValue
-    //            };
-
-    //            energyDataBatch.Add(energyDataObject);
-
-    //        }
-
-    //        for (int i = 0; i < n; i++)
-    //        {
-    //            // Generate a random EnergyMeterID for demonstration purposes
-    //            Guid energyMeterId = Guid.Parse("FC8FBF56-46D7-47D9-E486-08DBFA459D3E");
-
-    //            // Simulate energy accumulation
-    //            long accumulatedValue = accCount2++;
-
-    //            // Create an object in the required format
-    //            var energyDataObject = new
-    //            {
-    //                EnergyMeterID = energyMeterId,
-    //                AccumulatedValue = accumulatedValue
-    //            };
-
-    //            energyDataBatch.Add(energyDataObject);
-    //        }
-
-    //        for (int i = 0; i < n; i++)
-    //        {
-    //            // Generate a random EnergyMeterID for demonstration purposes
-    //            Guid energyMeterId = Guid.Parse("815EE1F1-F9CA-4040-1402-08DBFAF0C92B");
-
-    //            // Simulate energy accumulation
-    //            long accumulatedValue = accCount3++;
-
-    //            // Create an object in the required format
-    //            var energyDataObject = new
-    //            {
-    //                EnergyMeterID = energyMeterId,
-    //                AccumulatedValue = accumulatedValue
-    //            };
-
-    //            energyDataBatch.Add(energyDataObject);
-    //        }
-
-    //        for (int i = 0; i < n; i++)
-    //        {
-    //            // Generate a random EnergyMeterID for demonstration purposes
-    //            Guid energyMeterId = Guid.Parse("49D6F102-380A-401F-1403-08DBFAF0C92B");
-
-    //            // Simulate energy accumulation
-    //            long accumulatedValue = accCount4++;
-
-    //            // Create an object in the required format
-    //            var energyDataObject = new
-    //            {
-    //                EnergyMeterID = energyMeterId,
-    //                AccumulatedValue = accumulatedValue
-    //            };
-
-    //            energyDataBatch.Add(energyDataObject);
-    //        }
-    //        return energyDataBatch;
-    //}
-
     private static List<object> GenerateEnergyDataBatch()
     {
+        // Simulate generating a batch of EnergyData for the last 10 seconds
         DateTime currentDateTime = DateTime.UtcNow;
         List<object> energyDataBatch = new List<object>();
+
         Random rnd = new Random();
-        //var n = rnd.Next(0, 125);
-        var n = 10;
-
-        // Define a list to hold the tasks
-        List<Task<List<object>>> tasks = new List<Task<List<object>>>();
-
-        // Define a function to generate energy data in a thread
-        Func<Guid, int, int, Task<List<object>>> generateEnergyData = async (energyMeterId, accCount, countId) =>
+        var n = rnd.Next(0, 125);
+        for (int i = 0; i < n; i++)
         {
-            //long accumulatedValue = accCount;
-            List<object> data = new List<object>();
-            for (int i = 0; i < n; i++)
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB");
+
+            // Simulate energy accumulation
+            long accumulatedValue = accCount1++;
+
+            // Create an object in the required format
+            var energyDataObject = new
             {
-                long accumulatedValue = Interlocked.Increment(ref accCount);
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
 
-                var energyDataObject = new
-                {
-                    EnergyMeterID = energyMeterId,
-                    AccumulatedValue = accumulatedValue
-                };
+            energyDataBatch.Add(energyDataObject);
 
-                data.Add(energyDataObject);
-                //await Task.Delay(80); // Sleep for 80 milliseconds
-            }
-
-            //SaveAccCount(accCount, countId);
-            return data;
-        };
-
-        // Start tasks for each loop
-        tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB"), accCount1, 1)));
-        //tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("FC8FBF56-46D7-47D9-E486-08DBFA459D3E"), accCount2, 2)));
-        //tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("815EE1F1-F9CA-4040-1402-08DBFAF0C92B"), accCount3, 3)));
-        //tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("49D6F102-380A-401F-1403-08DBFAF0C92B"), accCount4, 4)));
-
-        // Wait for all tasks to complete
-        Task.WaitAll(tasks.ToArray());
-
-        // Collect results from completed tasks
-        foreach (var task in tasks)
-        {
-            energyDataBatch.AddRange(task.Result);
         }
+        n = rnd.Next(0, 125);
+        for (int i = 0; i < n; i++)
+        {
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("FC8FBF56-46D7-47D9-E486-08DBFA459D3E");
 
+            // Simulate energy accumulation
+            long accumulatedValue = accCount2++;
+
+            // Create an object in the required format
+            var energyDataObject = new
+            {
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
+
+            energyDataBatch.Add(energyDataObject);
+        }
+        n = rnd.Next(0, 125);
+        for (int i = 0; i < n; i++)
+        {
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("815EE1F1-F9CA-4040-1402-08DBFAF0C92B");
+
+            // Simulate energy accumulation
+            long accumulatedValue = accCount3++;
+
+            // Create an object in the required format
+            var energyDataObject = new
+            {
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
+
+            energyDataBatch.Add(energyDataObject);
+        }
+        n = rnd.Next(0, 125);
+        for (int i = 0; i < n; i++)
+        {
+            // Generate a random EnergyMeterID for demonstration purposes
+            Guid energyMeterId = Guid.Parse("49D6F102-380A-401F-1403-08DBFAF0C92B");
+
+            // Simulate energy accumulation
+            long accumulatedValue = accCount4++;
+
+            // Create an object in the required format
+            var energyDataObject = new
+            {
+                EnergyMeterID = energyMeterId,
+                AccumulatedValue = accumulatedValue
+            };
+
+            energyDataBatch.Add(energyDataObject);
+        }
         return energyDataBatch;
     }
+
+    //private static List<object> GenerateEnergyDataBatch()
+    //{
+    //    DateTime currentDateTime = DateTime.UtcNow;
+    //    List<object> energyDataBatch = new List<object>();
+    //    Random rnd = new Random();
+    //    //var n = rnd.Next(0, 125);
+    //    var n = 10;
+
+    //    // Define a list to hold the tasks
+    //    List<Task<List<object>>> tasks = new List<Task<List<object>>>();
+
+    //    // Define a function to generate energy data in a thread
+    //    Func<Guid, int, int, Task<List<object>>> generateEnergyData = async (energyMeterId, accCount, countId) =>
+    //    {
+    //        //long accumulatedValue = accCount;
+    //        List<object> data = new List<object>();
+    //        for (int i = 0; i < n; i++)
+    //        {
+    //            long accumulatedValue = Interlocked.Increment(ref accCount);
+
+    //            var energyDataObject = new
+    //            {
+    //                EnergyMeterID = energyMeterId,
+    //                AccumulatedValue = accumulatedValue
+    //            };
+
+    //            data.Add(energyDataObject);
+    //            //await Task.Delay(80); // Sleep for 80 milliseconds
+    //        }
+
+    //        //SaveAccCount(accCount, countId);
+    //        return data;
+    //    };
+
+    //    // Start tasks for each loop
+    //    tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB"), accCount1, 1)));
+    //    //tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("FC8FBF56-46D7-47D9-E486-08DBFA459D3E"), accCount2, 2)));
+    //    //tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("815EE1F1-F9CA-4040-1402-08DBFAF0C92B"), accCount3, 3)));
+    //    //tasks.Add(Task.Run(() => generateEnergyData(Guid.Parse("49D6F102-380A-401F-1403-08DBFAF0C92B"), accCount4, 4)));
+
+    //    // Wait for all tasks to complete
+    //    Task.WaitAll(tasks.ToArray());
+
+    //    // Collect results from completed tasks
+    //    foreach (var task in tasks)
+    //    {
+    //        energyDataBatch.AddRange(task.Result);
+    //    }
+
+    //    return energyDataBatch;
+    //}
 
 
 
