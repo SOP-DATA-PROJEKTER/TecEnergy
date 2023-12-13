@@ -42,7 +42,6 @@ public class EnergyMeterController : ControllerBase
         return Ok(result);
     }
 
-
     //EnergyDTO
     [HttpGet("EnergyDto/{id}")]
     public async Task<ActionResult<EnergyDto>> GetDtoById(Guid id)
@@ -62,7 +61,6 @@ public class EnergyMeterController : ControllerBase
         //return CreatedAtAction(nameof(GetByIdAsync), new { id = energyMeter.Id }, energyMeter);
         return Ok(energyMeter);
     }
-
 
     [HttpPut("{id}")]
     public async Task<IActionResult> PutAsync(Guid id, EnergyMeter updateResource)

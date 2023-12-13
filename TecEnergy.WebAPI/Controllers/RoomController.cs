@@ -45,10 +45,11 @@ public class RoomController : ControllerBase
 
     //EnergyDTO
     [HttpGet("EnergyDto/{id}")]
-    public async Task<ActionResult<EnergyDto>> GetByIdWithEnergyMetersAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
+    public async Task<ActionResult<EnergyDto>> GetByIdWithEnergyMetersAsync(Guid id)
     {
-        if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);
-        var result = await _service.GetEnergyDtoAsync(id, startDateTime, endDateTime);
+        var startDateTime = DateTime.UtcNow;
+        //if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);
+        var result = await _service.GetEnergyDtoAsync(id, startDateTime, startDateTime.AddSeconds(-60));
         if (result is null) return NotFound();
         return Ok(result);
     }

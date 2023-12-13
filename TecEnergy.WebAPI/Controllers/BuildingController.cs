@@ -38,11 +38,12 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
+    //Supposed to have two nullable datetimes (startDateTime and endDateTime) for filtering data with timeinterval and if nullable set default value
     [HttpGet("EnergyDto/{id}")]
-    public async Task<ActionResult<EnergyDto>> GetByIdWithRoomsAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
+    public async Task<ActionResult<EnergyDto>> GetByIdWithRoomsAsync(Guid id)
     {
-        if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);
-        var result = await _service.GetBuildingEnergyDtoAsync(id, startDateTime, endDateTime);
+        var startDateTime = DateTime.UtcNow;
+        var result = await _service.GetBuildingEnergyDtoAsync(id, startDateTime, startDateTime.AddSeconds(-60));
 
         if (result is null)
         {
