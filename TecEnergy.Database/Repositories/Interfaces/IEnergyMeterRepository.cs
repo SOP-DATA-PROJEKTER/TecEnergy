@@ -7,10 +7,11 @@ public interface IEnergyMeterRepository
 {
     Task<IEnumerable<EnergyMeter>> GetAllAsync();
     Task<EnergyMeter> GetByIdAsync(Guid id);
-    Task<EnergyMeter> GetByIdWithDataAsync(Guid id);
     Task AddAsync(EnergyMeter building);
     Task UpdateAsync(EnergyMeter building);
+
+    Task<Room> GetRoomByIdAsync(Guid roomId);
     Task DeleteAsync(Guid id);
     Task<IEnumerable<EnergyMeter>> SearchAsync(string searchInput);
-    Task<EnergyMeter> GetByIdDatetimeAsync(Guid id, DateTime startDate, DateTime endTime);
+    Task<EnergyMeter> GetByIdDatetimeAsync(Guid id, DateTime? startDate, DateTime? endTime);
 }

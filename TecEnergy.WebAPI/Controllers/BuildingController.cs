@@ -1,32 +1,34 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
+using TecEnergy.WebAPI.Services;
 
 namespace TecEnergy.WebAPI.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class BuildingController : ControllerBase
 {
-    private readonly IBuildingRepository _repository;
+    private readonly BuildingService _service;
 
-    public BuildingController(IBuildingRepository repository)
+    public BuildingController(BuildingService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Building>>> GetAllAsync()
     {
-        var result = await _repository.GetAllAsync();
+        var result = await _service.GetAllAsync();
         return Ok(result);
     }
 
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Building>> GetByIdAsync(Guid id)
+    public async Task<ActionResult<SimpleDto>> GetByIdAsync(Guid id)
     {
-        var result = await _repository.GetByIdAsync(id);
+        var result = await _service.GetByIdAsync(id);
 
         if (result == null)
         {
@@ -36,10 +38,12 @@ public class BuildingController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("WithRooms/{id}")]
-    public async Task<ActionResult<Building>> GetByIdWithRoomsAsync(Guid id)
+    //Supposed to have two nullable datetimes (startDateTime and endDateTime) for filtering data with timeinterval and if nullable set default value
+    [HttpGet("EnergyDto/{id}")]
+    public async Task<ActionResult<EnergyDto>> GetByIdWithRoomsAsync(Guid id)
     {
-        var result = await _repository.GetByIdWithRoomsAsync(id);
+        var startDateTime = DateTime.UtcNow;
+        var result = await _service.GetBuildingEnergyDtoAsync(id, startDateTime, startDateTime.AddSeconds(-60));
 
         if (result is null)
         {
@@ -52,7 +56,7 @@ public class BuildingController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Building>> CreateAsync(Building createResource)
     {
-        await _repository.AddAsync(createResource);
+        await _service.AddAsync(createResource);
         //return CreatedAtAction("GetBuilding", new { id = createResource.Id }, createResource);
         return Ok(createResource);
     }
@@ -65,14 +69,14 @@ public class BuildingController : ControllerBase
             return BadRequest();
         }
 
-        await _repository.UpdateAsync(updateResource);
+        await _service.UpdateAsync(id, updateResource);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        await _repository.DeleteAsync(id);
+        await _service.DeleteAsync(id);
         return NoContent();
     }
 

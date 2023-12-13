@@ -33,31 +33,44 @@ public class Program
         builder.Services.AddScoped<IEnergyDataRepository, EnergyDataRepository>();
         builder.Services.AddScoped<SearchService>();
         builder.Services.AddScoped<EnergyMeterService>();
+        builder.Services.AddScoped<RoomService>();
+        builder.Services.AddScoped<BuildingService>();
 
         //Ensures that many to many models does not loop into each other lists.
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null; // Preserve property names as-is
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Handle reference loops
+                //options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Handle reference loops
 
             });
+
+        builder.Services.AddCors(options =>
+        {
+            var allowedOrigins = "*";
+
+            options.AddDefaultPolicy(policy =>
+            {
+
+                policy.WithOrigins(allowedOrigins)
+                      .WithHeaders("Content-Type", "Authorization", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin")
+                      .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH");
+            });
+        });
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-
-
         var app = builder.Build();
-
-       
         // Configure the HTTP request pipeline.
 
         app.UseSwagger();
         app.UseSwaggerUI();
 
         app.UseHttpsRedirection();
+
+        app.UseCors();
 
         app.UseAuthorization();
 
