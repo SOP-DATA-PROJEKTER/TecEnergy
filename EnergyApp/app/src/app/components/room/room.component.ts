@@ -20,7 +20,7 @@ export class RoomComponent implements OnInit
   constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router) {}
 
   CurrentRoomId : number = 1;
-  Room : MeterData = {Name : "", Current : 0, Accumulated : 0, Note : ""}
+  Room : MeterData = {Id : 0, Name : "", RealTime : 0, Accumulated : 0, Note : ""}
   Meters : MeterData[] = [];
 
   Building : SimpleInfo = {Id : 0, Name : ""}

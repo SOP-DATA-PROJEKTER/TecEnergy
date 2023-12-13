@@ -14,7 +14,7 @@ export class MeterlistItemComponent
   Ticks : number[] = [];
   @Input() fontSize : number = 110;
 
-  @Input() Data : MeterData = {Name: "Lokale xxx", Current : 0, Accumulated: 999999, Note: "Test Note"};
+  @Input() Data : MeterData = {Id: 0, Name: "Lokale xxx", RealTime : 0, Accumulated: 999999, Note: "Test Note"};
 
   constructor() 
   {
