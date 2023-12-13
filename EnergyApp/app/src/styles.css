@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz@9..40&display=swap');
+
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root 
+{
+    /* Colors */
+    --color-background: rgb(17, 17, 17);
+    --gradient-grey: radial-gradient(#444, #222);
+    --gradient-background: linear-gradient(rgb(65, 65, 65),black);
+
+
+    /* Fonts */
+    --font-big: 'Poppins', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+}

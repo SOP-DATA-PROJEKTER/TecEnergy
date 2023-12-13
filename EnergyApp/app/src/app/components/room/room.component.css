@@ -1,0 +1,11 @@
+#Container
+{
+    /* background-color: var(--color-background); */
+    background: var(--gradient-background);
+    height: 100vh; 
+    width: 100vw; 
+    padding-top: 100;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}

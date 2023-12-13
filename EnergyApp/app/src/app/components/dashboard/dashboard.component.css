@@ -1,0 +1,185 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,900&display=swap');
+#Board
+{
+    box-sizing: content-box;
+    width: 60vw;
+    height: 30vw;
+    display: flex;
+    padding: 5%;
+    background: radial-gradient(#444, #222);
+    box-shadow: 0 0 20px black;
+}
+
+#MainMeter
+{
+    height: 100%;
+    width: 50%;
+    padding: 2.5%;
+}
+
+#SubMeters
+{
+    height: 100%;
+    width: 50%;
+    padding: 2.5%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#SubMeters div
+{
+    padding: 2.5%;
+    width: 50%;
+    flex-grow: 1;
+}
+
+#ListMeters
+{
+    height: 100%;
+    width: 50%;
+    padding: 0 2.5% 2.5%;
+    background-color: rgb(24, 24, 24);
+    display: flex;
+    flex-direction: column;
+}
+
+#ListHeaders
+{
+    display: flex;
+    width:100%;
+}
+
+#ListHeaders > h2
+{
+    width: 25%;
+    font-family: 'Poppins', sans-serif;
+    color: whitesmoke;
+    padding: 2.5%;
+}
+
+#ListScroll
+{
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+    flex-grow: 1;
+    overflow-y: auto;
+    background: radial-gradient(grey, rgb(90, 90, 90));
+} */
+
+
+#Board
+{
+    display: flex;
+}
+
+#MainMeter
+{
+    position: relative;
+    height: 30vw;
+    width: 30vw;
+    padding: 3vw;
+    margin-left: .5vw;
+    background: var(--gradient-grey);
+    box-shadow: 10px 10px 10px black;
+}
+
+#SubMeters
+{
+    height: 30vw;
+    width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5vw .5vw;
+}
+
+.SubMeter
+{
+    position: relative;
+    background: var(--gradient-grey);
+    width: 14.75vw;
+    height: 14.75vw;
+    padding: 5%;
+    box-shadow: 10px 10px 10px black;
+}
+
+
+#ListMeters
+{
+    height: 30vw;
+    width: 30vw;
+    padding: 0 2.5% 2.5%;
+    background: var(--gradient-grey);
+    display: flex;
+    flex-direction: column;
+}
+
+#ListHeaders
+{
+    display: flex;
+    width:100%;
+}
+
+#ListHeaders > h2
+{
+    width: 25%;
+    font-family: 'Poppins', sans-serif;
+    color: whitesmoke;
+    padding: 2.5%;
+}
+
+#ListScroll
+{
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+    flex-grow: 1;
+    overflow-y: auto;
+    /* background: radial-gradient(grey, rgb(90, 90, 90)); */
+}
+
+.Light
+{
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 5%;
+    height: 5%;
+    margin: 2.5%;
+    border-radius: 50%;
+    background-color: green;
+}
+
+.GraphButton
+{
+    position: absolute;
+    top:0;
+    right: 0;
+    width: 12.5%;
+    height: 12.5%;
+    padding: 2.5%;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+}
+
+/* width */
+::-webkit-scrollbar 
+{
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track 
+{
+    background: rgb(20, 20, 20);
+}
+    
+/* Handle */
+::-webkit-scrollbar-thumb 
+{
+    background: rgb(100, 100, 100);
+    border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover 
+{
+    background: #c0c0c0;
+}

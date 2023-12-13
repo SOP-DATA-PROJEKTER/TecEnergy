@@ -1,0 +1,5 @@
+<app-sidebar [List]="RoomList" [ActiveId]="CurrentRoomId" (OnClicked)="SideBarClick($event)"></app-sidebar>
+<app-navbar [Title]="'Lokale ' + Room.Name"></app-navbar>
+<div id="Container">
+    <app-dashboard [MainMeter]="Room" [SubMeters]="Meters"></app-dashboard>
+</div>

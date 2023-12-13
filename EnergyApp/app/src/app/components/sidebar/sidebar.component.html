@@ -1,0 +1,7 @@
+<nav>
+    <div *ngFor="let item of List;" class="Wrapper">
+        <div class="Circle" (click)="Click(item.Id)" [ngClass]="{'Active' : item.Id === ActiveId}">
+            {{item.Name}}
+        </div>
+    </div>
+</nav>
