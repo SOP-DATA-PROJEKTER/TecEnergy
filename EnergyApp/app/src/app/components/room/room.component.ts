@@ -57,7 +57,7 @@ export class RoomComponent implements OnInit
       {
         this.UpdateMeters();
       }
-     }, 1000);
+     }, 5000);
   }
 
   ngOnDestroy() 

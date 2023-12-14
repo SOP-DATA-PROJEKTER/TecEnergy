@@ -75,23 +75,29 @@ public class RoomService
         foreach (var item in result.EnergyMeters)
         {
             impulseCount += item.EnergyDatas.Count();
-            acc = item.EnergyDatas.OrderBy(x => x.DateTime).LastOrDefault().AccumulatedValue;
+            var x = item.EnergyDatas.OrderBy(x => x.DateTime).LastOrDefault();
+
+            if(x!= null)
+                acc += x.AccumulatedValue;
         }
 
         var accumulated = CalculationHelper.CalculateAccumulatedEnergy(acc, 0.001);
 
         // Calculate the real-time value
         var hoursInDouble = CalculationHelper.CalculateHoursToDouble(startDateTime, endDateTime);
-        var realtime = CalculationHelper.GetKilowattsInHours(impulseCount, hoursInDouble);
+
+
+        //var realtime = CalculationHelper.GetKilowattsInHours(impulseCount, hoursInDouble);
+        double realtime = impulseCount * 60f / 1000f;
 
         var energyDto = RoomMapping.RoomToEnergyDto(result, realtime, accumulated);
 
         return energyDto;
     }
 
-    public async Task<List<EnergyMeter>> GetEnergyMeterListDtoByRoomId(Guid roomId)
+    public async Task<List<EnergyMeter>> GetEnergyMeterListDtoByRoomId(Guid roomId, DateTime? startDateTime, DateTime? endDateTime)
     {
-        var result = await _repository.GetByIdWithEnergyMetersAsync(roomId);
+        var result = await _repository.GetByIdWithEnergyMetersFirstAndLastAsync(roomId, startDateTime, endDateTime);
         return result.EnergyMeters;
     }
 
