@@ -46,6 +46,8 @@ public class RoomService
     {
         var result = await _repository.GetByIdWithEnergyMetersAsync(id);
 
+        var energyMeterList = result.EnergyMeters.ToList();
+
         // Flatten the nested EnergyDatas from all EnergyMeters
         var allEnergyDatas = result.EnergyMeters
             .SelectMany(em => em.EnergyDatas)
@@ -59,12 +61,18 @@ public class RoomService
                 .ToList();
         }
 
-        // Calculate the sum of AccumulatedValue from all EnergyDatas
+        //Calculate the sum of AccumulatedValue from all EnergyDatas
         var impulseCount = result.EnergyMeters
             .SelectMany(em => em.EnergyDatas)
             .GroupBy(ed => ed.EnergyMeterID)
             .Select(group => group.Max(ed => ed.AccumulatedValue))
             .Sum();
+
+        //var impulseCount = 0;
+        //foreach (var item in energyMeterList)
+        //{
+        //    impulseCount += _repository.GetLatestEnergyDataAsync(item.Id).Result.AccumulatedValue;
+        //}
 
         var accumulated = CalculationHelper.CalculateAccumulatedEnergy(impulseCount, 0.001);
 

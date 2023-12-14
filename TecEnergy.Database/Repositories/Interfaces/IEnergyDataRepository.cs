@@ -13,5 +13,5 @@ public interface IEnergyDataRepository
     Task AddAsync(EnergyData building);
     Task UpdateAsync(EnergyData building);
     Task DeleteAsync(Guid id);
-    Task<EnergyData> GetLatestEnergyDataAsync();
+    Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId);
 }

@@ -1,6 +1,6 @@
 export interface MeterData
 {
-    Id : number;
+    Id : string;
     Name : string;
     RealTime : number;
     Accumulated : number;

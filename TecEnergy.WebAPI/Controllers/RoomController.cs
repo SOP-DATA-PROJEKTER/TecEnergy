@@ -49,7 +49,7 @@ public class RoomController : ControllerBase
     {
         var startDateTime = DateTime.UtcNow;
         //if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);
-        var result = await _service.GetEnergyDtoAsync(id, startDateTime, startDateTime.AddSeconds(-60));
+        var result = await _service.GetEnergyDtoAsync(id, startDateTime.AddSeconds(-60), startDateTime);
         if (result is null) return NotFound();
         return Ok(result);
     }
@@ -58,15 +58,24 @@ public class RoomController : ControllerBase
     public async Task<List<EnergyDto>> GetEnergyMeterListByRoomId(Guid roomId)
     {
         List<EnergyDto> list = new();
-        var result = _service.GetEnergyMeterListDtoByRoomId(roomId).Result;
+        var result = await _service.GetEnergyMeterListDtoByRoomId(roomId); 
         foreach (var item in result)
         {
             var firstPoint = item.EnergyDatas.OrderBy(x => x.DateTime).FirstOrDefault();
             var lastPoint = item.EnergyDatas.OrderByDescending(x => x.DateTime).FirstOrDefault();
 
-            var accumulated = CalculationHelper.CalculateAccumulatedEnergy(lastPoint.AccumulatedValue, 0.001);
-            var hoursInDouble = CalculationHelper.CalculateHoursToDouble(firstPoint.DateTime, lastPoint.DateTime);
-            var realTime = CalculationHelper.GetKilowattsInHours((int)lastPoint.AccumulatedValue, hoursInDouble);
+            //Quick hack
+            double accumulated = 0;
+            double hoursInDouble = 0;
+            double realTime = 0;
+
+            if(firstPoint != null && lastPoint != null)
+            {
+                hoursInDouble = CalculationHelper.CalculateHoursToDouble(firstPoint.DateTime, lastPoint.DateTime);
+                realTime = CalculationHelper.GetKilowattsInHours((int)lastPoint.AccumulatedValue, hoursInDouble);
+                accumulated = CalculationHelper.CalculateAccumulatedEnergy(lastPoint.AccumulatedValue, 0.001);
+            }
+
             var dto = EnergyMeterMappings.EnergyMeterToEnergyDto(item, realTime, accumulated);
             list.Add(dto);
         }

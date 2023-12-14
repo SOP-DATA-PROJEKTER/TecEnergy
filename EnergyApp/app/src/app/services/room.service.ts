@@ -9,17 +9,17 @@ import { HttpClient } from '@angular/common/http';
 })
 export class RoomService {
 
-  url : string = "http://192.168.21.7:2050/api/Room/"
+  url : string = "http://10.233.134.112:2050/api/Room/"
 
   constructor(private http: HttpClient) { }
 
-  getMeterData(id : number): Observable<MeterData> 
+  getMeterData(id : string): Observable<MeterData> 
   {
     return this.http.get<MeterData>(this.url+'EnergyDto/' + id);
     // return this.http.get<MeterData>('http://localhost:3001/rooms/'+id);
   }
 
-  getSubMeterData(id : number): Observable<MeterData[]> 
+  getSubMeterData(id : string): Observable<MeterData[]> 
   {
     return this.http.get<MeterData[]>(this.url+'EnergyMeterListDto/' + id);
     //return this.http.get<MeterData[]>('http://localhost:3001/meters/' + 1);
@@ -29,13 +29,13 @@ export class RoomService {
   {
     return new Observable(o => 
     {
-      o.next({Id:1, Name:"E"}); 
+      o.next({Id:"E48642F7-4193-4828-9F9F-08DBFBBFA201", Name:"E"}); 
      });
   }
 
   getSiblingsSimpleInfo(): Observable<SimpleInfo[]> 
   {
-    return this.http.get<SimpleInfo[]>(this.url+'SimpleList/224af2ab-a495-44dc-1fb7-08dbef442e9b');
+    return this.http.get<SimpleInfo[]>(this.url+'SimpleList/E48642F7-4193-4828-9F9F-08DBFBBFA201');
     //return this.http.get<SimpleInfo[]>('http://localhost:3001/rooms');
   }
 }

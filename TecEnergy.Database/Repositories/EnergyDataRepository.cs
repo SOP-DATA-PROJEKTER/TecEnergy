@@ -24,9 +24,10 @@ public class EnergyDataRepository : IEnergyDataRepository
     }
 
     //For the simulation to get the highest datetime and read the accumulatedvalue to set the appsettings configuration
-    public async Task<EnergyData> GetLatestEnergyDataAsync()
+    public async Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId)
     {
-        return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).LastOrDefaultAsync();
+        return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).Where(x => x.EnergyMeterID == energyMeterId).LastOrDefaultAsync();
+        //return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).LastOrDefaultAsync();
     }
 
     public async Task AddAsync(EnergyData energyData)

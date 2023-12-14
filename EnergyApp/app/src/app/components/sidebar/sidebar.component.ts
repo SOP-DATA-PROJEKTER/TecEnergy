@@ -11,10 +11,10 @@ import { SimpleInfo } from 'src/app/models/SimpleInfo';
 export class SidebarComponent 
 {
   @Input() List : SimpleInfo[] = [];
-  @Input() ActiveId : number = 1;
-  @Output() OnClicked = new EventEmitter<number>();
+  @Input() ActiveId : string = "1";
+  @Output() OnClicked = new EventEmitter<string>();
 
-  Click(id : number)
+  Click(id : string)
   {
     this.OnClicked.emit(id);
   }

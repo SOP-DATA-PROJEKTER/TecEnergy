@@ -12,4 +12,5 @@ public interface IRoomRepository
     Task UpdateAsync(Room room);
     Task DeleteAsync(Guid id);
     Task<IEnumerable<Room>> SearchAsync(string searchInput);
+    Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId);
 }

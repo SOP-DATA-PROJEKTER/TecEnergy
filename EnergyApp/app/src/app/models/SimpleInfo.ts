@@ -1,5 +1,5 @@
 export interface SimpleInfo
 {
-    Id : number;
+    Id : string;
     Name : string;
 }

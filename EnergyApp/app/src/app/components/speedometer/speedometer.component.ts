@@ -37,7 +37,7 @@ export class SpeedometerComponent
   @ViewChild("Circle") circle! : ElementRef;
 
 
-  @Input() Data : MeterData = {Id: 0, Name: "Lokale xxx", RealTime : 0, Accumulated: 999999, Note: "Test Note"};
+  @Input() Data : MeterData = {Id: "0", Name: "Lokale xxx", RealTime : 0, Accumulated: 999999, Note: "Test Note"};
 
 
   

@@ -34,10 +34,9 @@ public class EnergyDataController : ControllerBase
     }
 
     [HttpGet("latest")]
-    public async Task<ActionResult<EnergyData>> GetLatestEnergyData()
+    public async Task<ActionResult<EnergyData>> GetLatestEnergyData(Guid energyMeterId)
     {
-        var result = await _repository.GetLatestEnergyDataAsync();
-        await Console.Out.WriteLineAsync(   "32");
+        var result = await _repository.GetLatestEnergyDataAsync(energyMeterId);
         if (result is null) return NotFound();
         return Ok(result);
     }

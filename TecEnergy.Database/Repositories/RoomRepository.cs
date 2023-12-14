@@ -44,6 +44,11 @@ public class RoomRepository : IRoomRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId)
+    {
+        return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).Where(x => x.EnergyMeterID == energyMeterId).LastOrDefaultAsync();
+        //return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).LastOrDefaultAsync();
+    }
     public async Task UpdateAsync(Room room)
     {
         _context.Entry(room).State = EntityState.Modified;

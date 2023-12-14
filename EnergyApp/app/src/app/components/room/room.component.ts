@@ -19,27 +19,53 @@ export class RoomComponent implements OnInit
 {
   constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router) {}
 
-  CurrentRoomId : number = 1;
-  Room : MeterData = {Id : 0, Name : "", RealTime : 0, Accumulated : 0, Note : ""}
+  update : boolean = true;
+
+  CurrentRoomId : string = "1";
+  Room : MeterData = {Id : "0", Name : "", RealTime : 0, Accumulated : 0, Note : ""}
   Meters : MeterData[] = [];
 
-  Building : SimpleInfo = {Id : 0, Name : ""}
+  Building : SimpleInfo = {Id : "0", Name : ""}
   RoomList : SimpleInfo[] = [];
 
   ngOnInit(): void 
   {
     this.route.params.subscribe(params => 
     {
-      this.CurrentRoomId = parseFloat(params['id']);
+      this.CurrentRoomId = params['id'];
       this.roomService.getMeterData(params['id']).subscribe(x => this.Room = x);
       this.roomService.getSubMeterData(params['id']).subscribe(x => this.Meters = x);
     });
 
     this.roomService.getParentSimpleInfo().subscribe(x => this.Building = x);
     this.roomService.getSiblingsSimpleInfo().subscribe(x => this.RoomList = x);
+
+
+    setTimeout(() => {
+        this.UpdateMeters();
+     }, 5000);
   }
 
-  SideBarClick(id:number)
+  UpdateMeters() : void
+  {
+    this.roomService.getMeterData(this.CurrentRoomId).subscribe(x => this.Room = x);
+    this.roomService.getSubMeterData(this.CurrentRoomId).subscribe(x => this.Meters = x);
+
+
+    setTimeout(() => {
+      if(this.update)
+      {
+        this.UpdateMeters();
+      }
+     }, 1000);
+  }
+
+  ngOnDestroy() 
+  {
+    this.update = false;
+  }
+
+  SideBarClick(id:string)
   {
     this.router.navigate(['room', id]);
   }

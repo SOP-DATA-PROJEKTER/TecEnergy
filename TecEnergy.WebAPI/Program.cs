@@ -14,13 +14,14 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         //var cs = builder.Configuration.GetConnectionString("SqlServer");
-        
-       //builder.WebHost.UseUrls("https://*:7141");
+
+        //builder.WebHost.UseUrls("https://*:7141");
 
         //// Add services to the container.
+        //builder.Services.AddDbContext<DatabaseContext>(
+        //         o => o.UseSqlServer("Data Source=10.233.134.112,1433;Initial Catalog=TecEnergyDB;User ID=TecAdmin;Password=Tec420;TrustServerCertificate=True"));
         builder.Services.AddDbContext<DatabaseContext>(
                  o => o.UseSqlServer("Data Source=192.168.21.7,1433;Initial Catalog=EnergyMonitor7;User ID=Admin;Password=Tec420;TrustServerCertificate=True"));
-
 
         //builder.Services.AddDbContext<DatabaseContext>(options =>
         //{
