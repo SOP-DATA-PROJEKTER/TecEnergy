@@ -42,36 +42,17 @@ public class RoomService
         return dtoList;
     }
 
+    //returns energyDTO of a room with accumulated and realtime value in the given timespan of datetimes
     public async Task<EnergyDto> GetEnergyDtoAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
+        // Retrieve room data along with associated energy meters and energy data which datetime in within the timespan of startDateTime and endDateTime
         var result = await _repository.GetByIdWithEnergyMetersFirstAndLastAsync(id, startDateTime, endDateTime);
 
-        //var result = await _repository.GetByIdWithEnergyMetersAsync(id);
-
-        var energyMeterList = result.EnergyMeters.ToList();
-
-        // Flatten the nested EnergyDatas from all EnergyMeters
-        //var allEnergyDatas = result.EnergyMeters
-        //    .SelectMany(em => em.EnergyDatas)
-        //    .ToList();
-
-        //// Filter EnergyDatas based on startDateTime and endDateTime if provided
-        //if (startDateTime.HasValue && endDateTime.HasValue)
-        //{
-        //allEnergyDatas = allEnergyDatas
-        //    .Where(ed => ed.DateTime >= startDateTime && ed.DateTime <= endDateTime)
-        //    .ToList();
-        //}
-
-        ////Calculate the sum of AccumulatedValue from all EnergyDatas
-        //var impulseCount = result.EnergyMeters
-        //    .SelectMany(em => em.EnergyDatas)
-        //    .GroupBy(ed => ed.EnergyMeterID)
-        //    .Select(group => group.Max(ed => ed.AccumulatedValue))
-        //    .Sum();
-
+        //impulse count and accumulated value
         var impulseCount = 0;
         long acc = 0;
+
+        // Loop through each energy meter to calculate impulse count and the latest accumulated value
         foreach (var item in result.EnergyMeters)
         {
             impulseCount += item.EnergyDatas.Count();
@@ -80,18 +61,12 @@ public class RoomService
             if(x!= null)
                 acc += x.AccumulatedValue;
         }
-
+        // Calculate the accumulated and real-time value.
+        // this is quickfix for realtime for now, but implement method in calculationhelper
         var accumulated = CalculationHelper.CalculateAccumulatedEnergy(acc, 0.001);
-
-        // Calculate the real-time value
-        var hoursInDouble = CalculationHelper.CalculateHoursToDouble(startDateTime, endDateTime);
-
-
-        //var realtime = CalculationHelper.GetKilowattsInHours(impulseCount, hoursInDouble);
         double realtime = impulseCount * 60f / 1000f;
 
         var energyDto = RoomMapping.RoomToEnergyDto(result, realtime, accumulated);
-
         return energyDto;
     }
 

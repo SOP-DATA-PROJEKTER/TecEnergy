@@ -27,6 +27,7 @@ public class EnergyMeterService
         return dto;
     }
 
+    //returns simpledto list of energymeters based on their roomId
     public async Task<List<SimpleDto>> GetSimpleListByRoomIdAsync(Guid id)
     {
         List<SimpleDto> dtoList = new();
@@ -40,6 +41,7 @@ public class EnergyMeterService
         return dtoList;
     }
 
+    //return energydto for energymeter with realtime and accumulated within the timespan of datetimes
     public async Task<EnergyDto> GetByIdDatetimeAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
         var result = _repository.GetByIdDatetimeAsync(id, startDateTime, endDateTime).Result;
