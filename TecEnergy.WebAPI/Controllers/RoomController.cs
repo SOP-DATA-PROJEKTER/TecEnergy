@@ -57,24 +57,25 @@ public class RoomController : ControllerBase
     [HttpGet("EnergyMeterListDto/{roomId}")]
     public async Task<List<EnergyDto>> GetEnergyMeterListByRoomId(Guid roomId)
     {
+        var startDateTime = DateTime.UtcNow;
         List<EnergyDto> list = new();
-        var result = await _service.GetEnergyMeterListDtoByRoomId(roomId); 
+        var result = await _service.GetEnergyMeterListDtoByRoomId(roomId, startDateTime.AddSeconds(-60), startDateTime); 
         foreach (var item in result)
         {
-            var firstPoint = item.EnergyDatas.OrderBy(x => x.DateTime).FirstOrDefault();
-            var lastPoint = item.EnergyDatas.OrderByDescending(x => x.DateTime).FirstOrDefault();
-
             //Quick hack
             double accumulated = 0;
             double hoursInDouble = 0;
             double realTime = 0;
 
+            var firstPoint = item.EnergyDatas.OrderBy(x => x.DateTime).FirstOrDefault();
+            var lastPoint = item.EnergyDatas.OrderByDescending(x => x.DateTime).FirstOrDefault();
+            
+            //calculating realtime and accumulated values
             if(firstPoint != null && lastPoint != null)
             {
-                hoursInDouble = CalculationHelper.CalculateHoursToDouble(firstPoint.DateTime, lastPoint.DateTime);
-                realTime = CalculationHelper.GetKilowattsInHours((int)lastPoint.AccumulatedValue, hoursInDouble);
                 accumulated = CalculationHelper.CalculateAccumulatedEnergy(lastPoint.AccumulatedValue, 0.001);
             }
+            realTime = item.EnergyDatas.Count * 60f / 1000f;
 
             var dto = EnergyMeterMappings.EnergyMeterToEnergyDto(item, realTime, accumulated);
             list.Add(dto);

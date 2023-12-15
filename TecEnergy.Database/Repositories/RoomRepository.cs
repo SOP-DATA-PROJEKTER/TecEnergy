@@ -38,6 +38,11 @@ public class RoomRepository : IRoomRepository
         return await _context.Rooms.Include(x => x.EnergyMeters).ThenInclude(x => x.EnergyDatas).FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
+    {
+        return await _context.Rooms.Include(x => x.EnergyMeters).ThenInclude(x => x.EnergyDatas.Where(x => x.DateTime >= startDateTime && x.DateTime <= endDateTime)).FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task AddAsync(Room room)
     {
         _context.Rooms.Add(room);
