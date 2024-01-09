@@ -96,4 +96,10 @@ public class RoomService
         var result = await _repository.SearchAsync(searchInput);
         return result;
     }
+
+    public async Task<Room> GetFirstRoomAsync()
+    {
+        var result = await _repository.GetFirstRoomAsync();
+        return result;
+    }
 }

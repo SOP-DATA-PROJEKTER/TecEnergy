@@ -14,4 +14,5 @@ public interface IRoomRepository
     Task<IEnumerable<Room>> SearchAsync(string searchInput);
     Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId);
     Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime);
+    Task<Room> GetFirstRoomAsync();
 }

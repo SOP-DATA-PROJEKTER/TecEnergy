@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,11 @@ public class RoomRepository : IRoomRepository
     public RoomRepository(DatabaseContext context)
     {
         _context = context;
+    }
+
+    public async Task<Room> GetFirstRoomAsync()
+    {
+        return await _context.Rooms.FirstAsync();
     }
 
     public async Task<IEnumerable<Room>> GetAllAsync()
@@ -40,7 +46,9 @@ public class RoomRepository : IRoomRepository
 
     public async Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
-        return await _context.Rooms.Include(x => x.EnergyMeters).ThenInclude(x => x.EnergyDatas.Where(x => x.DateTime >= startDateTime && x.DateTime <= endDateTime)).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Rooms.Include(x => x.EnergyMeters)
+            .ThenInclude(x => x.EnergyDatas.Where(x => x.DateTime >= startDateTime && x.DateTime <= endDateTime))
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task AddAsync(Room room)
@@ -76,4 +84,6 @@ public class RoomRepository : IRoomRepository
             .Where(x => x.RoomName.Contains(searchInput) || x.RoomComment.Contains(searchInput))
             .ToListAsync();
     }
+
+
 }

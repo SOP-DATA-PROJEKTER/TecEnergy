@@ -27,6 +27,7 @@ export class DashboardComponent
 
     return false;
   }
+  
 
 
   TestGoToDetails()
