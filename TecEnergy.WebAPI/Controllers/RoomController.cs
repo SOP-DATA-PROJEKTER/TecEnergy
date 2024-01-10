@@ -109,4 +109,13 @@ public class RoomController : ControllerBase
         await _service.DeleteAsync(id);
         return NoContent();
     }
+
+    [HttpGet("roomId")]
+    public async Task<ActionResult<GuidDto>> GetFirstRoomIdAsync()
+    {
+        GuidDto result = new();
+        var room = await _service.GetFirstRoomAsync();
+        result.Id = room.Id;
+        return Ok(result);
+    }
 }
