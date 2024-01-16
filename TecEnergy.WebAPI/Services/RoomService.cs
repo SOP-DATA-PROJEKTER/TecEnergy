@@ -102,4 +102,11 @@ public class RoomService
         var result = await _repository.GetFirstRoomAsync();
         return result;
     }
+
+
+    public async Task<ICollection<EnergyData>> GetRoomEnergyDataByTimeInterval(Guid roomId, DateTime startTime, DateTime endTime)
+    {
+        var result = await _repository.GetEnergyDataByTimeIntervalForRoom(roomId, startTime, endTime);
+        return result;
+    }
 }

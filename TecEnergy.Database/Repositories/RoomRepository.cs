@@ -86,4 +86,14 @@ public class RoomRepository : IRoomRepository
     }
 
 
+    public async Task<ICollection<EnergyData>> GetEnergyDataByTimeIntervalForRoom(Guid roomId, DateTime startTime, DateTime? endTime)
+    {
+
+        return await _context.EnergyData
+            .Where(x => x.EnergyMeter.RoomID == roomId && x.DateTime >= startTime && x.DateTime <= endTime)
+            .ToListAsync();
+
+    }
+
+
 }

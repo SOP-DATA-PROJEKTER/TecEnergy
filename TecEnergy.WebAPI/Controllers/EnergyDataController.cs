@@ -85,4 +85,7 @@ public class EnergyDataController : ControllerBase
         await _repository.DeleteAsync(id);
         return NoContent();
     }
+
+
+
 }

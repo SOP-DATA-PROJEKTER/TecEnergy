@@ -118,4 +118,18 @@ public class RoomController : ControllerBase
         result.Id = room.Id;
         return Ok(result);
     }
+
+
+    // 2023-12-11T13:00:00
+
+    [HttpGet("TimeInterval/{roomId}")]
+    public async Task<IActionResult> GetEnergyDataByTimeIntervalAsync(Guid roomId, [FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
+    {
+        // validate inputs
+        var result = await _service.GetRoomEnergyDataByTimeInterval(roomId, startTime, endTime);
+        // validate result
+        // change result to dto
+        // return dto as actionresult
+        return Ok(result);
+    }
 }
