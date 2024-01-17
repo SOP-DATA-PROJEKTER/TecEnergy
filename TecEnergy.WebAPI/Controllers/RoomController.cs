@@ -126,10 +126,22 @@ public class RoomController : ControllerBase
     public async Task<IActionResult> GetEnergyDataByTimeIntervalAsync(Guid roomId, [FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
     {
         // validate inputs
-        var result = await _service.GetRoomEnergyDataByTimeInterval(roomId, startTime, endTime);
+        var result = await _service.GetAccumulatedEnergyForARoom(roomId, startTime, endTime);
+
+        List<DailyAccumulatedDto> dataList = new();
+
+        foreach (var item in result)
+        {
+            DailyAccumulatedDto temp = new();
+            temp.DailyAccumulatedValue = item.DailyAccumulatedValue;
+            temp.DateTime = item.DateTime;
+            dataList.Add(temp);
+        }
+
         // validate result
         // change result to dto
         // return dto as actionresult
-        return Ok(result);
+        return Ok(dataList);
     }
+
 }

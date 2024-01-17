@@ -104,9 +104,9 @@ public class RoomService
     }
 
 
-    public async Task<ICollection<EnergyData>> GetRoomEnergyDataByTimeInterval(Guid roomId, DateTime startTime, DateTime endTime)
+    public async Task<ICollection<DailyAccumulated>> GetAccumulatedEnergyForARoom(Guid roomId, DateTime startTime, DateTime endTime)
     {
-        var result = await _repository.GetEnergyDataByTimeIntervalForRoom(roomId, startTime, endTime);
+        var result = await _repository.GetDailyAccumulationAsync(roomId, startTime, endTime);
         return result;
     }
 }

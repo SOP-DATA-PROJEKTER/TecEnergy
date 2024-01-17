@@ -21,7 +21,7 @@ export class RoomComponent implements OnInit
 
   update : boolean = true;
 
-  CurrentRoomId : string = "1";
+  CurrentRoomId : string = "0";
   Room : MeterData = {Id : "0", Name : "", RealTime : 0, Accumulated : 0, Note : ""}
   Meters : MeterData[] = [];
 

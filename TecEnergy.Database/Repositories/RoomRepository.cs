@@ -85,15 +85,11 @@ public class RoomRepository : IRoomRepository
             .ToListAsync();
     }
 
-
-    public async Task<ICollection<EnergyData>> GetEnergyDataByTimeIntervalForRoom(Guid roomId, DateTime startTime, DateTime? endTime)
+    async Task<ICollection<DailyAccumulated>> IRoomRepository.GetDailyAccumulationAsync(Guid roomId, DateTime startTime, DateTime? endTime)
     {
-
-        return await _context.EnergyData
-            .Where(x => x.EnergyMeter.RoomID == roomId && x.DateTime >= startTime && x.DateTime <= endTime)
+        return await _context.DailyAccumulated
+            .Where(x => x.RoomId == roomId && x.DateTime >= startTime && x.DateTime <= endTime)
             .ToListAsync();
 
     }
-
-
 }
