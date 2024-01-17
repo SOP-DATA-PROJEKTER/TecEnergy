@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace TecEnergy.Database.Models.DataModels
 {
 
-    [Index(nameof(DateTime), IsUnique = true)] // makes an index from the DateTime so it is easier to query
+    [Index(nameof(DateTime))] // makes an index from the DateTime so it is easier to query
     public class DailyAccumulated
     {
         public Guid Id { get; set; }

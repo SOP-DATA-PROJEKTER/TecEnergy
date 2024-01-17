@@ -6,19 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TecEnergy.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class DailyAccumulatedTable : Migration
+    public partial class DailyAccu : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "MeasurementType",
-                table: "EnergyMeters");
-
-            migrationBuilder.DropColumn(
-                name: "ReadingFrequency",
-                table: "EnergyMeters");
-
             migrationBuilder.CreateTable(
                 name: "DailyAccumulated",
                 columns: table => new
@@ -42,8 +34,7 @@ namespace TecEnergy.Database.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_DailyAccumulated_DateTime",
                 table: "DailyAccumulated",
-                column: "DateTime",
-                unique: true);
+                column: "DateTime");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DailyAccumulated_RoomId",

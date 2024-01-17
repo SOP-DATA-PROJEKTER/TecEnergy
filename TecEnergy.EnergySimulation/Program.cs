@@ -51,6 +51,7 @@ internal class Program
             {
                 // Send a POST request with the JSON payload
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+                Console.WriteLine(jsonBody);
                 var response = httpClient.PostAsync(apiUrl, content).Result;
 
                 // Check the response if needed
@@ -77,6 +78,7 @@ internal class Program
     {
         // Simulate generating a batch of EnergyData for the last 10 seconds
         DateTime currentDateTime = DateTime.UtcNow;
+        
         List<object> energyDataBatch = new List<object>();
 
         Random rnd = new Random();

@@ -12,8 +12,8 @@ using TecEnergy.Database;
 namespace TecEnergy.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240116131936_DailyAccumulatedTable")]
-    partial class DailyAccumulatedTable
+    [Migration("20240117073112_DailyAccu")]
+    partial class DailyAccu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,8 +59,7 @@ namespace TecEnergy.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DateTime")
-                        .IsUnique();
+                    b.HasIndex("DateTime");
 
                     b.HasIndex("RoomId");
 

@@ -56,8 +56,7 @@ namespace TecEnergy.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DateTime")
-                        .IsUnique();
+                    b.HasIndex("DateTime");
 
                     b.HasIndex("RoomId");
 
