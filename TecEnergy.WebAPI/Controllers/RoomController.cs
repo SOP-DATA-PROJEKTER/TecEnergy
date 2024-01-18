@@ -122,8 +122,8 @@ public class RoomController : ControllerBase
 
     // 2023-12-11T13:00:00
 
-    [HttpGet("TimeInterval/{roomId}")]
-    public async Task<IActionResult> GetEnergyDataByTimeIntervalAsync(Guid roomId, [FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
+    [HttpGet("TimeInterval/{roomId}/{startTime}/{endTime}")]
+    public async Task<IActionResult> GetEnergyDataByTimeIntervalAsync(Guid roomId, DateTime startTime, DateTime endTime)
     {
         // validate inputs
         var result = await _service.GetAccumulatedEnergyForARoom(roomId, startTime, endTime);

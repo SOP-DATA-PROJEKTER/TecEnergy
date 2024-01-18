@@ -51,7 +51,6 @@ internal class Program
             {
                 // Send a POST request with the JSON payload
                 var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-                Console.WriteLine(jsonBody);
                 var response = httpClient.PostAsync(apiUrl, content).Result;
 
                 // Check the response if needed

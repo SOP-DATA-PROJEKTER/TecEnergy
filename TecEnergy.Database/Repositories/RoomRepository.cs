@@ -89,6 +89,7 @@ public class RoomRepository : IRoomRepository
     {
         return await _context.DailyAccumulated
             .Where(x => x.RoomId == roomId && x.DateTime >= startTime && x.DateTime <= endTime)
+            .OrderBy(x => x.DateTime)
             .ToListAsync();
 
     }
