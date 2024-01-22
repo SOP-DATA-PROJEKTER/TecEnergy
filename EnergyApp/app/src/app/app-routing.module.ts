@@ -11,10 +11,10 @@ const routes: Routes =
     path: 'room/:id',
     loadComponent: () => import('./components/room/room.component').then(m => m.RoomComponent)
   },
-  {
-    path: 'meterdetail/:id',
-    loadComponent: () => import('./components/meterdetailpage/meterdetailpage.component').then(m => m.MeterdetailpageComponent)
-  }
+  // {
+  //   path: 'meterdetail/:id',
+  //   loadComponent: () => import('./components/meterdetailpage/meterdetailpage.component').then(m => m.MeterdetailpageComponent)
+  // }
 ];
 
 @NgModule({
