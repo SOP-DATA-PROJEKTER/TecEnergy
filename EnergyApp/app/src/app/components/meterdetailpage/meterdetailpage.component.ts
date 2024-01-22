@@ -1,22 +1,28 @@
-import { Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatDatepickerModule } from '@angular/material/datepicker';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { MomentDateAdapter, provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { FormGroup } from '@angular/forms';
+import { DailyAccumulatedDto } from 'src/app/models/DailyAccumulatedDto';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { RoomService } from 'src/app/services/room.service';
-import { DailyAccumulatedDto } from 'src/app/models/DailyAccumulatedDto';
 import { ActivatedRoute } from '@angular/router';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
-import { FormGroup, FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import 'moment/locale/da';
+import * as moment from 'moment';
 
 
 @Component({
   selector: 'app-meterdetailpage',
-  standalone: true,
-  imports: [
+  templateUrl: './meterdetailpage.component.html',
+  styleUrls: ['./meterdetailpage.component.css'],
+    imports: [
     CommonModule,
     HighchartsChartModule,
     MatDatepickerModule,
@@ -24,13 +30,26 @@ import { CommonModule } from '@angular/common';
     MatInputModule,
     MatNativeDateModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
 
   ],
-  templateUrl: './meterdetailpage.component.html',
-  styleUrls: ['./meterdetailpage.component.css']
+  providers: [
+    // The locale would typically be provided on the root module of your application. We do it at
+    // the component level here, due to limitations of our example generation script.
+    {provide: MAT_DATE_LOCALE, useValue: 'da-DK'},
+
+    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
+    // to your app config. We provide it at the component level here, due to limitations
+    // of our example generation script.
+    provideMomentDateAdapter(),
+  ],
+  standalone: true,
 })
 export class MeterdetailpageComponent implements OnInit {
+
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
@@ -41,21 +60,46 @@ export class MeterdetailpageComponent implements OnInit {
 
   data: DailyAccumulatedDto[] = [];
 
-  constructor(private roomService : RoomService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
+
+  constructor(
+    private roomService : RoomService, 
+    private route: ActivatedRoute, 
+    private formBuilder: FormBuilder,
+    @Inject(MAT_DATE_LOCALE) private _locale: string,
+  ) 
+  {
+
+    const startMoment = {
+      month: 11,
+      date: 12,
+      year: 2023
+    }
+    
+    const newDate = new Date();
+
+    const endMoment = {
+      month: newDate.getMonth(),
+      date: newDate.getDate(),
+      year: newDate.getFullYear()
+    }
+
+
     this.range = this.formBuilder.group({
-      start: new Date(2023, 11, 12),
-      end: new Date()
-    });
+        start: moment(startMoment),
+        end: moment(endMoment)
+      });
+  
+      this.id = this.route.snapshot.paramMap.get('id')!;
+      
+    }
 
-    this.id = this.route.snapshot.paramMap.get('id')!;
-    
-  }
 
-
-
+  
   ngOnInit(): void {
-    this.updateData()
+
+    this.updateDataFromMoment();
     
+    // Initializes chart
       this.chartOptions = 
       {
         chart: {
@@ -69,7 +113,7 @@ export class MeterdetailpageComponent implements OnInit {
           }
         },
         xAxis: {
-          categories: this.data,
+          categories: [],
           labels: {
             style: {
               color: 'white'
@@ -91,7 +135,7 @@ export class MeterdetailpageComponent implements OnInit {
         },
         series: [{
           name: 'Daily Accumulated Value',
-          data: this.data.map(x => x.DailyAccumulatedValue),
+          data: [],
           color: '#00FF00',
           dataLabels: {
             enabled: true,
@@ -107,24 +151,22 @@ export class MeterdetailpageComponent implements OnInit {
           }
         }
       };
-
-
   }
 
 
-  updateData(){
+  updateData(startDate: String, endDate: String){
 
+    // fetches new data based on input range
 
-
-    this.roomService.getRoomDailyAccumulationList(this.id, this.range.value.start, this.range.value.end).subscribe((data: DailyAccumulatedDto[]) => {
+    this.roomService.getRoomDailyAccumulationList(this.id, startDate, endDate).subscribe((data: DailyAccumulatedDto[]) => {
       this.data = data;
       this.updateChart();
     });
-    
-    
   }
   
   updateChart() {
+
+    // updates the chart data and rerenders it
 
     this.chartOptions.series![0] = {
           name: 'Daily Accumulated Value',
@@ -140,10 +182,10 @@ export class MeterdetailpageComponent implements OnInit {
         }
 
     this.chartOptions.xAxis! ={
-      categories: this.data.map(x => new Date(x.DateTime).toLocaleDateString('dk-DK', {
+      categories: this.data.map(x => new Date(x.DateTime).toLocaleDateString('da-DK', {
         year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
+        month: 'numeric',
+        day: 'numeric'
       })),
       labels: {
         style: {
@@ -152,11 +194,26 @@ export class MeterdetailpageComponent implements OnInit {
       }
     }
 
+
+
     // rerenders the chart
     Highcharts.chart('container', this.chartOptions);
     
-
   }
-  
 
+
+  updateDataFromMoment(){
+    // formats a moment into MM-DD-YYYY format and calls function to update data
+
+    const startValue = this.range.value.start._i;
+    const endValue = this.range.value.end._i;
+
+    const start = `${startValue.month+1}-${startValue.date}-${startValue.year}`
+    const end =  `${endValue.month+1}-${endValue.date}-${endValue.year}`
+
+    this.updateData(start, end);
+  }
+
+
+  
 }
