@@ -1,10 +1,10 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDatepickerModule } from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import { MomentDateAdapter, provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { FormGroup } from '@angular/forms';
 import { DailyAccumulatedDto } from 'src/app/models/DailyAccumulatedDto';
 import * as Highcharts from 'highcharts';
@@ -16,39 +16,43 @@ import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 
 @Component({
-  selector: 'app-meterdetailpage',
-  templateUrl: './meterdetailpage.component.html',
-  styleUrls: ['./meterdetailpage.component.css'],
+    selector: 'app-meterdetailpage',
+    templateUrl: './meterdetailpage.component.html',
+    styleUrls: ['./meterdetailpage.component.css'],
+    providers: [
+        // The locale would typically be provided on the root module of your application. We do it at
+        // the component level here, due to limitations of our example generation script.
+        { provide: MAT_DATE_LOCALE, useValue: 'da-DK' },
+        // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
+        // to your app config. We provide it at the component level here, due to limitations
+        // of our example generation script.
+        provideMomentDateAdapter(),
+    ],
+    standalone: true,
     imports: [
-    CommonModule,
-    HighchartsChartModule,
-    MatDatepickerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatNativeDateModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule
+        CommonModule,
+        HighchartsChartModule,
+        MatDatepickerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatNativeDateModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
 
-  ],
-  providers: [
-    // The locale would typically be provided on the root module of your application. We do it at
-    // the component level here, due to limitations of our example generation script.
-    {provide: MAT_DATE_LOCALE, useValue: 'da-DK'},
+    ],
 
-    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
-    // to your app config. We provide it at the component level here, due to limitations
-    // of our example generation script.
-    provideMomentDateAdapter(),
-  ],
-  standalone: true,
-})
+  })
+
 export class MeterdetailpageComponent implements OnInit {
+
+  @Output() meterDetailEvent = new EventEmitter<boolean>();
 
 
   Highcharts: typeof Highcharts = Highcharts;
@@ -214,6 +218,8 @@ export class MeterdetailpageComponent implements OnInit {
     this.updateData(start, end);
   }
 
-
+  goBack() {
+    this.meterDetailEvent.emit(true);
+  }
   
 }

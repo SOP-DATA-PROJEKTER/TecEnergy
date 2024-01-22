@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit,  Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SpeedometerComponent } from '../speedometer/speedometer.component';
 import { MeterData } from 'src/app/models/MeterData';
@@ -17,6 +17,8 @@ export class DashboardComponent implements OnInit
 {
   @Input() MainMeter! : MeterData;
   @Input() SubMeters! : MeterData[];
+
+  @Output() detailEvent = new EventEmitter<boolean>();
   
   CurrentRoomId : string = "0";
 
@@ -41,6 +43,8 @@ export class DashboardComponent implements OnInit
 
   TestGoToDetails()
   {
-    this.router.navigate([`meterdetail/${this.CurrentRoomId}`]);
+    // emit event
+    this.detailEvent.emit(false);
+    // this.router.navigate([`meterdetail/${this.CurrentRoomId}`]);
   }
 }
