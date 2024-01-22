@@ -85,5 +85,12 @@ public class RoomRepository : IRoomRepository
             .ToListAsync();
     }
 
+    async Task<ICollection<DailyAccumulated>> IRoomRepository.GetDailyAccumulationAsync(Guid roomId, DateTime startTime, DateTime? endTime)
+    {
+        return await _context.DailyAccumulated
+            .Where(x => x.RoomId == roomId && x.DateTime >= startTime && x.DateTime <= endTime)
+            .OrderBy(x => x.DateTime)
+            .ToListAsync();
 
+    }
 }

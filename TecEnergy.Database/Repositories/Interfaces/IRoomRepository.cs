@@ -15,4 +15,9 @@ public interface IRoomRepository
     Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId);
     Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime);
     Task<Room> GetFirstRoomAsync();
+
+    Task<ICollection<DailyAccumulated>> GetDailyAccumulationAsync(Guid roomId, DateTime startTime,  DateTime? endTime);
+
+
+
 }

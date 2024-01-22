@@ -18,9 +18,16 @@ public class DatabaseContext : DbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<EnergyMeter> EnergyMeters { get; set; }
     public DbSet<EnergyData> EnergyData { get; set; }
+    public DbSet<DailyAccumulated> DailyAccumulated { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<EnergyData>();
+
+        modelBuilder.Entity<DailyAccumulated>()
+            .HasOne(ar => ar.Room)
+            .WithMany()
+            .HasForeignKey(ar => ar.RoomId);
+
     }
 }

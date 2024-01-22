@@ -39,6 +39,30 @@ namespace TecEnergy.Database.Migrations
                     b.ToTable("Buildings");
                 });
 
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.DailyAccumulated", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("DailyAccumulatedValue")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DateTime");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("DailyAccumulated");
+                });
+
             modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyData", b =>
                 {
                     b.Property<Guid>("Id")
@@ -82,12 +106,6 @@ namespace TecEnergy.Database.Migrations
                     b.Property<string>("MeasurementPointName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MeasurementType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReadingFrequency")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid?>("RoomID")
                         .HasColumnType("uniqueidentifier");
 
@@ -118,6 +136,17 @@ namespace TecEnergy.Database.Migrations
                     b.HasIndex("BuildingID");
 
                     b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("TecEnergy.Database.Models.DataModels.DailyAccumulated", b =>
+                {
+                    b.HasOne("TecEnergy.Database.Models.DataModels.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("TecEnergy.Database.Models.DataModels.EnergyData", b =>

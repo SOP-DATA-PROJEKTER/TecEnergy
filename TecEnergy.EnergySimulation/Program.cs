@@ -77,6 +77,7 @@ internal class Program
     {
         // Simulate generating a batch of EnergyData for the last 10 seconds
         DateTime currentDateTime = DateTime.UtcNow;
+        
         List<object> energyDataBatch = new List<object>();
 
         Random rnd = new Random();

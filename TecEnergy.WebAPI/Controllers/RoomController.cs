@@ -118,4 +118,30 @@ public class RoomController : ControllerBase
         result.Id = room.Id;
         return Ok(result);
     }
+
+
+    // 2023-12-11T13:00:00
+
+    [HttpGet("TimeInterval/{roomId}/{startTime}/{endTime}")]
+    public async Task<IActionResult> GetEnergyDataByTimeIntervalAsync(Guid roomId, DateTime startTime, DateTime endTime)
+    {
+        // validate inputs
+        var result = await _service.GetAccumulatedEnergyForARoom(roomId, startTime, endTime);
+
+        List<DailyAccumulatedDto> dataList = new();
+
+        foreach (var item in result)
+        {
+            DailyAccumulatedDto temp = new();
+            temp.DailyAccumulatedValue = item.DailyAccumulatedValue;
+            temp.DateTime = item.DateTime;
+            dataList.Add(temp);
+        }
+
+        // validate result
+        // change result to dto
+        // return dto as actionresult
+        return Ok(dataList);
+    }
+
 }

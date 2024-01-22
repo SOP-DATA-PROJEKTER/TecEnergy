@@ -1,3 +1,18 @@
 <div id="Container">
     <h1>METER DETAILS</h1>
-</div>
+  
+    <div>
+      <mat-form-field>
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+          <input matStartDate formControlName="start" placeholder="Start date" (dateChange)="updateData()">
+          <input matEndDate formControlName="end" placeholder="End date" (dateChange)="updateData()">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  
+    <div id="container"></div>
+  </div>
+  

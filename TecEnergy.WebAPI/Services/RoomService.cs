@@ -102,4 +102,11 @@ public class RoomService
         var result = await _repository.GetFirstRoomAsync();
         return result;
     }
+
+
+    public async Task<ICollection<DailyAccumulated>> GetAccumulatedEnergyForARoom(Guid roomId, DateTime startTime, DateTime endTime)
+    {
+        var result = await _repository.GetDailyAccumulationAsync(roomId, startTime, endTime);
+        return result;
+    }
 }
