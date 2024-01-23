@@ -5,8 +5,8 @@ import {MatDateRangePicker, MatDatepicker, MatDatepickerModule } from '@angular/
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
-import { FormGroup } from '@angular/forms';
-import { DailyAccumulatedDto } from 'src/app/models/DailyAccumulatedDto';
+import { FormControl, FormGroup } from '@angular/forms';
+import { YearlyAccumulatedDto } from 'src/app/models/YearlyAccumulatedDto';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { RoomService } from 'src/app/services/room.service';
@@ -48,20 +48,13 @@ import * as moment from 'moment';
 })
 
 export class MeterdetailpageComponent implements OnInit {
-
-
   @Output() meterDetailEvent = new EventEmitter<boolean>();
-
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
-  
-
-  range: FormGroup;
+  date: FormControl;
   id: string;
-
-  data: DailyAccumulatedDto[] = [];
-
+  data: YearlyAccumulatedDto[] = [];
 
   constructor(
     private roomService : RoomService, 
@@ -71,35 +64,22 @@ export class MeterdetailpageComponent implements OnInit {
   ) 
   {
 
-    const startMoment = {
-      month: 11,
-      date: 12,
+    const momentStart = {
+      month: 0,
+      date: 1,
       year: 2023
     }
-    
-    const newDate = new Date();
 
-    const endMoment = {
-      month: newDate.getMonth(),
-      date: newDate.getDate(),
-      year: newDate.getFullYear()
-    }
-
-
-    this.range = this.formBuilder.group({
-        start: moment(startMoment),
-        end: moment(endMoment)
-      });
-  
-      this.id = this.route.snapshot.paramMap.get('id')!;
+    this.date = new FormControl(moment(momentStart));
       
-    }
+    this.id = this.route.snapshot.paramMap.get('id')!;
+  }
 
 
   
   ngOnInit(): void {
 
-    this.updateDataFromMoment();
+    this.updateDataFromMoment()
     
     // Initializes chart
       this.chartOptions = 
@@ -109,7 +89,7 @@ export class MeterdetailpageComponent implements OnInit {
           backgroundColor: 'transparent'
         },
         title: {
-          text: 'Daily Accumulated Values',
+          text: 'Monthly Accumulated Values',
           style: {
             color: 'white'
           }
@@ -136,7 +116,7 @@ export class MeterdetailpageComponent implements OnInit {
           }
         },
         series: [{
-          name: 'Daily Accumulated Value',
+          name: 'Monthly Accumulated Value',
           data: [],
           color: '#00FF00',
           dataLabels: {
@@ -155,24 +135,21 @@ export class MeterdetailpageComponent implements OnInit {
       };
   }
 
+  updateDataYearly(Date: String){
 
-  updateData(startDate: String, endDate: String){
-
-    // fetches new data based on input range
-
-    this.roomService.getRoomDailyAccumulationList(this.id, startDate, endDate).subscribe((data: DailyAccumulatedDto[]) => {
+    this.roomService.getRoomYearlyAccumulationList(this.id, Date).subscribe((data: YearlyAccumulatedDto[]) => {
       this.data = data;
       this.updateChart();
     });
+  
   }
   
   updateChart() {
-
     // updates the chart data and rerenders it
 
     this.chartOptions.series![0] = {
-          name: 'Daily Accumulated Value',
-          data: this.data.map(x => x.DailyAccumulatedValue),
+          name: 'Monthly Accumulated Value',
+          data: this.data.map(x => x.MonthlyAccumulatedValue),
           color: '#00FF00',
           dataLabels: {
             enabled: true,
@@ -184,10 +161,8 @@ export class MeterdetailpageComponent implements OnInit {
         }
 
     this.chartOptions.xAxis! ={
-      categories: this.data.map(x => new Date(x.DateTime).toLocaleDateString('da-DK', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric'
+      categories: this.data.map(x => new Date(x.Month).toLocaleDateString('da-DK', {
+        month: 'long'
       })),
       labels: {
         style: {
@@ -196,8 +171,6 @@ export class MeterdetailpageComponent implements OnInit {
       }
     }
 
-
-
     // rerenders the chart
     Highcharts.chart('container', this.chartOptions);
     
@@ -205,19 +178,23 @@ export class MeterdetailpageComponent implements OnInit {
 
 
   updateDataFromMoment(){
+    console.log("updateDataFromMoment ")
     // formats a moment into MM-DD-YYYY format and calls function to update data
+    const val = this.date.value._i;
 
-    const startValue = this.range.value.start._i;
-    const endValue = this.range.value.end._i;
+    const dateString = `${val.month+1}-${val.date}-${val.year}`
 
-    const start = `${startValue.month+1}-${startValue.date}-${startValue.year}`
-    const end =  `${endValue.month+1}-${endValue.date}-${endValue.year}`
-
-    this.updateData(start, end);
+    this.updateDataYearly(dateString);
   }
 
   goBack() {
     this.meterDetailEvent.emit(true);
+  }
+
+  setDate($event: any, datepicker: MatDatepicker<any>) {
+    this.date.setValue($event);
+    datepicker.close();
+    this.updateDataFromMoment();    
   }
 
 }

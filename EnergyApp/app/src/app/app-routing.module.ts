@@ -15,10 +15,7 @@ const routes: Routes =
     path: 'meterdetail/:id',
     loadComponent: () => import('./components/meterdetailpage/meterdetailpage.component').then(m => m.MeterdetailpageComponent)
   },
-  {
-    path: 'carousel',
-    loadComponent: () => import('./components/carousel/carousel.component').then(m => m.CarouselComponent)
-  }
+
 ];
 
 @NgModule({

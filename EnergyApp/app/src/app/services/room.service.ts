@@ -4,7 +4,7 @@ import { MeterData } from '../models/MeterData';
 import { SimpleInfo } from '../models/SimpleInfo';
 import { HttpClient } from '@angular/common/http';
 import { SimpleRoom } from '../models/SimpleRoom';
-import { DailyAccumulatedDto } from '../models/DailyAccumulatedDto';
+import { YearlyAccumulatedDto } from '../models/YearlyAccumulatedDto';
 import { Moment } from 'moment';
 
 @Injectable({
@@ -55,17 +55,20 @@ export class RoomService {
     return this.http.get<SimpleRoom>(this.url+'roomId');
   }
 
-  getRoomDailyAccumulationList(roomId: string, startTime: String, endTime: String): Observable<DailyAccumulatedDto[]>
+  getRoomDailyAccumulationList(roomId: string, startTime: String, endTime: String): Observable<YearlyAccumulatedDto[]>
   {
-
-    
-    return this.http.get<DailyAccumulatedDto[]>(`https://localhost:7141/api/Room/TimeInterval/${roomId}/${startTime}/${endTime}`)
+    return this.http.get<YearlyAccumulatedDto[]>(`https://localhost:7141/api/Room/TimeInterval/${roomId}/${startTime}/${endTime}`)
     
     
     
     // return this.http.get<DailyAccumulatedDto[]>('https://localhost:7141/api/Room/TimeInterval/4E10F56A-147E-4541-ADE4-08DBEF4BCA36?startTime=2023-12-11T00%3A00%3A00.0000000&endTime=2024-01-17T00%3A00%3A00.0000000')
     // return this.http.get<DailyAccumulatedDto[]>('https://localhost:7141/api/Room/TimeInterval/4E10F56A-147E-4541-ADE4-08DBEF4BCA36?startTime=2024-01-01&endTime=2024-01-17')
     
+  }
+
+  getRoomYearlyAccumulationList(roomId: string, Year: String): Observable<YearlyAccumulatedDto[]>
+  {
+    return this.http.get<YearlyAccumulatedDto[]>(`https://localhost:7141/api/Room/YearlyAccumulation/${roomId}/${Year}`)
 
   }
 
