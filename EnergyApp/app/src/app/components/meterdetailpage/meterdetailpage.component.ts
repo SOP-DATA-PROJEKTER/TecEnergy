@@ -137,11 +137,21 @@ export class MeterdetailpageComponent implements OnInit {
 
   updateDataYearly(Date: String){
 
-    this.roomService.getRoomYearlyAccumulationList(this.id, Date).subscribe((data: YearlyAccumulatedDto[]) => {
-      this.data = data;
-      this.updateChart();
-    });
+    // this.roomService.getRoomYearlyAccumulationList(this.id, Date).subscribe((data: YearlyAccumulatedDto[]) => {
+    //   this.data = data;
+    //   this.updateChart();
+    // });
   
+
+    this.roomService.getRoomYearlyAccumulationList(this.id, Date).subscribe({
+      next: (data) =>{
+        this.data = data;
+        this.updateChart();
+      },
+      error: (err) => console.log(err),
+      complete: () => console.log("complete")
+
+    })
   }
   
   updateChart() {
