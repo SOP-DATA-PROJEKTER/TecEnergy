@@ -1,4 +1,5 @@
 ﻿using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 
 namespace TecEnergy.Database.Repositories.Interfaces;
 
@@ -17,6 +18,7 @@ public interface IRoomRepository
     Task<Room> GetFirstRoomAsync();
 
     Task<ICollection<DailyAccumulated>> GetDailyAccumulationAsync(Guid roomId, DateTime startTime,  DateTime? endTime);
+    Task<MonthlyAccumulatedDto> GetYearlyAccumulation(Guid roomId, DateOnly year);
 
 
 

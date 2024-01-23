@@ -1,10 +1,7 @@
 <div id="Container" >
     <h1>METER DETAILS</h1>
-
     
 
-
-  
     <div class=range-picker-div>
       <mat-form-field>
         <mat-label>Enter a date range</mat-label>
@@ -13,16 +10,13 @@
           <input matEndDate formControlName="end" placeholder="End date" (dateChange)="updateDataFromMoment()">
         </mat-date-range-input>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
+        <mat-date-range-picker #picker 
+        ></mat-date-range-picker>
       </mat-form-field>
     </div>
-  
-    <div id="container"></div>
 
-    <!-- Make a go back to previous page button -->
+    <div id="container"></div>
 
     <button mat-raised-button color="primary" (click)="goBack()">Go back</button>
     
   </div>
-
-  

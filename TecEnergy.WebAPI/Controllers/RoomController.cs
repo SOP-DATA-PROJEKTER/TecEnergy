@@ -144,4 +144,14 @@ public class RoomController : ControllerBase
         return Ok(dataList);
     }
 
+
+    [HttpGet("YearlyAccumulation/{roomId}/{year}")]
+    public async Task<IActionResult> GetYearlyAccumulationAsync(Guid roomId, DateOnly year)
+    {
+        // converted to dto in repository instead of here
+
+        var result = await _service.GetYearlyAccumulation(roomId, year);
+        return Ok(result);
+    }
+
 }

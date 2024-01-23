@@ -109,4 +109,26 @@ public class RoomService
         var result = await _repository.GetDailyAccumulationAsync(roomId, startTime, endTime);
         return result;
     }
+
+
+    public async Task<ICollection<MonthlyAccumulatedDto>> GetYearlyAccumulation(Guid roomId, DateOnly year)
+    {
+        // call this for every month in the year
+        // if i get null back no data was logged for that month and is skipped
+        // if i get a value back i add it to the total
+        // return as a list
+
+        List<MonthlyAccumulatedDto> result = new();
+
+        for (var i = 1; i < 13; i++)
+        {
+            var month = new DateOnly(year.Year, i, 1);
+            var data = await _repository.GetYearlyAccumulation(roomId, month);
+            if (data != null && data.MonthlyAccumulatedValue != 0)
+            {
+                result.Add(data);
+            }
+        }
+        return result;
+    }
 }
