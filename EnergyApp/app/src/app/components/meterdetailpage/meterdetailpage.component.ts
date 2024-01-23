@@ -16,7 +16,7 @@ import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
-import { animate, style, transition, trigger } from '@angular/animations';
+import { CarouselComponent } from "../carousel/carousel.component";
 
 
 @Component({
@@ -45,10 +45,9 @@ import { animate, style, transition, trigger } from '@angular/animations';
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-
-    ],
-
-  })
+        CarouselComponent
+    ]
+})
 
 export class MeterdetailpageComponent implements OnInit {
 
