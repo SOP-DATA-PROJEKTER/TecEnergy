@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatDatepickerModule } from '@angular/material/datepicker';
+import {MatDateRangePicker, MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
@@ -51,6 +51,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
   })
 
 export class MeterdetailpageComponent implements OnInit {
+
 
   @Output() meterDetailEvent = new EventEmitter<boolean>();
 
@@ -221,5 +222,5 @@ export class MeterdetailpageComponent implements OnInit {
   goBack() {
     this.meterDetailEvent.emit(true);
   }
-  
+
 }

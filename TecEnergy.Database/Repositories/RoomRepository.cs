@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -92,5 +93,20 @@ public class RoomRepository : IRoomRepository
             .OrderBy(x => x.DateTime)
             .ToListAsync();
 
+    }
+
+    public async Task<MonthlyAccumulatedDto> GetYearlyAccumulation(Guid roomId, DateOnly date)
+    {
+        var dailyAccumulatedValues = await _context.DailyAccumulated
+        .Where(d => d.RoomId == roomId && d.DateTime.Month == date.Month && d.DateTime.Year == date.Year)
+        .ToListAsync();
+
+        long monthlyAccumulatedValue = dailyAccumulatedValues.Sum(d => d.DailyAccumulatedValue);
+
+        return new MonthlyAccumulatedDto
+        {
+            MonthlyAccumulatedValue = monthlyAccumulatedValue,
+            Month = date
+        };
     }
 }
