@@ -16,7 +16,6 @@ import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
-import { CarouselComponent } from "../carousel/carousel.component";
 
 
 @Component({
@@ -45,7 +44,6 @@ import { CarouselComponent } from "../carousel/carousel.component";
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        CarouselComponent
     ]
 })
 
