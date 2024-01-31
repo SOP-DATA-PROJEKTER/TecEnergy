@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -86,9 +87,8 @@ public class EnergyDataController : ControllerBase
         return NoContent();
     }
 
-
     [HttpPost("Test")]
-    public async Task<IActionResult> TestPostAsync([FromBody] Test any)
+    public async Task<IActionResult> TestPostAsync([FromBody] TestDto any)
     {
         return Ok(any);
     }
