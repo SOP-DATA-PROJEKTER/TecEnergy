@@ -88,7 +88,7 @@ public class EnergyDataController : ControllerBase
 
 
     [HttpPost("Test")]
-    public async Task<IActionResult> TestPostAsync([FromBody] object any)
+    public async Task<IActionResult> TestPostAsync([FromBody] Test any)
     {
         return Ok(any);
     }
