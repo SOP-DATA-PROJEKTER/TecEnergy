@@ -19,8 +19,8 @@ public class Program
         //         o => o.UseSqlServer("Data Source=10.233.134.112,1433;Initial Catalog=TecEnergyDB;User ID=TecAdmin;Password=Tec420;TrustServerCertificate=True"));
 
         //SKP Room connectionstring
-        //builder.Services.AddDbContext<DatabaseContext>(
-        //         o => o.UseSqlServer("Data Source=192.168.21.7,1433;Initial Catalog=EnergyMonitor7;User ID=Admin;Password=Tec420;TrustServerCertificate=True"));
+        builder.Services.AddDbContext<DatabaseContext>(
+                 o => o.UseSqlServer("Data Source=192.168.21.7,1433;Initial Catalog=EnergyMonitor7;User ID=Admin;Password=Tec420;TrustServerCertificate=True"));
 
 
         // configure user secrets:
@@ -30,13 +30,13 @@ public class Program
         // to view the secrets.json right click the project (TecEnergy.WebAPI) and chose manage user 
         // documentation: https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-8.0&tabs=windows
 
-        var conStrBuilder = new SqlConnectionStringBuilder();
-        conStrBuilder.ConnectionString = builder.Configuration["ConnectionString"];
-        conStrBuilder.Password = builder.Configuration["DbPass"];
-        var conn = conStrBuilder.ConnectionString;
+        //var conStrBuilder = new SqlConnectionStringBuilder();
+        //conStrBuilder.ConnectionString = builder.Configuration["ConnectionString"];
+        //conStrBuilder.Password = builder.Configuration["DbPass"];
+        //var conn = conStrBuilder.ConnectionString;
 
-        builder.Services.AddDbContext<DatabaseContext>(
-            o => o.UseSqlServer(conn));
+        //builder.Services.AddDbContext<DatabaseContext>(
+        //    o => o.UseSqlServer(conn));
 
 
         builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();

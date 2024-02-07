@@ -48,7 +48,6 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<EnergyDto>> GetByIdWithEnergyMetersAsync(Guid id)
     {
         var startDateTime = DateTime.UtcNow;
-        //if (endDateTime == null && startDateTime == null) endDateTime = DateTime.UtcNow; startDateTime = endDateTime.Value.AddSeconds(-60);
         var result = await _service.GetEnergyDtoAsync(id, startDateTime.AddSeconds(-60), startDateTime);
         if (result is null) return NotFound();
         return Ok(result);
@@ -58,29 +57,8 @@ public class RoomController : ControllerBase
     public async Task<List<EnergyDto>> GetEnergyMeterListByRoomId(Guid roomId)
     {
         var startDateTime = DateTime.UtcNow;
-        List<EnergyDto> list = new();
-        var result = await _service.GetEnergyMeterListDtoByRoomId(roomId, startDateTime.AddSeconds(-60), startDateTime); 
-        foreach (var item in result)
-        {
-            //Quick hack
-            double accumulated = 0;
-            double hoursInDouble = 0;
-            double realTime = 0;
-
-            var firstPoint = item.EnergyDatas.OrderBy(x => x.DateTime).FirstOrDefault();
-            var lastPoint = item.EnergyDatas.OrderByDescending(x => x.DateTime).FirstOrDefault();
-            
-            //calculating realtime and accumulated values
-            if(firstPoint != null && lastPoint != null)
-            {
-                accumulated = CalculationHelper.CalculateAccumulatedEnergy(lastPoint.AccumulatedValue, 0.001);
-            }
-            realTime = item.EnergyDatas.Count * 60f / 1000f;
-
-            var dto = EnergyMeterMappings.EnergyMeterToEnergyDto(item, realTime, accumulated);
-            list.Add(dto);
-        }
-        return list;
+        var result = await _service.GetEnergyMeterListDtoByRoomId(roomId, startDateTime.AddSeconds(-60), startDateTime);
+        return result;
     }
 
     [HttpPost]
@@ -153,5 +131,4 @@ public class RoomController : ControllerBase
         var result = await _service.GetYearlyAccumulation(roomId, year);
         return Ok(result);
     }
-
 }

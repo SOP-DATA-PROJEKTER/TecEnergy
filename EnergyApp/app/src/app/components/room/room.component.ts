@@ -38,7 +38,6 @@ export class RoomComponent implements OnInit
     this.route.params.subscribe(params => 
     {
       this.CurrentRoomId = params['id'];
-      // console.log(this.CurrentRoomId)
       this.roomService.getMeterData(params['id']).subscribe(x => this.Room = x);
       this.roomService.getSubMeterData(params['id']).subscribe(x => this.Meters = x);
     });
@@ -56,7 +55,6 @@ export class RoomComponent implements OnInit
   {
     this.roomService.getMeterData(this.CurrentRoomId).subscribe(x => this.Room = x);
     this.roomService.getSubMeterData(this.CurrentRoomId).subscribe(x => this.Meters = x);
-    // console.log(this.Meters)
 
     setTimeout(() => {
       if(this.update)

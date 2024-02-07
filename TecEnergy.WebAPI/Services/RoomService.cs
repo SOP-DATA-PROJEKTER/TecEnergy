@@ -55,12 +55,16 @@ public class RoomService
         // Loop through each energy meter to calculate impulse count and the latest accumulated value
         foreach (var item in result.EnergyMeters)
         {
-            impulseCount += item.EnergyDatas.Count();
-            var x = item.EnergyDatas.OrderBy(x => x.DateTime).LastOrDefault();
+            var latest = item.EnergyDatas.OrderBy(x => x.DateTime).LastOrDefault();
 
-            if(x!= null)
-                acc += x.AccumulatedValue;
+            if(latest.DateTime >= startDateTime)
+                impulseCount += item.EnergyDatas.Count();
+
+
+            if(latest != null)
+                acc += latest.AccumulatedValue;
         }
+
         // Calculate the accumulated and real-time value.
         // this is quickfix for realtime for now, but implement method in calculationhelper
         var accumulated = CalculationHelper.CalculateAccumulatedEnergy(acc, 0.001);
@@ -70,10 +74,32 @@ public class RoomService
         return energyDto;
     }
 
-    public async Task<List<EnergyMeter>> GetEnergyMeterListDtoByRoomId(Guid roomId, DateTime? startDateTime, DateTime? endDateTime)
+    public async Task<List<EnergyDto>> GetEnergyMeterListDtoByRoomId(Guid roomId, DateTime? startDateTime, DateTime? endDateTime)
     {
+        List<EnergyDto> meters = new();
+        // Retrieve room data along with associated energy meters and energy data which datetime in within the timespan of startDateTime and endDateTime
         var result = await _repository.GetByIdWithEnergyMetersFirstAndLastAsync(roomId, startDateTime, endDateTime);
-        return result.EnergyMeters;
+
+        // Loop through each energy meter to calculate impulse count and the latest accumulated value
+        foreach (var item in result.EnergyMeters)
+        {
+            double accumulated = 0;
+            double realTime = 0;
+
+            var latest = item.EnergyDatas.OrderBy(x => x.DateTime).LastOrDefault();
+
+            if (latest.DateTime >= startDateTime)
+                realTime = item.EnergyDatas.Count() * 60f / 1000f;
+
+
+            if (latest != null)
+                accumulated = CalculationHelper.CalculateAccumulatedEnergy(latest.AccumulatedValue, 0.001);
+            
+            meters.Add(EnergyMeterMappings.EnergyMeterToEnergyDto(item, realTime, accumulated));
+        }
+
+        
+        return meters;
     }
 
     public async Task AddAsync(Room room)
