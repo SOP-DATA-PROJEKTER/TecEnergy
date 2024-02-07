@@ -24,10 +24,15 @@ public class BuildingRepository : IBuildingRepository
         return await _context.Buildings.FindAsync(id);
     }
 
-    public async Task<Building> GetByIdWithRoomsAsync(Guid? id)
+    public async Task<Building> GetByIdWithRoomsAndMetersAsync(Guid? id)
     {
-        return await _context.Buildings.Include(r => r.Rooms).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Buildings
+            .Include(r => r.Rooms)
+                .ThenInclude(room => room.EnergyMeters)
+                    .ThenInclude(meter => meter.EnergyDatas)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
+
 
     public async Task AddAsync(Building building)
     {
