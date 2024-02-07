@@ -154,4 +154,12 @@ public class RoomController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("AllYearData/{roomId}")]
+    public async Task<IActionResult> GetAllYearDataAsync(Guid roomId)
+    {
+        var result = await _service.GetAllYearData(roomId);
+        return Ok(result);
+    }
+
+
 }

@@ -17,38 +17,35 @@ import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
 
-
 @Component({
-    selector: 'app-meterdetailpage',
-    templateUrl: './meterdetailpage.component.html',
-    styleUrls: ['./meterdetailpage.component.css'],
-    providers: [
-        // The locale would typically be provided on the root module of your application. We do it at
-        // the component level here, due to limitations of our example generation script.
-        { provide: MAT_DATE_LOCALE, useValue: 'da-DK' },
-        // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
-        // to your app config. We provide it at the component level here, due to limitations
-        // of our example generation script.
-        provideMomentDateAdapter(),
-    ],
-    standalone: true,
-    imports: [
-        CommonModule,
-        HighchartsChartModule,
-        MatDatepickerModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatNativeDateModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatButtonModule,
-    ]
+  selector: 'app-overall-graph',
+  templateUrl: './overall-graph.component.html',
+  styleUrls: ['./overall-graph.component.css'],
+  standalone: true,
+  providers: [
+    // The locale would typically be provided on the root module of your application. We do it at
+    // the component level here, due to limitations of our example generation script.
+    { provide: MAT_DATE_LOCALE, useValue: 'da-DK' },
+    // Moment can be provided globally to your app by adding `provideMomentDateAdapter`
+    // to your app config. We provide it at the component level here, due to limitations
+    // of our example generation script.
+    provideMomentDateAdapter(),
+],
+imports: [
+    CommonModule,
+    HighchartsChartModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+]
 })
-
-export class MeterdetailpageComponent implements OnInit {
-  @Output() meterDetailEvent = new EventEmitter<boolean>();
+export class OverallGraphComponent implements OnInit{
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
@@ -59,7 +56,6 @@ export class MeterdetailpageComponent implements OnInit {
   constructor(
     private roomService : RoomService, 
     private route: ActivatedRoute, 
-    private formBuilder: FormBuilder,
     @Inject(MAT_DATE_LOCALE) private _locale: string,
   ) 
   {
@@ -78,7 +74,7 @@ export class MeterdetailpageComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.updateDataFromMoment()
+    
     
     // Initializes chart
       this.chartOptions = 
@@ -132,6 +128,8 @@ export class MeterdetailpageComponent implements OnInit {
           }
         }
       };
+
+      this.updateDataFromMoment();
   }
 
   updateDataYearly(Date: String){
@@ -196,14 +194,11 @@ export class MeterdetailpageComponent implements OnInit {
     this.updateDataYearly(dateString);
   }
 
-  goBack() {
-    this.meterDetailEvent.emit(true);
-  }
-
   setDate($event: any, datepicker: MatDatepicker<any>) {
     this.date.setValue($event);
     datepicker.close();
     this.updateDataFromMoment();    
   }
+
 
 }

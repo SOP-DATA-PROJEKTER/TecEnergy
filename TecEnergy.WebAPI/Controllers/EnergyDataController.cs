@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.WebAPI.Controllers;
@@ -11,6 +12,9 @@ namespace TecEnergy.WebAPI.Controllers;
 [ApiController]
 public class EnergyDataController : ControllerBase
 {
+    
+    // why is this not consistent with the other controllers, here we directly inject the repository but in the other controllers we inject services.
+
     private readonly IEnergyDataRepository _repository;
 
     public EnergyDataController(IEnergyDataRepository repository)
@@ -18,6 +22,8 @@ public class EnergyDataController : ControllerBase
         _repository = repository;
     }
 
+
+    // doubt getting all data will be useful
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnergyData>>> GetAllAsync()
     {
@@ -25,6 +31,8 @@ public class EnergyDataController : ControllerBase
         return Ok(result);
     }
 
+
+    // doubt this will get used
     [HttpGet("{id}")]
     public async Task<ActionResult<EnergyData>> GetByIdAsync(Guid id)
     {
@@ -33,6 +41,8 @@ public class EnergyDataController : ControllerBase
         return Ok(result);
     }
 
+
+    // we can use this to initialize the esp32 if a crash occurs, get the last value and set it to the accumulatedvalue
     [HttpGet("latest")]
     public async Task<ActionResult<EnergyData>> GetLatestEnergyData(Guid energyMeterId)
     {
@@ -40,6 +50,7 @@ public class EnergyDataController : ControllerBase
         if (result is null) return NotFound();
         return Ok(result);
     }
+
 
     [HttpPost]
     //public async Task<ActionResult<EnergyData>> CreateAsync(EnergyData energyData)
@@ -49,7 +60,7 @@ public class EnergyDataController : ControllerBase
     //    await _repository.AddAsync(energyData);
     //    return Ok(energyData);
     //}
-    public async Task<ActionResult<IEnumerable<EnergyData>>> CreateAsync([FromBody] IEnumerable<EnergyData> energyDataList)
+    public async Task<ActionResult<IEnumerable<EnergyDataDto>>> CreateAsync([FromBody] IEnumerable<EnergyDataDto> energyDataList)
     {
         if (energyDataList == null || !ModelState.IsValid)
         {
@@ -60,7 +71,7 @@ public class EnergyDataController : ControllerBase
         {
             if (energyData.EnergyMeterID == Guid.Empty)
             {
-                ModelState.AddModelError(nameof(EnergyData.EnergyMeterID), "Missing Energy Meter Id.");
+                ModelState.AddModelError(nameof(EnergyDataDto.EnergyMeterID), "Missing Energy Meter Id.");
                 return BadRequest(ModelState);
             }
 
@@ -68,9 +79,23 @@ public class EnergyDataController : ControllerBase
             await _repository.AddAsync(energyData);
         }
 
-        return Ok(energyDataList);
+        //return Ok(energyDataList);
+        // instead of returning ok, we should return the created status code 201.
+        return Created("~api/EnergyData", energyDataList);
     }
 
+
+    // should be deleted, only used for testing without modifying the database
+    [HttpPost("Test")]
+    public async Task<IActionResult> TestPostAsync([FromBody] List<Test> any)
+    {
+        return CreatedAtAction(nameof(TestPostAsync), any);
+    }
+
+
+    // put is for replace data with a new one. so we first delete the old one and then add the new one
+    // seems to me this shuld have been a patch since we update the data.
+    // not sure how useful this even is.
     [HttpPut("{id}")]
     public async Task<IActionResult> PutAsync(Guid id, EnergyData updateResource)
     {
@@ -79,6 +104,7 @@ public class EnergyDataController : ControllerBase
         return NoContent();
     }
 
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
@@ -86,12 +112,6 @@ public class EnergyDataController : ControllerBase
         return NoContent();
     }
 
-
-    [HttpPost("Test")]
-    public async Task<IActionResult> TestPostAsync([FromBody] Test any)
-    {
-        return Ok(any);
-    }
 
 
 

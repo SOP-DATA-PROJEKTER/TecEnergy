@@ -109,4 +109,20 @@ public class RoomRepository : IRoomRepository
             Month = date
         };
     }
+
+    public async Task<YearlyAccumulatedDto> GetAllAccumulation(Guid roomId, DateOnly date)
+    {
+
+        var values = await _context.DailyAccumulated
+            .Where(d => d.RoomId == roomId && d.DateTime.Year == date.Year)
+            .ToListAsync();
+
+        long yearlyAccumulatedValue = values.Sum(d => d.DailyAccumulatedValue);
+
+        return new YearlyAccumulatedDto
+        {
+            Accumulated = yearlyAccumulatedValue,
+            Date = date
+        };
+    }
 }

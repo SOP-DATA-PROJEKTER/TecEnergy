@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { SimpleRoom } from '../models/SimpleRoom';
 import { YearlyAccumulatedDto } from '../models/YearlyAccumulatedDto';
 import { Moment } from 'moment';
+import { AllAccumulatedData } from '../models/AllAccumulatedData';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +60,12 @@ export class RoomService {
   getRoomYearlyAccumulationList(roomId: string, Year: String): Observable<YearlyAccumulatedDto[]>
   {
     return this.http.get<YearlyAccumulatedDto[]>(`https://localhost:7141/api/Room/YearlyAccumulation/${roomId}/${Year}`)
+
+  }
+
+  getRoomAllAccumulationList(roomId: string): Observable<AllAccumulatedData[]>
+  {
+    
 
   }
 
