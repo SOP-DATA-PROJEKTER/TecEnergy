@@ -14,7 +14,12 @@ const routes: Routes =
   {
     path: 'meterdetail/:id',
     loadComponent: () => import('./components/meterdetailpage/meterdetailpage.component').then(m => m.MeterdetailpageComponent)
+  },
+  {
+    path: 'test',
+    loadComponent: () => import('./components/test-room/test-room.component').then(m => m.TestRoomComponent)
   }
+
 ];
 
 @NgModule({

@@ -1,0 +1,5 @@
+<p>test-room works!</p>
+<button (click)="click()">Click</button>
+<div *ngIf="Info | async as info">
+    Id: {{info[0].Id}} | Name: {{info[0].Name}} | Type: {{getInfoType(info[0].Type)}}
+ </div>
