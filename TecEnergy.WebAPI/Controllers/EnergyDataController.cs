@@ -112,7 +112,4 @@ public class EnergyDataController : ControllerBase
         return NoContent();
     }
 
-
-
-
 }
