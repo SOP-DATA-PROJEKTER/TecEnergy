@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,9 +48,21 @@ public class RoomRepository : IRoomRepository
 
     public async Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
-        return await _context.Rooms.Include(x => x.EnergyMeters)
+        var room = await _context.Rooms.Include(x => x.EnergyMeters)
             .ThenInclude(x => x.EnergyDatas.Where(x => x.DateTime >= startDateTime && x.DateTime <= endDateTime))
             .FirstOrDefaultAsync(x => x.Id == id);
+
+        if(room?.EnergyMeters != null)
+        {
+            foreach(var meter in room.EnergyMeters)
+            {
+                if(meter.EnergyDatas?.Count == 0)
+                {
+                    meter.EnergyDatas.Add(_context.EnergyData.Where(e => e.EnergyMeterID == meter.Id).OrderByDescending(e => e.DateTime).FirstOrDefault());
+                }
+            }
+        }
+        return room;
     }
 
     public async Task AddAsync(Room room)
