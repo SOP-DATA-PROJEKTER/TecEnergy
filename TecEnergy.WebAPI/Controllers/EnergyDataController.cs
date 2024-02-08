@@ -85,14 +85,6 @@ public class EnergyDataController : ControllerBase
     }
 
 
-    // should be deleted, only used for testing without modifying the database
-    [HttpPost("Test")]
-    public async Task<IActionResult> TestPostAsync([FromBody] List<Test> any)
-    {
-        return CreatedAtAction(nameof(TestPostAsync), any);
-    }
-
-
     // put is for replace data with a new one. so we first delete the old one and then add the new one
     // seems to me this shuld have been a patch since we update the data.
     // not sure how useful this even is.
