@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatDateRangePicker, MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
+import {MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { YearlyAccumulatedDto } from 'src/app/models/YearlyAccumulatedDto';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -16,6 +16,7 @@ import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
+import { OverallGraphComponent } from "../overall-graph/overall-graph.component";
 
 
 @Component({
@@ -44,6 +45,7 @@ import * as moment from 'moment';
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
+        OverallGraphComponent
     ]
 })
 
@@ -71,12 +73,11 @@ export class MeterdetailpageComponent implements OnInit {
     }
 
     this.date = new FormControl(moment(momentStart));
-      
+    
     this.id = this.route.snapshot.paramMap.get('id')!;
   }
 
 
-  
   ngOnInit(): void {
 
     this.updateDataFromMoment()

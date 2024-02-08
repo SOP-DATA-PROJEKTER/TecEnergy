@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { SimpleRoom } from '../models/SimpleRoom';
 import { YearlyAccumulatedDto } from '../models/YearlyAccumulatedDto';
 import { Moment } from 'moment';
+import { AllAccumulatedData } from '../models/AllAccumulatedData';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,9 @@ import { Moment } from 'moment';
 export class RoomService {
 
   // url : string = "http://10.233.134.112:2050/api/Room/"
-  // url : string = "https://localhost:7141/api/"
-  url : string = "http://192.168.21.7:2050/api/Room/"
+
+  // url : string = "http://192.168.21.7:2050/api/Room/"
+  url : string = "https://localhost:7141/api/Room/"
 
   constructor(private http: HttpClient) { }
 
@@ -49,6 +51,11 @@ export class RoomService {
 
   getRoomYearlyAccumulationList(roomId: string, Year: String): Observable<YearlyAccumulatedDto[]>
   {
-    return this.http.get<YearlyAccumulatedDto[]>(`${this.url}YearlyAccumulation/${roomId}/${Year}`)
+    return this.http.get<YearlyAccumulatedDto[]>(this.url + `YearlyAccumulation/${roomId}/${Year}`)
+  }
+
+  getRoomAllAccumulationList(roomId: string): Observable<AllAccumulatedData[]>
+  {
+    return this.http.get<AllAccumulatedData[]>(this.url + `AllYearData/${roomId}`)
   }
 }
