@@ -109,4 +109,57 @@ public class RoomController : ControllerBase
         await _service.DeleteAsync(id);
         return NoContent();
     }
+
+    [HttpGet("roomId")]
+    public async Task<ActionResult<GuidDto>> GetFirstRoomIdAsync()
+    {
+        GuidDto result = new();
+        var room = await _service.GetFirstRoomAsync();
+        result.Id = room.Id;
+        return Ok(result);
+    }
+
+
+    // 2023-12-11T13:00:00
+
+    [HttpGet("TimeInterval/{roomId}/{startTime}/{endTime}")]
+    public async Task<IActionResult> GetEnergyDataByTimeIntervalAsync(Guid roomId, DateTime startTime, DateTime endTime)
+    {
+        // validate inputs
+        var result = await _service.GetAccumulatedEnergyForARoom(roomId, startTime, endTime);
+
+        List<DailyAccumulatedDto> dataList = new();
+
+        foreach (var item in result)
+        {
+            DailyAccumulatedDto temp = new();
+            temp.DailyAccumulatedValue = item.DailyAccumulatedValue;
+            temp.DateTime = item.DateTime;
+            dataList.Add(temp);
+        }
+
+        // validate result
+        // change result to dto
+        // return dto as actionresult
+        return Ok(dataList);
+    }
+
+
+    [HttpGet("YearlyAccumulation/{roomId}/{year}")]
+    public async Task<IActionResult> GetYearlyAccumulationAsync(Guid roomId, DateOnly year)
+    {
+        // converted to dto in repository instead of here
+
+        var result = await _service.GetYearlyAccumulation(roomId, year);
+        return Ok(result);
+    }
+
+    [HttpGet("AllYearData/{roomId}")]
+    public async Task<IActionResult> GetAllYearDataAsync(Guid roomId)
+    {
+        var result = await _service.GetAllYearData(roomId);
+        return Ok(result);
+    }
+
+
 }

@@ -1,9 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit,  Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SpeedometerComponent } from '../speedometer/speedometer.component';
 import { MeterData } from 'src/app/models/MeterData';
 import { MeterlistItemComponent } from '../meterlist-item/meterlist-item.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TooltipDirective } from 'src/app/directives/tooltip.directive';
 
 @Component({
@@ -13,12 +13,23 @@ import { TooltipDirective } from 'src/app/directives/tooltip.directive';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent 
+export class DashboardComponent implements OnInit
 {
   @Input() MainMeter! : MeterData;
   @Input() SubMeters! : MeterData[];
 
-  constructor(private router: Router) {}
+  @Output() detailEvent = new EventEmitter<boolean>();
+  
+  CurrentRoomId : string = "0";
+
+  constructor(private router: Router, private route : ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.params.subscribe(params => 
+    {
+      this.CurrentRoomId = params['id'];
+    });
+  }
 
   ShowListView() : boolean
   {
@@ -27,10 +38,13 @@ export class DashboardComponent
 
     return false;
   }
+  
 
 
   TestGoToDetails()
   {
-    this.router.navigate(['meterdetail/1']);
+    // emit event
+    this.detailEvent.emit(false);
+    // this.router.navigate([`meterdetail/${this.CurrentRoomId}`]);
   }
 }

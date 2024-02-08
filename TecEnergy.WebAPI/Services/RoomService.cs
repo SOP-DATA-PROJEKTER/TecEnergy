@@ -96,4 +96,63 @@ public class RoomService
         var result = await _repository.SearchAsync(searchInput);
         return result;
     }
+
+    public async Task<Room> GetFirstRoomAsync()
+    {
+        var result = await _repository.GetFirstRoomAsync();
+        return result;
+    }
+
+
+    public async Task<ICollection<DailyAccumulated>> GetAccumulatedEnergyForARoom(Guid roomId, DateTime startTime, DateTime endTime)
+    {
+        var result = await _repository.GetDailyAccumulationAsync(roomId, startTime, endTime);
+        return result;
+    }
+
+
+    public async Task<ICollection<MonthlyAccumulatedDto>> GetYearlyAccumulation(Guid roomId, DateOnly year)
+    {
+        // call this for every month in the year
+        // if i get null back no data was logged for that month and is skipped
+        // if i get a value back i add it to the total
+        // return as a list
+
+        List<MonthlyAccumulatedDto> result = new();
+
+        for (var i = 1; i < 13; i++)
+        {
+            var month = new DateOnly(year.Year, i, 1);
+            var data = await _repository.GetYearlyAccumulation(roomId, month);
+            if (data != null && data.MonthlyAccumulatedValue != 0)
+            {
+                result.Add(data);
+            }
+        }
+        return result;
+    }
+
+    public async Task<ICollection<YearlyAccumulatedDto>> GetAllYearData(Guid roomId)
+    {
+
+        List<YearlyAccumulatedDto> result = new();
+
+        var startYear = new DateOnly(2023, 1, 1);
+        DateOnly endYear = DateOnly.FromDateTime(DateTime.Now);
+
+        for (var i = 0; i <= endYear.Year - startYear.Year; i++)
+        {
+            var date = new DateOnly(startYear.Year + i, 1, 1);
+            var data = await _repository.GetAllAccumulation(roomId, date);
+            if (data != null && data.Accumulated != 0)
+            {
+                result.Add(data);
+            }
+
+        }
+
+        return result;
+    }
+
+
 }

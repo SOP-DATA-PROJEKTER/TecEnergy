@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -16,6 +18,11 @@ public class RoomRepository : IRoomRepository
     public RoomRepository(DatabaseContext context)
     {
         _context = context;
+    }
+
+    public async Task<Room> GetFirstRoomAsync()
+    {
+        return await _context.Rooms.FirstAsync();
     }
 
     public async Task<IEnumerable<Room>> GetAllAsync()
@@ -40,7 +47,9 @@ public class RoomRepository : IRoomRepository
 
     public async Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime)
     {
-        return await _context.Rooms.Include(x => x.EnergyMeters).ThenInclude(x => x.EnergyDatas.Where(x => x.DateTime >= startDateTime && x.DateTime <= endDateTime)).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Rooms.Include(x => x.EnergyMeters)
+            .ThenInclude(x => x.EnergyDatas.Where(x => x.DateTime >= startDateTime && x.DateTime <= endDateTime))
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task AddAsync(Room room)
@@ -75,5 +84,45 @@ public class RoomRepository : IRoomRepository
         return await _context.Rooms
             .Where(x => x.RoomName.Contains(searchInput) || x.RoomComment.Contains(searchInput))
             .ToListAsync();
+    }
+
+    async Task<ICollection<DailyAccumulated>> IRoomRepository.GetDailyAccumulationAsync(Guid roomId, DateTime startTime, DateTime? endTime)
+    {
+        return await _context.DailyAccumulated
+            .Where(x => x.RoomId == roomId && x.DateTime >= startTime && x.DateTime <= endTime)
+            .OrderBy(x => x.DateTime)
+            .ToListAsync();
+
+    }
+
+    public async Task<MonthlyAccumulatedDto> GetYearlyAccumulation(Guid roomId, DateOnly date)
+    {
+        var dailyAccumulatedValues = await _context.DailyAccumulated
+        .Where(d => d.RoomId == roomId && d.DateTime.Month == date.Month && d.DateTime.Year == date.Year)
+        .ToListAsync();
+
+        long monthlyAccumulatedValue = dailyAccumulatedValues.Sum(d => d.DailyAccumulatedValue);
+
+        return new MonthlyAccumulatedDto
+        {
+            MonthlyAccumulatedValue = monthlyAccumulatedValue,
+            Month = date
+        };
+    }
+
+    public async Task<YearlyAccumulatedDto> GetAllAccumulation(Guid roomId, DateOnly date)
+    {
+
+        var values = await _context.DailyAccumulated
+            .Where(d => d.RoomId == roomId && d.DateTime.Year == date.Year)
+            .ToListAsync();
+
+        long yearlyAccumulatedValue = values.Sum(d => d.DailyAccumulatedValue);
+
+        return new YearlyAccumulatedDto
+        {
+            Accumulated = yearlyAccumulatedValue,
+            Date = date
+        };
     }
 }

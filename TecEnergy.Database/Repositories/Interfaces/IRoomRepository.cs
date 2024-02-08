@@ -1,4 +1,5 @@
 ﻿using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 
 namespace TecEnergy.Database.Repositories.Interfaces;
 
@@ -14,4 +15,13 @@ public interface IRoomRepository
     Task<IEnumerable<Room>> SearchAsync(string searchInput);
     Task<EnergyData> GetLatestEnergyDataAsync(Guid energyMeterId);
     Task<Room> GetByIdWithEnergyMetersFirstAndLastAsync(Guid id, DateTime? startDateTime, DateTime? endDateTime);
+    Task<Room> GetFirstRoomAsync();
+
+    Task<ICollection<DailyAccumulated>> GetDailyAccumulationAsync(Guid roomId, DateTime startTime,  DateTime? endTime);
+    Task<MonthlyAccumulatedDto> GetYearlyAccumulation(Guid roomId, DateOnly year);
+
+    Task<YearlyAccumulatedDto> GetAllAccumulation(Guid roomId, DateOnly date);
+
+
+
 }

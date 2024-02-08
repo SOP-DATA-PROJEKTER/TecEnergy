@@ -37,9 +37,9 @@ internal class Program
         try
         {
             // Adjust the URL based on your API endpoint
-            //string apiUrl = "https://localhost:7141/api/energydata";
+            string apiUrl = "https://localhost:7141/api/energydata";
 
-            string apiUrl = "http://192.168.21.7:2050/api/EnergyData";
+            //string apiUrl = "http://192.168.21.7:2050/api/EnergyData";
 
             // Create a batch of EnergyData for the last 10 seconds
             var energyDataBatch = GenerateEnergyDataBatch();
@@ -77,6 +77,7 @@ internal class Program
     {
         // Simulate generating a batch of EnergyData for the last 10 seconds
         DateTime currentDateTime = DateTime.UtcNow;
+        
         List<object> energyDataBatch = new List<object>();
 
         Random rnd = new Random();

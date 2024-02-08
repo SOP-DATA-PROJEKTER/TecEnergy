@@ -7,21 +7,26 @@ import { SimpleInfo } from 'src/app/models/SimpleInfo';
 import { MeterData } from 'src/app/models/MeterData';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MeterdetailpageComponent } from "../meterdetailpage/meterdetailpage.component";
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-room',
-  standalone: true,
-  imports: [CommonModule,NavbarComponent,SidebarComponent,DashboardComponent],
-  templateUrl: './room.component.html',
-  styleUrls: ['./room.component.css']
+    selector: 'app-room',
+    standalone: true,
+    templateUrl: './room.component.html',
+    styleUrls: ['./room.component.css'],
+    imports: [CommonModule, NavbarComponent, SidebarComponent, DashboardComponent, MeterdetailpageComponent],
+
 })
 export class RoomComponent implements OnInit
 {
   constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router) {}
 
+  showMainContent : boolean = false;
+
   update : boolean = true;
 
-  CurrentRoomId : string = "1";
+  CurrentRoomId : string = "0";
   Room : MeterData = {Id : "0", Name : "", RealTime : 0, Accumulated : 0, Note : ""}
   Meters : MeterData[] = [];
 
@@ -33,6 +38,7 @@ export class RoomComponent implements OnInit
     this.route.params.subscribe(params => 
     {
       this.CurrentRoomId = params['id'];
+      // console.log(this.CurrentRoomId)
       this.roomService.getMeterData(params['id']).subscribe(x => this.Room = x);
       this.roomService.getSubMeterData(params['id']).subscribe(x => this.Meters = x);
     });
@@ -50,7 +56,7 @@ export class RoomComponent implements OnInit
   {
     this.roomService.getMeterData(this.CurrentRoomId).subscribe(x => this.Room = x);
     this.roomService.getSubMeterData(this.CurrentRoomId).subscribe(x => this.Meters = x);
-
+    // console.log(this.Meters)
 
     setTimeout(() => {
       if(this.update)
@@ -68,5 +74,11 @@ export class RoomComponent implements OnInit
   SideBarClick(id:string)
   {
     this.router.navigate(['room', id]);
+    this.showMainContent = true;
   }
+
+  onEmitEvent(event : boolean){
+    this.showMainContent = event;
+  }
+
 }

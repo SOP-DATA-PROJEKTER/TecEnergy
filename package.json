@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@angular/material": "^17.1.0",
+    "highcharts-angular": "^4.0.0",
+    "moment": "^2.30.1"
+  }
+}
