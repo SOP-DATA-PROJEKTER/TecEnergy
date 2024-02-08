@@ -22,7 +22,7 @@ export class RoomComponent implements OnInit
 {
   constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router) {}
 
-  showMainContent : boolean = true;
+  showMainContent : boolean = false;
 
   update : boolean = true;
 

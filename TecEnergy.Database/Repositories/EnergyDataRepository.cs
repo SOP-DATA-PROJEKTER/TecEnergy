@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TecEnergy.Database.Models.DataModels;
+using TecEnergy.Database.Models.DtoModels;
 using TecEnergy.Database.Repositories.Interfaces;
 
 namespace TecEnergy.Database.Repositories;
@@ -30,10 +31,18 @@ public class EnergyDataRepository : IEnergyDataRepository
         //return await _context.EnergyData.OrderBy(x => x.AccumulatedValue).LastOrDefaultAsync();
     }
 
-    public async Task AddAsync(EnergyData energyData)
+    public async Task AddAsync(EnergyDataDto energyData)
     {
-        energyData.DateTime = DateTimeOffset.UtcNow.UtcDateTime;
-        await _context.EnergyData.AddAsync(energyData);
+
+        // map dto to entity
+        EnergyData energyDataEntity = new()
+        {
+            EnergyMeterID = energyData.EnergyMeterID,
+            DateTime = DateTimeOffset.UtcNow.UtcDateTime,
+            AccumulatedValue = energyData.AccumulatedValue
+        };
+
+        await _context.EnergyData.AddAsync(energyDataEntity);
         await _context.SaveChangesAsync();
     }
 
