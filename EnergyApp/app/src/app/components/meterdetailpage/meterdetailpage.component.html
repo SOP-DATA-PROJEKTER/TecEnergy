@@ -1,7 +1,15 @@
 <div id="Container" >
+
+  <div class="headerCol">
+
     <h1>METER DETAILS</h1>
     
+  </div>
 
+
+<div class="date-picker">
+
+    <div class="helper">
 
     <mat-form-field>
       <mat-label>Month and Year</mat-label>
@@ -9,15 +17,33 @@
       <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
       <mat-datepicker #dp
                       startView="multi-year"
-                      (yearSelected)="setDate($event, dp)"
-                      >
+                      (yearSelected)="setDate($event, dp)">
       </mat-datepicker>
     </mat-form-field>
+  
+  </div>
+    <div class="helper">
 
-
-    <div id="container"></div>
-
-    <button mat-raised-button color="primary" (click)="goBack()">Go back</button>
-    
+    </div>
   </div>
 
+
+  <div class="graphs">
+    
+    <div id="container"></div>
+    <app-overall-graph></app-overall-graph>
+
+  </div>
+    
+
+
+  <div class="button-container">
+    <button  mat-raised-button color="primary" (click)="goBack()">Go back</button>
+  </div>
+
+</div>
+
+
+
+
+  

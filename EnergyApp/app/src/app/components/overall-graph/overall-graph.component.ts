@@ -1,21 +1,18 @@
-import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import {MatButtonModule} from '@angular/material/button';
-import {MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
+import {MatDatepickerModule } from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
-import { FormControl } from '@angular/forms';
-import { YearlyAccumulatedDto } from 'src/app/models/YearlyAccumulatedDto';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { RoomService } from 'src/app/services/room.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatNativeDateModule } from '@angular/material/core';
-import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import {  FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import 'moment/locale/da';
-import * as moment from 'moment';
+import { AllAccumulatedData } from 'src/app/models/AllAccumulatedData';
 
 @Component({
   selector: 'app-overall-graph',
@@ -49,24 +46,14 @@ export class OverallGraphComponent implements OnInit{
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
-  date: FormControl;
   id: string;
-  data: YearlyAccumulatedDto[] = [];
+  data: AllAccumulatedData[] = [];
 
   constructor(
     private roomService : RoomService, 
-    private route: ActivatedRoute, 
-    @Inject(MAT_DATE_LOCALE) private _locale: string,
+    private route: ActivatedRoute,
   ) 
   {
-
-    const momentStart = {
-      month: 0,
-      date: 1,
-      year: 2023
-    }
-
-    this.date = new FormControl(moment(momentStart));
     
     this.id = this.route.snapshot.paramMap.get('id')!;
   }
@@ -74,76 +61,80 @@ export class OverallGraphComponent implements OnInit{
 
   ngOnInit(): void {
 
+    this.updateDataYearly();
     
-    
-    // Initializes chart
-      this.chartOptions = 
-      {
-        chart: {
-          type: 'column',
-          backgroundColor: 'transparent'
-        },
+  }
+
+
+  initialzeChart(){
+
+    this.chartOptions = 
+    {
+      chart: {
+        type: 'column',
+        backgroundColor: 'transparent'
+      },
+      title: {
+        text: 'Yearly Accumulated Values',
+        style: {
+          color: 'white'
+        }
+      },
+      xAxis: {
+        categories: this.data.map(x => new Date(x.Date).toLocaleDateString('da-DK',
+        {
+          year: 'numeric',
+        })
+        ),
+        labels: {
+          style: {
+            color: 'white'
+          }
+        }
+      },
+      yAxis: {
         title: {
-          text: 'Monthly Accumulated Values',
+          text: 'Accumulated Value',
           style: {
             color: 'white'
           }
         },
-        xAxis: {
-          categories: [],
-          labels: {
-            style: {
-              color: 'white'
-            }
-          }
-        },
-        yAxis: {
-          title: {
-            text: 'Accumulated Value',
-            style: {
-              color: 'white'
-            }
-          },
-          labels: {
-            style: {
-              color: 'white'
-            }
-          }
-        },
-        series: [{
-          name: 'Monthly Accumulated Value',
-          data: [],
-          color: '#00FF00',
-          dataLabels: {
-            enabled: true,
-            color: '#ffffff',
-            style: {
-              textOutline: '1px contrast'
-            }
-          }
-        }],
-        legend: {
-          itemStyle: {
-              color: 'white'
+        labels: {
+          style: {
+            color: 'white'
           }
         }
-      };
+      },
+      series: [{
+        name: 'Yearly Accumulated Value',
+        data: this.data.map(x => x.Accumulated),
+        color: '#00FF00',
+        dataLabels: {
+          enabled: true,
+          color: '#ffffff',
+          style: {
+            textOutline: '1px contrast'
+          }
+        }
+      }],
+      legend: {
+        itemStyle: {
+            color: 'white'
+        }
+      }
+    };
 
-      this.updateDataFromMoment();
+    Highcharts.chart('chart', this.chartOptions);
+
   }
 
-  updateDataYearly(Date: String){
 
-    // this.roomService.getRoomYearlyAccumulationList(this.id, Date).subscribe((data: YearlyAccumulatedDto[]) => {
-    //   this.data = data;
-    //   this.updateChart();
-    // });
-  
+  updateDataYearly(){
 
-    this.roomService.getRoomYearlyAccumulationList(this.id, Date).subscribe({
+    this.roomService.getRoomAllAccumulationList(this.id).subscribe({
       next: (data) =>{
         this.data = data;
-        this.updateChart();
+        this.initialzeChart();
       },
       error: (err) => console.log(err),
       complete: () => console.log("complete")
@@ -151,54 +142,5 @@ export class OverallGraphComponent implements OnInit{
     })
   }
   
-  updateChart() {
-    // updates the chart data and rerenders it
-
-    this.chartOptions.series![0] = {
-          name: 'Monthly Accumulated Value',
-          data: this.data.map(x => x.MonthlyAccumulatedValue),
-          color: '#00FF00',
-          dataLabels: {
-            enabled: true,
-            color: '#ffffff',
-            style: {
-              textOutline: '1px contrast'
-            }
-          }
-        }
-
-    this.chartOptions.xAxis! ={
-      categories: this.data.map(x => new Date(x.Month).toLocaleDateString('da-DK', {
-        month: 'long'
-      })),
-      labels: {
-        style: {
-          color: 'white'
-        }
-      }
-    }
-
-    // rerenders the chart
-    Highcharts.chart('container', this.chartOptions);
-    
-  }
-
-
-  updateDataFromMoment(){
-    console.log("updateDataFromMoment ")
-    // formats a moment into MM-DD-YYYY format and calls function to update data
-    const val = this.date.value._i;
-
-    const dateString = `${val.month+1}-${val.date}-${val.year}`
-
-    this.updateDataYearly(dateString);
-  }
-
-  setDate($event: any, datepicker: MatDatepicker<any>) {
-    this.date.setValue($event);
-    datepicker.close();
-    this.updateDataFromMoment();    
-  }
-
-
+  
 }

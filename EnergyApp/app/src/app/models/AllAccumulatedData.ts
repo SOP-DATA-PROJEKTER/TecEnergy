@@ -1,5 +1,5 @@
 export interface AllAccumulatedData
 {
-    Year: Date;
-    AllAccumulatedValue : number;
+    Date: Date;
+    Accumulated : number;
 }
