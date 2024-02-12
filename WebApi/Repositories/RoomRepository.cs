@@ -1,4 +1,6 @@
-﻿using WebApi.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApi.Data;
+using WebApi.Dtos;
 using WebApi.Interfaces;
 using WebApi.Models;
 
@@ -11,14 +13,44 @@ namespace WebApi.Repositories
         {
             _context = context;
         }
-        public Task<Room> CreateAsync(Guid BuilidingId)
+        public async Task<Room> CreateAsync(Guid BuilidingId)
         {
-            throw new NotImplementedException();
+            Room room = new Room
+            {
+                Id = Guid.NewGuid(),
+                BuildingId = BuilidingId
+            };
+
+            await _context.Rooms.AddAsync(room);
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return room;
+            }
+            throw new Exception("Failed to save data");
+
         }
 
-        public Task<ICollection<Room>> GetSimpleInfoAsyn()
+        public async Task<Room> GetRoomByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.Rooms
+                .FirstOrDefaultAsync(x => x.Id == id)
+                ?? throw new Exception("No Data Found");
+        }
+
+        public async Task<ICollection<SimpleInfoDto>> GetSimpleInfoAsync()
+        {
+            // this only works for 1 room beware!
+            
+            return await _context.Rooms
+                .Include(x => x.EnergyMeters)
+                .Select(x => new SimpleInfoDto
+                {
+                    roomId = x.Id,
+                    meterIds = x.EnergyMeters.Select(y => y.Id).ToList(),
+                    roomName = x.Name
+                })
+                .ToListAsync() ?? throw new Exception("No Data Found");
+
         }
     }
 }

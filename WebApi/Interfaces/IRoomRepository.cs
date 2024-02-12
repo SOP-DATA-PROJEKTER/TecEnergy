@@ -1,10 +1,12 @@
-﻿using WebApi.Models;
+﻿using WebApi.Dtos;
+using WebApi.Models;
 
 namespace WebApi.Interfaces
 {
     public interface IRoomRepository
     {
         Task<Room> CreateAsync(Guid BuilidingId);
-        Task<ICollection<Room>> GetSimpleInfoAsyn();
+        Task<ICollection<SimpleInfoDto>> GetSimpleInfoAsync();
+        Task<Room> GetRoomByIdAsync(Guid id);
     }
 }

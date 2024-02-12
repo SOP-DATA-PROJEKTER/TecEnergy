@@ -1,4 +1,5 @@
-﻿using WebApi.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApi.Data;
 using WebApi.Interfaces;
 using WebApi.Models;
 
@@ -11,14 +12,29 @@ namespace WebApi.Repositories
         {
             _context = context;
         }
-        public Task<Building> CreateBuildingAsync()
+        public async Task<Building> CreateBuildingAsync(string name)
         {
-            throw new NotImplementedException();
+            Building building = new Building
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+            };
+            await _context.Buildings.AddAsync(building);
+
+            if(await _context.SaveChangesAsync() > 0)
+            {
+                return building;
+            }
+            throw new Exception("Failed to save building");
+            
         }
 
-        public Task<Building> GetBuildingAsync(Guid id)
+        public async Task<Building> GetBuildingAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var result = await _context.Buildings.FirstOrDefaultAsync(x => x.Id == id);
+
+            // if result is null, throw an exception else return the result
+            return result == null ? throw new Exception("Building not found") : result;
         }
     }
 }

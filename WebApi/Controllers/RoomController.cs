@@ -14,22 +14,44 @@ namespace WebApi.Controllers
             _roomRepository = roomRepository;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateRoom()
+
+        [HttpGet("RoomId/{id}")]
+        public async Task<IActionResult> GetRoomId(Guid id)
         {
-            return NoContent();
+            var result = await _roomRepository.GetRoomByIdAsync(id);
+            return Ok(result);
         }
 
-        [HttpGet]
+
+        [HttpPost("BuildingId")]
+        public async Task<IActionResult> CreateRoom(Guid BuildingId)
+        {
+            try
+            {
+                var result = await _roomRepository.CreateAsync(BuildingId);
+                return CreatedAtAction(nameof(GetRoomId), result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpGet("SimpleInfo")]
         public async Task<IActionResult> GetSimpleInfo()
         {
             return NoContent();
         }
 
-        [HttpGet("/Id")]
-        public async Task<IActionResult> GetRoomMeterData([FromQuery] Guid Id)
+
+        [HttpGet("MeterData/{Id}")]
+        public async Task<IActionResult> GetRoomMeterData(Guid Id)
         {
             return NoContent();
         }
+
+
+
     }
 }

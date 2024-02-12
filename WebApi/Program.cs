@@ -1,6 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.Interfaces;
+using WebApi.Repositories;
 
 namespace WebApi
 {
@@ -49,6 +51,12 @@ namespace WebApi
                 });
             });
 
+            // DI
+
+            builder.Services.AddScoped<IEnergyDataRepository, EnergyDataRepository>();
+            builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
+            builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+            builder.Services.AddScoped<IEnergyMeterRepository, EnergyMeterRepository>();
 
 
             builder.Services.AddControllers();

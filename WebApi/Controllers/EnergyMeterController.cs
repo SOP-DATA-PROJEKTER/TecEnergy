@@ -20,19 +20,19 @@ namespace WebApi.Controllers
             return NoContent();
         }
 
-        [HttpGet]
+        [HttpGet("Daily")]
         public async Task<IActionResult> GetDailyGraphData()
         {
             return NoContent();
         }
 
-        [HttpGet]
+        [HttpGet("Monthly")]
         public async Task<IActionResult> GetMonthlyGraphData()
         {
             return NoContent();
         }
 
-        [HttpGet]
+        [HttpGet("Yearly")]
         public async Task<IActionResult> GetYearlyGraphData()
         {
             return NoContent();
