@@ -14,10 +14,44 @@ namespace WebApi.Controllers
             _buildingRepository = buildingRepository;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateBuilding()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBuilding(Guid id)
         {
-            return NoContent();
+
+            if(id == Guid.Empty)
+            {
+                return BadRequest("Id cannot be empty");
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model state");
+            }
+
+            try
+            {
+                var result = await _buildingRepository.GetBuildingAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
+ 
+        }
+
+        [HttpPost("{BuildingName}")]
+        public async Task<IActionResult> CreateBuilding(string BuildingName)
+        {
+            try
+            {
+                var result = await _buildingRepository.CreateBuildingAsync(BuildingName);
+                return CreatedAtAction(nameof(GetBuilding), result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpGet]

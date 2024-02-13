@@ -29,12 +29,16 @@ namespace WebApi.Repositories
             
         }
 
+        public async Task<List<Building>> GetAllBuildingsAsync()
+        {
+            return await _context.Buildings.ToListAsync() ?? throw new Exception("No buildings found");
+        }
+
         public async Task<Building> GetBuildingAsync(Guid id)
         {
-            var result = await _context.Buildings.FirstOrDefaultAsync(x => x.Id == id);
 
             // if result is null, throw an exception else return the result
-            return result == null ? throw new Exception("Building not found") : result;
+            return await _context.Buildings.FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Building not found");
         }
     }
 }
