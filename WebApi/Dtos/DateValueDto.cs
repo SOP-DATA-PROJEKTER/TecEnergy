@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Dtos
 {
-    public class SimpleGraphDto
+    public class DateValueDto
     {
         public DateTime Date { get; set; }
         public long AccumulatedValue { get; set; }

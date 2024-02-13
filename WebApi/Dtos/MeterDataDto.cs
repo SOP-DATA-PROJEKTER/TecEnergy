@@ -2,8 +2,10 @@
 {
     public class MeterDataDto
     {
-        public Guid meterId { get; set; }
-        public DateTime dateTime { get; set; }
-        public long accumulatedValue { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public double RealTime { get; set; }
+        public long Accumulated { get; set; }
+        public bool IsConnected { get; set; }
     }
 }

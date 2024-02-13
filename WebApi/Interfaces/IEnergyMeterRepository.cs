@@ -5,10 +5,13 @@ namespace WebApi.Interfaces
 {
     public interface IEnergyMeterRepository
     {
-        Task<EnergyMeter> CreateAsync(Guid roomId);
-        Task<ICollection<SimpleGraphDto>> GetDailyAsync(Guid id, DateOnly date);
-        Task<ICollection<SimpleGraphDto>> GetMonthlyAsync(Guid id, DateOnly date);
-        Task<ICollection<SimpleGraphDto>> GetYearlyAsync(Guid id, DateOnly date);
+        Task<EnergyMeter> CreateAsync(SimpleInfoDto data);
+        Task<EnergyMeter> GetEnergyMeter(Guid id);
+        Task<ICollection<DateValueDto>> GetDailyAsync(Guid meterId, DateTime date);
+        Task<ICollection<DateValueDto>> GetMonthlyAsync(Guid meterId, DateTime date);
+        Task<ICollection<DateValueDto>> GetYearlyAsync(Guid meterId, DateTime date);
+        Task<bool> RoomExists(Guid roomId);
+        Task<bool> EnergyMeterExists(SimpleInfoDto data);
 
 
     }

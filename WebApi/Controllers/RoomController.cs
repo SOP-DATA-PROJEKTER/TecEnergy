@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebApi.Interfaces;
 
 namespace WebApi.Controllers
@@ -15,40 +14,87 @@ namespace WebApi.Controllers
         }
 
 
-        [HttpGet("RoomId/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomId(Guid id)
-        {
-            var result = await _roomRepository.GetRoomByIdAsync(id);
-            return Ok(result);
-        }
-
-
-        [HttpPost("BuildingId")]
-        public async Task<IActionResult> CreateRoom(Guid BuildingId)
         {
             try
             {
-                var result = await _roomRepository.CreateAsync(BuildingId);
-                return CreatedAtAction(nameof(GetRoomId), result);
+                var result = await _roomRepository.GetRoomByIdAsync(id);
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status404NotFound, ex.Message);
             }
+
+        }
+
+        [HttpPost("{name}")]
+        public async Task<IActionResult> CreateRoom(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest("Name is required");
+            }
+
+            if(await _roomRepository.GetRoomByNameAsync(name))
+            {
+                return BadRequest("Name already exists");
+            }
+
+            try
+            {
+                var result = await _roomRepository.CreateAsync(name);
+                return CreatedAtAction("GetRoomId", new { id = result.Id }, result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
+
         }
 
 
         [HttpGet("SimpleInfo")]
         public async Task<IActionResult> GetSimpleInfo()
         {
-            return NoContent();
+            // Returns a list of SimpleInfoDto of rooms
+            try
+            {
+                return Ok(await _roomRepository.GetSimpleInfoAsync());
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
         }
 
 
         [HttpGet("MeterData/{Id}")]
-        public async Task<IActionResult> GetRoomMeterData(Guid Id)
+        public async Task<IActionResult> GetRoomData(Guid Id)
         {
-            return NoContent();
+            // return a RoomDataDto
+
+            if (Id == Guid.Empty)
+            {
+                return BadRequest("Id is required");
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                return Ok(await _roomRepository.GetRoomDataAsync(Id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
+
         }
 
 

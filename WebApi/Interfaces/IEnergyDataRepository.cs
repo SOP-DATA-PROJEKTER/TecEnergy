@@ -5,6 +5,6 @@ namespace WebApi.Interfaces
 {
     public interface IEnergyDataRepository
     {
-        Task<EnergyData> CreateData(EspDataDto data);
+        Task<bool> CreateData(List<EspDataDto> data);
     }
 }

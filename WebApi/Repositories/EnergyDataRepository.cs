@@ -8,30 +8,29 @@ namespace WebApi.Repositories
     public class EnergyDataRepository : IEnergyDataRepository
     {
         private readonly DatabaseContext _context;
+
+
         public EnergyDataRepository(DatabaseContext context)
         {
             _context = context;
         }
-        public async Task<EnergyData> CreateData(EspDataDto data)
+
+
+        public async Task<bool> CreateData(List<EspDataDto> dataList)
         {
-            EnergyData energyData = new EnergyData
+            foreach(var data in dataList)
             {
-                Id = Guid.NewGuid(),
-                MeterId = data.MeterId,
-                Date = data.DateTime,
-                AccumulatedValue = data.AccumulatedValue
-            };
+                var energyData = new EnergyData
+                {
+                    EnergyMeterId = data.MeterId,
+                    AccumulatedValue = data.AccumulatedValue,
+                    DateTime = DateTime.Now
+                };
 
-            await _context.EnergyData.AddAsync(energyData);
-
-            // check if the save was successful and return the object if it was
-            if(await _context.SaveChangesAsync() > 0)
-            {
-                return energyData;
+                await _context.EnergyData.AddAsync(energyData);
             }
 
-            // return error
-            throw new Exception("Failed to save data");
+            return await _context.SaveChangesAsync() > 0;
 
 
         }

@@ -2,8 +2,7 @@
 {
     public class SimpleInfoDto
     {
-        public Guid roomId { get; set; }
-        public List<Guid> meterIds{ get; set; }
-        public string roomName { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
     }
 }
