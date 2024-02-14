@@ -1,7 +1,12 @@
 <!-- <div id="Container" >
     <h1>METER DETAILS</h1>
     
+  </div>
 
+
+<div class="date-picker">
+
+    <div class="helper">
 
     <mat-form-field>
       <mat-label>Month and Year</mat-label>
@@ -9,8 +14,7 @@
       <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
       <mat-datepicker #dp
                       startView="multi-year"
-                      (yearSelected)="setDate($event, dp)"
-                      panelClass="example-month-picker">
+                      (yearSelected)="setDate($event, dp)">
       </mat-datepicker>
     </mat-form-field>
 

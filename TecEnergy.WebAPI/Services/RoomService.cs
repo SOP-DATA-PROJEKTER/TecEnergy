@@ -157,4 +157,28 @@ public class RoomService
         }
         return result;
     }
+
+    public async Task<ICollection<YearlyAccumulatedDto>> GetAllYearData(Guid roomId)
+    {
+
+        List<YearlyAccumulatedDto> result = new();
+
+        var startYear = new DateOnly(2023, 1, 1);
+        DateOnly endYear = DateOnly.FromDateTime(DateTime.Now);
+
+        for (var i = 0; i <= endYear.Year - startYear.Year; i++)
+        {
+            var date = new DateOnly(startYear.Year + i, 1, 1);
+            var data = await _repository.GetAllAccumulation(roomId, date);
+            if (data != null && data.Accumulated != 0)
+            {
+                result.Add(data);
+            }
+
+        }
+
+        return result;
+    }
+
+
 }

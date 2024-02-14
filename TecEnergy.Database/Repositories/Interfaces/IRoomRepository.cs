@@ -20,6 +20,8 @@ public interface IRoomRepository
     Task<ICollection<DailyAccumulated>> GetDailyAccumulationAsync(Guid roomId, DateTime startTime,  DateTime? endTime);
     Task<MonthlyAccumulatedDto> GetYearlyAccumulation(Guid roomId, DateOnly year);
 
+    Task<YearlyAccumulatedDto> GetAllAccumulation(Guid roomId, DateOnly date);
+
 
 
 }
