@@ -8,7 +8,8 @@ import { MeterData } from 'src/app/models/MeterData';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MeterdetailpageComponent } from "../meterdetailpage/meterdetailpage.component";
-import { animate, style, transition, trigger } from '@angular/animations';
+import { Observable } from 'rxjs';
+import { RoomData } from 'src/app/models/RoomData';
 
 @Component({
     selector: 'app-room',
@@ -24,49 +25,21 @@ export class RoomComponent implements OnInit
 
   showMainContent : boolean = false;
 
-  update : boolean = true;
-
   CurrentRoomId : string = "0";
-  Room : MeterData = {Id : "0", Name : "", RealTime : 0, Accumulated : 0, Note : ""}
-  Meters : MeterData[] = [];
 
-  Building : SimpleInfo = {Id : "0", Name : ""}
-  RoomList : SimpleInfo[] = [];
+  // CurrentRoom! : SimpleInfo;
+
+  RoomData$! : Observable<RoomData>;
+  RoomList$! : Observable<SimpleInfo[]>;
 
   ngOnInit(): void 
   {
     this.route.params.subscribe(params => 
-    {
-      this.CurrentRoomId = params['id'];
-      this.roomService.getMeterData(params['id']).subscribe(x => this.Room = x);
-      this.roomService.getSubMeterData(params['id']).subscribe(x => this.Meters = x);
-    });
-
-    this.roomService.getParentSimpleInfo().subscribe(x => this.Building = x);
-    this.roomService.getSiblingsSimpleInfo().subscribe(x => this.RoomList = x);
-
-
-    setTimeout(() => {
-        this.UpdateMeters();
-     }, 5000);
-  }
-
-  UpdateMeters() : void
-  {
-    this.roomService.getMeterData(this.CurrentRoomId).subscribe(x => this.Room = x);
-    this.roomService.getSubMeterData(this.CurrentRoomId).subscribe(x => this.Meters = x);
-
-    setTimeout(() => {
-      if(this.update)
       {
-        this.UpdateMeters();
-      }
-     }, 5000);
-  }
-
-  ngOnDestroy() 
-  {
-    this.update = false;
+        this.CurrentRoomId = params['id'];
+        this.RoomList$ = this.roomService.getAllRoomsSimpleInfo();
+        this.RoomData$ = this.roomService.getRoomDataStream(params['id'], 5000);
+    });
   }
 
   SideBarClick(id:string)
@@ -78,5 +51,4 @@ export class RoomComponent implements OnInit
   onEmitEvent(event : boolean){
     this.showMainContent = event;
   }
-
 }

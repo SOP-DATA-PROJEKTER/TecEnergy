@@ -1,10 +1,9 @@
 
 <div id="Container">
-    <h3>{{Data.Name}}</h3>
-    <h3>{{Data.Accumulated}}kWh</h3>
-    <h3>{{Data.RealTime}}kWh</h3>
+    <h3>{{Data.name}}</h3>
+    <h3>{{Data.accumulated}}kWh</h3>
+    <h3>{{Data.realTime}}kWh</h3>
     <div id="TickContainer">
-        <div [ngClass]="{'Active' : Tick < Data.RealTime}" *ngFor="let Tick of Ticks; index as i;" class="Tick"></div>
+        <div [ngClass]="{'Active' : Tick < Data.realTime}" *ngFor="let Tick of Ticks; index as i;" class="Tick"></div>
     </div>
-    <div *ngIf="HasNote()" id="Note">{{Data.Note}}</div>
 </div>

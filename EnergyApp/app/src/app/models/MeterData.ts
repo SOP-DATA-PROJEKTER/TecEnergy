@@ -1,8 +1,8 @@
 export interface MeterData
 {
-    Id : string;
-    Name : string;
-    RealTime : number;
-    Accumulated : number;
-    Note? : string;
+    id : string;
+    name : string;
+    realTime : number;
+    accumulated : number;
+    isConnected : boolean;
 }
