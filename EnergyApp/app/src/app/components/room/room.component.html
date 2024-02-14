@@ -1,4 +1,4 @@
-<app-sidebar [List]="RoomList" [ActiveId]="CurrentRoomId" (OnClicked)="SideBarClick($event)"></app-sidebar>
+<!-- <app-sidebar [List]="RoomList" [ActiveId]="CurrentRoomId" (OnClicked)="SideBarClick($event)"></app-sidebar>
 <app-navbar [Title]="'Lokale ' + Room.Name"></app-navbar>
 <div id="Container">
     <div *ngIf="showMainContent" >
@@ -7,4 +7,10 @@
     <div *ngIf="!showMainContent">
         <app-meterdetailpage (meterDetailEvent)="onEmitEvent($event)"></app-meterdetailpage>
     </div>
-</div>
+</div> -->
+
+
+
+<app-navbar [Title]="'Lokale '"></app-navbar>
+<app-sidebar [List$]="RoomList$" [ActiveId]="CurrentRoomId" (OnClicked)="SideBarClick($event)"></app-sidebar>
+

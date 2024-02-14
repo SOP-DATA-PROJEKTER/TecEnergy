@@ -79,5 +79,4 @@ public class BuildingController : ControllerBase
         await _service.DeleteAsync(id);
         return NoContent();
     }
-
 }
