@@ -15,7 +15,6 @@ import {  FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
-import { OverallGraphComponent } from "../overall-graph/overall-graph.component";
 
 
 @Component({
@@ -44,7 +43,6 @@ import { OverallGraphComponent } from "../overall-graph/overall-graph.component"
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        OverallGraphComponent
     ]
 })
 

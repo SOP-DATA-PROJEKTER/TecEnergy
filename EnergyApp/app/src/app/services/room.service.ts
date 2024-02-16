@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { interval, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, interval, map, Observable, of, switchMap, timer } from 'rxjs';
 import { SimpleInfo } from '../models/SimpleInfo';
 import { HttpClient } from '@angular/common/http';
 import { RoomData } from '../models/RoomData';
@@ -15,7 +15,7 @@ export class RoomService {
 
   getRoomDataStream(roomId : string, intervalMs : number) : Observable<RoomData>
   {
-    return interval(intervalMs).pipe(
+    return timer(0,intervalMs).pipe(
       switchMap(() => this.http.get<RoomData>(this.url +"MeterData/" + roomId))
     );
   }

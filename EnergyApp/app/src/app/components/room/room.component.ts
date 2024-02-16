@@ -26,19 +26,40 @@ export class RoomComponent implements OnInit
   showMainContent : boolean = false;
 
   CurrentRoomId : string = "0";
+  RoomDataStream$! : Observable<RoomData>;
 
-  // CurrentRoom! : SimpleInfo;
-
-  RoomData$! : Observable<RoomData>;
-  RoomList$! : Observable<SimpleInfo[]>;
+  //New
+  CurrentRoom : SimpleInfo = {id :"0", name:"" };
+  RoomList : SimpleInfo[] = [];
+  MainMeter : MeterData = {id :"0",name : "",realTime : 0, accumulated : 0, isConnected : false}
+  SubMeters : MeterData[] = [];
+  
 
   ngOnInit(): void 
   {
-    this.route.params.subscribe(params => 
-      {
-        this.CurrentRoomId = params['id'];
-        this.RoomList$ = this.roomService.getAllRoomsSimpleInfo();
-        this.RoomData$ = this.roomService.getRoomDataStream(params['id'], 5000);
+    this.roomService.getAllRoomsSimpleInfo().subscribe(x => 
+    {
+      this.RoomList = x;
+      this.route.params.subscribe(params => 
+        {
+          //Set Current Room and handle if id == 0
+          if(params['id'] == 0)
+          {
+            this.CurrentRoom.id = this.RoomList[0].id;
+            this.CurrentRoom.name = this.RoomList[0].name;
+          }
+          else
+          {
+            this.CurrentRoom.id = params['id'];
+            this.CurrentRoom.name = this.RoomList.filter(x => x.id = params['id'])[0].name;
+          }
+
+          //HandleRoomDataStream
+  
+          this.RoomDataStream$ = this.roomService.getRoomDataStream(this.CurrentRoom.id, 5000);
+          this.RoomDataStream$.subscribe(x => {this.MainMeter = x.mainMeter; this.SubMeters = x.subMeters; console.log(x)});
+      });
+
     });
   }
 

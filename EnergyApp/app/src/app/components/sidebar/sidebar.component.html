@@ -1,5 +1,5 @@
 <nav>
-    <div *ngFor="let item of List$ | async;" class="Wrapper">
+    <div *ngFor="let item of List" class="Wrapper">
         <div class="Circle" (click)="Click(item.id)" [ngClass]="{'Active' : item.id === ActiveId}">
             {{item.name}}
         </div>
