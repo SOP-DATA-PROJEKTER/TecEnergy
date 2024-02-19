@@ -55,6 +55,7 @@ namespace WebApi
             builder.Services.AddScoped<IEnergyDataRepository, EnergyDataRepository>();
             builder.Services.AddScoped<IRoomRepository, RoomRepository>();
             builder.Services.AddScoped<IEnergyMeterRepository, EnergyMeterRepository>();
+            builder.Services.AddScoped<IGraphRepository, GraphRepository>();
 
 
             builder.Services.AddControllers();

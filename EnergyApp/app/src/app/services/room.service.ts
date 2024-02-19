@@ -24,4 +24,11 @@ export class RoomService {
   {
     return this.http.get<SimpleInfo[]>(this.url + "SimpleInfo");
   }
+
+  getRoomDataOnce(roomId : string) : Observable<RoomData>
+  {
+    return this.http.get<RoomData>(this.url + "MeterData/" + roomId);
+  }
+
+
 }

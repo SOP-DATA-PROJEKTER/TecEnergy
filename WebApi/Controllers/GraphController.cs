@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Metrics;
 using WebApi.Dtos;
 using WebApi.Interfaces;
 
@@ -9,18 +10,19 @@ namespace WebApi.Controllers
     [ApiController]
     public class GraphController : ControllerBase
     {
-        private readonly IEnergyMeterRepository _energyMeterRepository;
-        public GraphController(IEnergyMeterRepository energyMeterRepository)
+        private readonly IGraphRepository _graphRepository;
+        public GraphController(IGraphRepository graphRepository)
         {
-            _energyMeterRepository = energyMeterRepository;
+            _graphRepository = graphRepository;
         }
 
-        [HttpGet("Daily/{meterId}/{date}")]
-        public async Task<IActionResult> GetDailyGraphData(Guid meterid, DateTime date)
+        [HttpGet("Daily/{MeterId}/{Date}")]
+        public async Task<IActionResult> GetDailyGraphData(string MeterId, DateTime Date)
         {
             try
             {
-                return Ok(await _energyMeterRepository.GetDailyAsync(meterid, date));
+                Guid meterId = Guid.Parse(MeterId);
+                return Ok(await _graphRepository.GetDailyAsync(meterId, Date));
             }
             catch (Exception ex)
             {
@@ -28,12 +30,13 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpGet("Monthly/{meterId}/{date}")]
-        public async Task<IActionResult> GetMonthlyGraphData(Guid meterid, DateTime date)
+        [HttpGet("Monthly/{MeterId}/{date}")]
+        public async Task<IActionResult> GetMonthlyGraphData(string MeterId, DateTime date)
         {
             try
             {
-                return Ok(await _energyMeterRepository.GetMonthlyAsync(meterid, date));
+                Guid meterId = Guid.Parse(MeterId);
+                return Ok(await _graphRepository.GetMonthlyAsync(meterId, date));
             }
             catch (Exception ex)
             {
@@ -41,12 +44,13 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpGet("Yearly/{meterId}/{date}")]
-        public async Task<IActionResult> GetYearlyGraphData(Guid meterid, DateTime date)
+        [HttpGet("Yearly/{MeterId}")]
+        public async Task<IActionResult> GetYearlyGraphData(string MeterId)
         {
             try
             {
-                return Ok(await _energyMeterRepository.GetYearlyAsync(meterid, date));
+                Guid meterId = Guid.Parse(MeterId);
+                return Ok(await _graphRepository.GetYearlyAsync(meterId));
             }
             catch (Exception ex)
             {

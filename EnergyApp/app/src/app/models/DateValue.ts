@@ -1,5 +1,5 @@
 export interface DateValue
 {
-    name : string;
-    value : number;
+    date : Date;
+    accumulatedValue : number;
 }

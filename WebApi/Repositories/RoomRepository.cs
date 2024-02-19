@@ -76,7 +76,9 @@ namespace WebApi.Repositories
 
             DateTime start = DateTime.Now;
             var end = start;
-            start.AddSeconds(-60);
+            start = start.AddSeconds(-60);
+            await Console.Out.WriteLineAsync("start: " + start);
+            await Console.Out.WriteLineAsync("end: " + end);
 
 
 
@@ -101,33 +103,44 @@ namespace WebApi.Repositories
                 // handle no values from meterdata (no data from the last 60 seconds)
                 if (meterData.Count == 0)
                 {
+                    // since there is no meterData we have to get the last accumulated value from the meter look at all time, instead of last 60 seconds
+                    var meterDataWasZero = await _context.EnergyData
+                        .Where(x => x.EnergyMeterId == meter.Id)
+                        .OrderByDescending(x => x.DateTime)
+                        .FirstOrDefaultAsync();
+
+                    if(meterDataWasZero == null)
+                        meterDataWasZero.AccumulatedValue = 0;
+
                     subMeters.Add(new MeterDataDto
                     {
                         Id = meter.Id,
                         Name = meter.Name,
                         RealTime = 0,
-                        Accumulated = 0,
+                        Accumulated = meterDataWasZero.AccumulatedValue,
                         IsConnected = true
                     });
                     // break the loop and continue to the next meter
+
+                    mainMeter.Accumulated += meterDataWasZero.AccumulatedValue;
                     continue;
                 }
 
                 double realtime = meterData.Count * 60f / 1000f;
-                long accumulated = meterData.Sum(x => x.AccumulatedValue);
+
 
                 subMeters.Add(new MeterDataDto
                 {
                     Id = meter.Id,
                     Name = meter.Name,
                     RealTime = realtime,
-                    Accumulated = accumulated,
+                    Accumulated = meterData.First().AccumulatedValue,
                     IsConnected = true
                 });
 
                 mainMeter.RealTime += realtime; // the same as getting all the counts of meterData and multiplying it by 60 and dividing by 1000,
                                                 // but here we are just adding the realtime of each meter resulting in the same value
-                mainMeter.Accumulated += accumulated;
+                mainMeter.Accumulated += meterData.First().AccumulatedValue;
 
 
 
