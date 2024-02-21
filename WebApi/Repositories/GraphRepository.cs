@@ -2,10 +2,12 @@
 using WebApi.Data;
 using WebApi.Dtos;
 using WebApi.Interfaces;
+using WebApi.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApi.Repositories
 {
-    public class GraphRepository: IGraphRepository
+    public class GraphRepository : IGraphRepository
     {
 
         private readonly DatabaseContext _context;
@@ -63,6 +65,7 @@ namespace WebApi.Repositories
 
             // select the latest date in each month and take the accumulated value of that date
 
+            // x.key is the month, since we groupBy month
             return result.GroupBy(x => x.DateTime.Month)
                 .OrderBy(x => x.Key)
                 .Select(x => new DateValueDto
@@ -73,7 +76,6 @@ namespace WebApi.Repositories
         }
 
 
-        // TODO: remove the date from parameter
         public async Task<ICollection<DateValueDto>> GetYearlyAsync(Guid meterId)
         {
             // get all data for the given id as a list of years and the data for the whole year. starting at year 2023.
@@ -91,6 +93,134 @@ namespace WebApi.Repositories
                 }).ToList();
         }
 
+
+        public async Task<ICollection<DateValueDto>> GetDailyAsyncFromRoomId(Guid roomId, DateTime date)
+        {
+            // get all meterIds from the given roomId
+            // then get the data for each meterId
+            // if there are multiple meters, sum the values for each date
+            // then return the list
+
+
+            var meters = EnergyMetersFromRoomId(roomId);
+            List<DateValueDto> data = new();
+
+            foreach(var meter in meters.Result)
+            {
+                var result = GetDailyAsync(meter.Id, date).Result;
+
+                foreach(var item in result)
+                {
+                    var existing = data.FirstOrDefault(x => x.Date == item.Date);
+                    if(existing != null)
+                    {
+                        existing.AccumulatedValue += item.AccumulatedValue;
+                    }
+                    else
+                    {
+                        data.Add(item);
+                    }
+                }
+            }
+
+            // if there is no data, throw an exception
+            if(data.Count == 0)
+            {
+                throw new Exception("No data found");
+            }
+
+            return data;
+        }
+
+
+        public async Task<ICollection<DateValueDto>> GetMonthlyAsyncFromRoomId(Guid roomId, DateTime date)
+        {
+            // get all meterIds from the given roomId
+            // then get the data for each meterId
+            // if there are multiple meters, sum the values for each date
+            // then return the list
+
+
+            var meters = EnergyMetersFromRoomId(roomId);
+            List<DateValueDto> data = new();
+
+            foreach (var meter in meters.Result)
+            {
+                var result = GetMonthlyAsync(meter.Id, date).Result;
+
+                foreach (var item in result)
+                {
+                    var existing = data.FirstOrDefault(x => x.Date.Month == item.Date.Month);
+                    if (existing != null)
+                    {
+                        existing.AccumulatedValue += item.AccumulatedValue;
+                    }
+                    else
+                    {
+                        data.Add(item);
+                    }
+                }
+            }
+
+            // if there is no data, throw an exception
+            if (data.Count == 0)
+            {
+                throw new Exception("No data found");
+            }
+
+            return data;
+        }
+
+
+        public async Task<ICollection<DateValueDto>> GetYearlyAsyncFromRoomId(Guid roomId)
+        {
+            // get all meterIds from the given roomId
+            // then get the data for each meterId
+            // if there are multiple meters, sum the values for each date
+            // then return the list
+
+
+            var meters = EnergyMetersFromRoomId(roomId);
+            List<DateValueDto> data = new();
+
+            foreach (var meter in meters.Result)
+            {
+                var result = GetYearlyAsync(meter.Id).Result;
+
+                foreach (var item in result)
+                {
+                    var existing = data.FirstOrDefault(x => x.Date.Year == item.Date.Year);
+                    if (existing != null)
+                    {
+                        existing.AccumulatedValue += item.AccumulatedValue;
+                    }
+                    else
+                    {
+                        data.Add(item);
+                    }
+                }
+            }
+
+            // if there is no data, throw an exception
+            if (data.Count == 0)
+            {
+                throw new Exception("No data found");
+            }
+
+            return data;
+        }
+
+
+        public async Task<bool> IsRoomId(Guid id)
+        {
+            return await _context.Rooms.AnyAsync(x => x.Id == id);
+        }
+
+
+        private async Task<ICollection<EnergyMeter>> EnergyMetersFromRoomId(Guid roomId)
+        {
+            return await _context.EnergyMeters.Where(x => x.RoomId == roomId).ToListAsync();
+        }
 
     }
 }

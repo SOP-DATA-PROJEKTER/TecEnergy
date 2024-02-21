@@ -50,7 +50,7 @@ import { ActivatedRoute } from '@angular/router';
 
 export class MeterdetailpageComponent implements OnInit{
 
-  @Input({ required: true }) meterId!: string;
+  @Input() meterId!: string;
   @Output() meterDetailEvent = new EventEmitter<boolean>();
 
   Highcharts: typeof Highcharts = Highcharts;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Metrics;
 using WebApi.Dtos;
 using WebApi.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApi.Controllers
 {
@@ -19,42 +20,90 @@ namespace WebApi.Controllers
         [HttpGet("Daily/{MeterId}/{Date}")]
         public async Task<IActionResult> GetDailyGraphData(string MeterId, DateTime Date)
         {
-            try
+            Guid meterId = Guid.Parse(MeterId);
+            
+            if(await _graphRepository.IsRoomId(meterId))
             {
-                Guid meterId = Guid.Parse(MeterId);
-                return Ok(await _graphRepository.GetDailyAsync(meterId, Date));
+                try
+                {
+                    return Ok(await _graphRepository.GetDailyAsyncFromRoomId(meterId, Date));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                try
+                {
+                    return Ok(await _graphRepository.GetDailyAsync(meterId, Date));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
+
             }
+
         }
 
         [HttpGet("Monthly/{MeterId}/{date}")]
         public async Task<IActionResult> GetMonthlyGraphData(string MeterId, DateTime date)
         {
-            try
+            Guid meterId = Guid.Parse(MeterId);
+
+            if (await _graphRepository.IsRoomId(meterId))
             {
-                Guid meterId = Guid.Parse(MeterId);
-                return Ok(await _graphRepository.GetMonthlyAsync(meterId, date));
+                try
+                {
+                    return Ok(await _graphRepository.GetMonthlyAsyncFromRoomId(meterId, date));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                try
+                {
+                    return Ok(await _graphRepository.GetMonthlyAsync(meterId, date));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
+
         }
 
         [HttpGet("Yearly/{MeterId}")]
         public async Task<IActionResult> GetYearlyGraphData(string MeterId)
         {
-            try
+            Guid meterId = Guid.Parse(MeterId);
+
+            if (await _graphRepository.IsRoomId(meterId))
             {
-                Guid meterId = Guid.Parse(MeterId);
-                return Ok(await _graphRepository.GetYearlyAsync(meterId));
+                try
+                {
+                    return Ok(await _graphRepository.GetYearlyAsyncFromRoomId(meterId));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                try
+                {
+                    return Ok(await _graphRepository.GetYearlyAsync(meterId));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                }
             }
         }
     }
