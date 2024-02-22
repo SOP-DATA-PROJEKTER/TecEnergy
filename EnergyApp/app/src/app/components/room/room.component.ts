@@ -10,8 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MeterdetailpageComponent } from "../meterdetailpage/meterdetailpage.component";
 import { Observable } from 'rxjs';
 import { RoomData } from 'src/app/models/RoomData';
-import { GraphService } from 'src/app/services/graph.service';
-import { DateValue } from 'src/app/models/DateValue';
+import { Location } from '@angular/common';
 
 @Component({
     selector: 'app-room',
@@ -26,12 +25,12 @@ export class RoomComponent implements OnInit
   // output emit from graph componenet with new date 
   
 
-  constructor(private roomService : RoomService, private graphService: GraphService, private route : ActivatedRoute, private router: Router) {}
+  constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router, private location: Location) {}
 
   showMainContent : boolean = true;
   meterDetailParameter: string = ""
 
-  CurrentRoomId : string = "0";
+  // CurrentRoomId : string = "0";
   RoomDataStream$! : Observable<RoomData>;
 
   //New
@@ -53,6 +52,7 @@ export class RoomComponent implements OnInit
           if(params['id'] == 0)
           {
             this.CurrentRoom.id = this.RoomList[0].id;
+            this.meterDetailParameter = this.CurrentRoom.id;
             this.CurrentRoom.name = this.RoomList[0].name;
           }
           else
@@ -78,7 +78,7 @@ export class RoomComponent implements OnInit
 
 
   EventFromDashboard(event : string){
-    this.meterDetailParameter = event;
+    if(event != "0") this.meterDetailParameter = event;
     this.showMainContent = false;
 
   }
@@ -86,6 +86,7 @@ export class RoomComponent implements OnInit
 
   EventFromMeterDetail(){
     this.showMainContent = true;
+    this.meterDetailParameter = this.CurrentRoom.id;
   }
 
 }
