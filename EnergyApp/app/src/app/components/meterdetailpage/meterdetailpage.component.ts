@@ -14,8 +14,6 @@ import {  FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
-import { DateValue } from 'src/app/models/DateValue';
-import { GraphService } from 'src/app/services/graph.service';
 import { ActivatedRoute } from '@angular/router';
 
 
@@ -44,7 +42,7 @@ import { ActivatedRoute } from '@angular/router';
         ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
-        MatButtonModule
+        MatButtonModule,
     ]
 })
 
