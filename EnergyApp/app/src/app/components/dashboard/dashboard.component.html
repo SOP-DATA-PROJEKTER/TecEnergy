@@ -3,7 +3,7 @@
     <div id="SubMeters" *ngIf="!ShowListView()">
         <div class="SubMeter" *ngFor="let meter of SubMeters; trackBy:identify; index as i;">
             <div tooltip tooltipText="Tændt" class="Light"></div>
-            <img tooltip tooltipText="Gå til grafer for måleren" class="GraphButton" src="assets\GraphIcon.png" (click)="TestGoToDetails()">
+            <img tooltip tooltipText="Gå til grafer for måleren" class="GraphButton" src="assets\GraphIcon.png" (click)="TestGoToDetails(meter.id)">
             <app-speedometer [TopValue]="6" [Data]="meter"></app-speedometer>
         </div>
     </div>

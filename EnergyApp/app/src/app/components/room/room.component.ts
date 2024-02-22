@@ -24,12 +24,12 @@ import { DateValue } from 'src/app/models/DateValue';
 export class RoomComponent implements OnInit
 {
   // output emit from graph componenet with new date 
-
   
 
   constructor(private roomService : RoomService, private graphService: GraphService, private route : ActivatedRoute, private router: Router) {}
 
-  showMainContent : boolean = false;
+  showMainContent : boolean = true;
+  meterDetailParameter: string = ""
 
   CurrentRoomId : string = "0";
   RoomDataStream$! : Observable<RoomData>;
@@ -77,9 +77,15 @@ export class RoomComponent implements OnInit
   }
 
 
-  onEmitEvent(event : boolean){
-    this.showMainContent = event;
+  EventFromDashboard(event : string){
+    this.meterDetailParameter = event;
+    this.showMainContent = false;
+
   }
 
+
+  EventFromMeterDetail(){
+    this.showMainContent = true;
+  }
 
 }

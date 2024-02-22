@@ -10,13 +10,21 @@
     margin-left: 5%;
 } */
 
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
 .wrapper{
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100%;
-    background: var(--gradient-background);
+    animation: fadeIn 2s;
+
+    /* background: var(--gradient-background); */
     /* margin-left: 5%; */
 
 }

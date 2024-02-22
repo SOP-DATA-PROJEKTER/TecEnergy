@@ -15,6 +15,8 @@ import { CommonModule } from '@angular/common';
 import 'moment/locale/da';
 import * as moment from 'moment';
 import { ActivatedRoute } from '@angular/router';
+import { DateValue } from 'src/app/models/DateValue';
+import { GraphService } from 'src/app/services/graph.service';
 
 
 @Component({
@@ -48,8 +50,8 @@ import { ActivatedRoute } from '@angular/router';
 
 export class MeterdetailpageComponent implements OnInit{
 
-  @Input() meterId!: string;
-  @Output() meterDetailEvent = new EventEmitter<boolean>();
+  @Input({required: true}) meterId!: string;
+  @Output() meterDetailEvent = new EventEmitter();
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
@@ -353,6 +355,12 @@ export class MeterdetailpageComponent implements OnInit{
     datepicker.close();
     this.fetchDailyData();
     this.fetchMonthlyData();
-    }
+  }
+
+  
+  routeBack(){
+    this.meterDetailEvent.emit();
+  }
+
 
 }

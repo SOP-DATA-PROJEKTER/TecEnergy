@@ -18,7 +18,7 @@ export class DashboardComponent implements OnInit
   @Input() MainMeter! : MeterData;
   @Input() SubMeters : MeterData[] = [];
 
-  @Output() detailEvent = new EventEmitter<boolean>();
+  @Output() detailEvent = new EventEmitter<string>();
   
   CurrentRoomId : string = "0";
 
@@ -45,10 +45,10 @@ export class DashboardComponent implements OnInit
     return item.id; 
   }
 
-  TestGoToDetails()
+  TestGoToDetails(id: string = this.CurrentRoomId)
   {
     // emit event
-    this.detailEvent.emit(false);
-    // this.router.navigate([`meterdetail/${this.CurrentRoomId}`]);
+    this.detailEvent.emit(id);
+    // this.router.navigate([`meterdetail/${id}`]);
   }
 }
