@@ -1,17 +1,5 @@
-<!-- <app-sidebar [List]="RoomList" [ActiveId]="CurrentRoomId" (OnClicked)="SideBarClick($event)"></app-sidebar> -->
-<!-- <app-navbar [Title]="'Lokale ' + Room.Name"></app-navbar> -->
+<app-sidebar [List]="RoomList" [ActiveId]="CurrentRoom.id" (OnClicked)="SideBarClick($event)"></app-sidebar>
+<app-navbar [Title]="'Lokale ' + CurrentRoom.name"></app-navbar>
 <div id="Container">
-    <div *ngIf="showMainContent" >
-        <!-- <app-dashboard  [MainMeter]="Room" [SubMeters]="Meters" (detailEvent)="onEmitEvent($event)" ></app-dashboard> -->
-    </div>
-    <!-- <div *ngIf="!showMainContent"> -->
-        <!-- <app-meterdetailpage (meterDetailEvent)="onEmitEvent($event)" ></app-meterdetailpage> -->
-    <!-- </div> -->
-
+    <app-dashboard  [MainMeter]="MainMeter" [SubMeters]="SubMeters" (detailEvent)="onEmitEvent($event)" ></app-dashboard>
 </div>
-
-
-
-<app-navbar [Title]="'Lokale '"></app-navbar>
-<app-sidebar [List$]="RoomList$" [ActiveId]="CurrentRoomId" (OnClicked)="SideBarClick($event)"></app-sidebar>
-

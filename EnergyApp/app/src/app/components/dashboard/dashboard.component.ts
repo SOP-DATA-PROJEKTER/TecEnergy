@@ -16,7 +16,7 @@ import { TooltipDirective } from 'src/app/directives/tooltip.directive';
 export class DashboardComponent implements OnInit
 {
   @Input() MainMeter! : MeterData;
-  @Input() SubMeters! : MeterData[];
+  @Input() SubMeters : MeterData[] = [];
 
   @Output() detailEvent = new EventEmitter<boolean>();
   
@@ -39,7 +39,11 @@ export class DashboardComponent implements OnInit
     return false;
   }
   
-
+  //For the TrackBy
+  identify(index : Number, item : MeterData)
+  {
+    return item.id; 
+  }
 
   TestGoToDetails()
   {

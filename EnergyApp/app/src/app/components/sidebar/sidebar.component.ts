@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 })
 export class SidebarComponent 
 {
-  @Input() List$! : Observable<SimpleInfo[]>;
+  @Input() List : SimpleInfo[] = [];
   @Input() ActiveId : string = "1";
   @Output() OnClicked = new EventEmitter<string>();
 
