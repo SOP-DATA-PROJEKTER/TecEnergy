@@ -10,6 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MeterdetailpageComponent } from "../meterdetailpage/meterdetailpage.component";
 import { Observable } from 'rxjs';
 import { RoomData } from 'src/app/models/RoomData';
+import { GraphService } from 'src/app/services/graph.service';
+import { DateValue } from 'src/app/models/DateValue';
 
 @Component({
     selector: 'app-room',
@@ -21,7 +23,11 @@ import { RoomData } from 'src/app/models/RoomData';
 })
 export class RoomComponent implements OnInit
 {
-  constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router) {}
+  // output emit from graph componenet with new date 
+
+  
+
+  constructor(private roomService : RoomService, private graphService: GraphService, private route : ActivatedRoute, private router: Router) {}
 
   showMainContent : boolean = false;
 
@@ -34,6 +40,7 @@ export class RoomComponent implements OnInit
   MainMeter : MeterData = {id :"0",name : "",realTime : 0, accumulated : 0, isConnected : false}
   SubMeters : MeterData[] = [];
   
+
 
   ngOnInit(): void 
   {
@@ -59,9 +66,9 @@ export class RoomComponent implements OnInit
           this.RoomDataStream$ = this.roomService.getRoomDataStream(this.CurrentRoom.id, 5000);
           this.RoomDataStream$.subscribe(x => {this.MainMeter = x.mainMeter; this.SubMeters = x.subMeters; console.log(x)});
       });
-
-    });
+    });    
   }
+
 
   SideBarClick(id:string)
   {
@@ -69,7 +76,10 @@ export class RoomComponent implements OnInit
     this.showMainContent = true;
   }
 
+
   onEmitEvent(event : boolean){
     this.showMainContent = event;
   }
+
+
 }
