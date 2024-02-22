@@ -37,7 +37,7 @@ export class SpeedometerComponent
   @ViewChild("Circle") circle! : ElementRef;
 
 
-  @Input() Data : MeterData = {Id: "0", Name: "Lokale xxx", RealTime : 0, Accumulated: 999999, Note: "Test Note"};
+  @Input() Data! : MeterData;
 
 
   
@@ -90,13 +90,13 @@ export class SpeedometerComponent
       'transform': `rotate(${tick.rotation}deg)`
     };
 
-    if(this.Data.RealTime >= this.TopValue)
+    if(this.Data.realTime >= this.TopValue)
     {
       baseStyles['background-color'] = this.maxColor;
       (baseStyles as any)['box-shadow'] = `0 0 25px ${this.maxColor}, 0 0 50px ${this.maxColor}`;
     }
 
-    else if(tick.value <= this.Data.RealTime)
+    else if(tick.value <= this.Data.realTime)
     {
       baseStyles['background-color'] = this.activeColor;
       (baseStyles as any)['box-shadow'] = `0 0 25px ${this.activeColor}, 0 0 50px ${this.activeColor}`;

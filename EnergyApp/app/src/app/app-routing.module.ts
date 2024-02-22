@@ -14,8 +14,7 @@ const routes: Routes =
   {
     path: 'meterdetail/:id',
     loadComponent: () => import('./components/meterdetailpage/meterdetailpage.component').then(m => m.MeterdetailpageComponent)
-  },
-
+  }
 ];
 
 @NgModule({
