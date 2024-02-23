@@ -12,15 +12,14 @@ AS
 			(SELECT TOP(1) AccumulatedValue FROM EnergyData
 				Where EnergyMeterId = @EnergyMeterId
 				AND [DateTime] >= @StartDate
-				AND [DateTime] < @StartDate
+				AND [DateTime] < @EndDate
 				Order By [DateTime] DESC)
 				-
 			(SELECT TOP(1) AccumulatedValue FROM EnergyData
 				Where EnergyMeterId = @EnergyMeterId
 				AND [DateTime] >= @StartDate
-				AND [DateTime] < @StartDate
+				AND [DateTime] < @EndDate
 				Order By [DateTime] ASC);
 
 		INSERT INTO DailyAccumulations VALUES(NEWID(), @EnergyMeterId, @StartDate, @DailyAccumulatedValue);
 	END;
-
