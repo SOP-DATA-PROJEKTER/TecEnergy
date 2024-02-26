@@ -8,7 +8,9 @@ import { MeterData } from 'src/app/models/MeterData';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MeterdetailpageComponent } from "../meterdetailpage/meterdetailpage.component";
-import { animate, style, transition, trigger } from '@angular/animations';
+import { Observable } from 'rxjs';
+import { RoomData } from 'src/app/models/RoomData';
+import { Location } from '@angular/common';
 
 @Component({
     selector: 'app-room',
@@ -20,56 +22,53 @@ import { animate, style, transition, trigger } from '@angular/animations';
 })
 export class RoomComponent implements OnInit
 {
-  constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router) {}
+  // output emit from graph componenet with new date 
+  
 
-  showMainContent : boolean = false;
+  constructor(private roomService : RoomService, private route : ActivatedRoute, private router: Router, private location: Location) {}
 
-  update : boolean = true;
+  showMainContent : boolean = true;
+  meterDetailParameter: string = ""
 
-  CurrentRoomId : string = "0";
-  Room : MeterData = {Id : "0", Name : "", RealTime : 0, Accumulated : 0, Note : ""}
-  Meters : MeterData[] = [];
+  // CurrentRoomId : string = "0";
+  RoomDataStream$! : Observable<RoomData>;
 
-  Building : SimpleInfo = {Id : "0", Name : ""}
+  //New
+  CurrentRoom : SimpleInfo = {id :"0", name:"" };
   RoomList : SimpleInfo[] = [];
+  MainMeter : MeterData = {id :"0",name : "",realTime : 0, accumulated : 0, isConnected : false}
+  SubMeters : MeterData[] = [];
+  
+
 
   ngOnInit(): void 
   {
-    this.route.params.subscribe(params => 
+    this.roomService.getAllRoomsSimpleInfo().subscribe(x => 
     {
-      this.CurrentRoomId = params['id'];
-      // console.log(this.CurrentRoomId)
-      this.roomService.getMeterData(params['id']).subscribe(x => this.Room = x);
-      this.roomService.getSubMeterData(params['id']).subscribe(x => this.Meters = x);
-    });
+      this.RoomList = x;
+      this.route.params.subscribe(params => 
+        {
+          //Set Current Room and handle if id == 0
+          if(params['id'] == 0)
+          {
+            this.CurrentRoom.id = this.RoomList[0].id;
+            this.meterDetailParameter = this.CurrentRoom.id;
+            this.CurrentRoom.name = this.RoomList[0].name;
+          }
+          else
+          {
+            this.CurrentRoom.id = params['id'];
+            this.CurrentRoom.name = this.RoomList.filter(x => x.id = params['id'])[0].name;
+          }
 
-    this.roomService.getParentSimpleInfo().subscribe(x => this.Building = x);
-    this.roomService.getSiblingsSimpleInfo().subscribe(x => this.RoomList = x);
-
-
-    setTimeout(() => {
-        this.UpdateMeters();
-     }, 5000);
+          //HandleRoomDataStream
+  
+          this.RoomDataStream$ = this.roomService.getRoomDataStream(this.CurrentRoom.id, 5000);
+          this.RoomDataStream$.subscribe(x => {this.MainMeter = x.mainMeter; this.SubMeters = x.subMeters; console.log(x)});
+      });
+    });    
   }
 
-  UpdateMeters() : void
-  {
-    this.roomService.getMeterData(this.CurrentRoomId).subscribe(x => this.Room = x);
-    this.roomService.getSubMeterData(this.CurrentRoomId).subscribe(x => this.Meters = x);
-    // console.log(this.Meters)
-
-    setTimeout(() => {
-      if(this.update)
-      {
-        this.UpdateMeters();
-      }
-     }, 5000);
-  }
-
-  ngOnDestroy() 
-  {
-    this.update = false;
-  }
 
   SideBarClick(id:string)
   {
@@ -77,8 +76,17 @@ export class RoomComponent implements OnInit
     this.showMainContent = true;
   }
 
-  onEmitEvent(event : boolean){
-    this.showMainContent = event;
+
+  EventFromDashboard(event : string){
+    if(event != "0") this.meterDetailParameter = event;
+    this.showMainContent = false;
+
+  }
+
+
+  EventFromMeterDetail(){
+    this.showMainContent = true;
+    this.meterDetailParameter = this.CurrentRoom.id;
   }
 
 }

@@ -14,7 +14,7 @@ export class MeterlistItemComponent
   Ticks : number[] = [];
   @Input() fontSize : number = 110;
 
-  @Input() Data : MeterData = {Id: "0", Name: "Lokale xxx", RealTime : 0, Accumulated: 999999, Note: "Test Note"};
+  @Input() Data! : MeterData;
 
   constructor() 
   {
@@ -22,13 +22,5 @@ export class MeterlistItemComponent
     {
       this.Ticks.push(i);
     }
-  }
-  
-  HasNote() : boolean
-  {
-    if(this.Data.Note != undefined && this.Data.Note != "")
-      return true;
-
-    return false;
   }
 }

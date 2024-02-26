@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { ComponentRef, Directive, ElementRef, HostListener, Inject, Input } from '@angular/core';
+import { ComponentRef, Directive, ElementRef, HostListener, Inject, Input, OnDestroy, OnInit } from '@angular/core';
 import {ViewContainerRef} from '@angular/core';
 import { TooltipComponent } from '../components/tooltip/tooltip.component';
 
@@ -36,6 +36,7 @@ export class TooltipDirective {
     this.tooltipComponent.instance.top = top + height / 2;
     this.tooltipComponent.instance.text = this.tooltipText;
   }
+  
 
 
   //Removes the created tooltip
@@ -50,7 +51,7 @@ export class TooltipDirective {
     }
 
     //Removes the tooltip 
-    this.viewContainerRef.clear();
+    this.tooltipComponent.destroy();
     this.tooltipComponent = undefined;
   }
 
@@ -61,4 +62,13 @@ export class TooltipDirective {
     @Inject(DOCUMENT) private document: Document,
     ) { }
 
+    ngOnDestroy(): void {
+    //Check that there is a tooltip
+    if(!this.tooltipComponent)
+    {
+      return;      
+    }
+      this.tooltipComponent.destroy();
+      this.tooltipComponent = undefined;
+    }
 }
