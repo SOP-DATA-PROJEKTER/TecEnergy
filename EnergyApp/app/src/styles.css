@@ -20,3 +20,5 @@
     --font-big: 'Poppins', sans-serif;
     --font-body: 'DM Sans', sans-serif;
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

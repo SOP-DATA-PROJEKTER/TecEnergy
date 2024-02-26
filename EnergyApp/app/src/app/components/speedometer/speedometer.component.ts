@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MeterData } from 'src/app/models/MeterData';
 import { TooltipDirective } from 'src/app/directives/tooltip.directive';
@@ -18,9 +18,10 @@ interface Tick
   templateUrl: './speedometer.component.html',
   styleUrls: ['./speedometer.component.css']
 })
-export class SpeedometerComponent
+export class SpeedometerComponent implements OnInit
 {
   @Input() TopValue = 60;
+  @Input() Data! : MeterData;
 
   Ticks : Tick[] = [];
 
@@ -37,11 +38,12 @@ export class SpeedometerComponent
   @ViewChild("Circle") circle! : ElementRef;
 
 
-  @Input() Data : MeterData = {Id: "0", Name: "Lokale xxx", RealTime : 0, Accumulated: 999999, Note: "Test Note"};
 
 
   
-  constructor() 
+  constructor(){}
+
+  ngOnInit(): void 
   {
     var tickInterval = this.TopValue / 60;
 
@@ -50,6 +52,7 @@ export class SpeedometerComponent
       this.Ticks.push({ rotation:4 * i - 120, index : i , value: i * tickInterval});
     }
   }
+  
 
   ngAfterViewInit()
   {
@@ -90,13 +93,23 @@ export class SpeedometerComponent
       'transform': `rotate(${tick.rotation}deg)`
     };
 
-    if(this.Data.RealTime >= this.TopValue)
+    if(this.Data.realTime >= this.TopValue)
     {
       baseStyles['background-color'] = this.maxColor;
       (baseStyles as any)['box-shadow'] = `0 0 25px ${this.maxColor}, 0 0 50px ${this.maxColor}`;
     }
-
-    else if(tick.value <= this.Data.RealTime)
+    else if(tick.index == 0 || tick.index == this.Ticks.length -1)
+    {
+      baseStyles['background-color'] = "";
+    }
+    
+    else if(this.Data.realTime == 0)
+    {
+      //Do nothing
+      //Makes sure that if the realtime is 0, then every tick is turned turned of
+    }
+    
+    else if(tick.value <= this.Data.realTime)
     {
       baseStyles['background-color'] = this.activeColor;
       (baseStyles as any)['box-shadow'] = `0 0 25px ${this.activeColor}, 0 0 50px ${this.activeColor}`;

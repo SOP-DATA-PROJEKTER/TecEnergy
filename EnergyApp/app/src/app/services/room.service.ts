@@ -1,41 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { MeterData } from '../models/MeterData';
+import { catchError, interval, map, Observable, of, switchMap, timer } from 'rxjs';
 import { SimpleInfo } from '../models/SimpleInfo';
 import { HttpClient } from '@angular/common/http';
+import { RoomData } from '../models/RoomData';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoomService {
 
-  url : string = "http://10.233.134.112:2050/api/Room/"
+  url : string = "http://192.168.21.7:2050/api/Room/"
 
   constructor(private http: HttpClient) { }
 
-  getMeterData(id : string): Observable<MeterData> 
+  getRoomDataStream(roomId : string, intervalMs : number) : Observable<RoomData>
   {
-    return this.http.get<MeterData>(this.url+'EnergyDto/' + id);
-    // return this.http.get<MeterData>('http://localhost:3001/rooms/'+id);
+    return timer(0,intervalMs).pipe(
+      switchMap(() => this.http.get<RoomData>(this.url +"MeterData/" + roomId))
+    );
   }
 
-  getSubMeterData(id : string): Observable<MeterData[]> 
+  getAllRoomsSimpleInfo() : Observable<SimpleInfo[]> 
   {
-    return this.http.get<MeterData[]>(this.url+'EnergyMeterListDto/' + id);
-    //return this.http.get<MeterData[]>('http://localhost:3001/meters/' + 1);
+    return this.http.get<SimpleInfo[]>(this.url + "SimpleInfo");
   }
 
-  getParentSimpleInfo(): Observable<SimpleInfo> 
+  getRoomDataOnce(roomId : string) : Observable<RoomData>
   {
-    return new Observable(o => 
-    {
-      o.next({Id:"E48642F7-4193-4828-9F9F-08DBFBBFA201", Name:"E"}); 
-     });
+    return this.http.get<RoomData>(this.url + "MeterData/" + roomId);
   }
 
-  getSiblingsSimpleInfo(): Observable<SimpleInfo[]> 
-  {
-    return this.http.get<SimpleInfo[]>(this.url+'SimpleList/E48642F7-4193-4828-9F9F-08DBFBBFA201');
-    //return this.http.get<SimpleInfo[]>('http://localhost:3001/rooms');
-  }
+
 }
