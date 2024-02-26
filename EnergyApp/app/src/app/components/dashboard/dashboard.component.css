@@ -69,6 +69,8 @@
 #Board
 {
     display: flex;
+    animation: fadeIn 2s;
+
 }
 
 #MainMeter
@@ -182,4 +184,9 @@
 ::-webkit-scrollbar-thumb:hover 
 {
     background: #c0c0c0;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }

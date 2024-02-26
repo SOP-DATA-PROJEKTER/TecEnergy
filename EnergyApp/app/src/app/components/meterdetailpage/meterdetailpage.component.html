@@ -1,3 +1,43 @@
-<div id="Container">
-    <h1>METER DETAILS</h1>
+<div class="wrapper mat-typography">
+
+  <div class="flex-col">
+
+
+      <div class="datepicker">
+        <mat-form-field>
+          <mat-label>Choose a date</mat-label>
+          <input matInput [matDatepicker]="picker" [formControl]="date">
+          <mat-datepicker-toggle  matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker  startView="multi-year" (monthSelected)="onChange($event, picker)"></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+
+    <div class="graph-row">
+
+      <div class="graph-container" *ngIf="isDaily">
+        <!-- place day graph here -->
+        <div id="graph-daily"></div>
+      </div>
+
+      <div class="graph-container" *ngIf="isMonthly">
+        <!-- place month graph here -->
+        <div id="graph-monthly"></div>
+      </div>
+
+      <div class="graph-container" *ngIf="isYearly"> 
+        <!-- place year graph here -->
+        <div id="graph-yearly"></div>
+      </div>
+
+    </div>
+
+    <div class="btn-container">
+      <!-- onclick emit event -->
+      <button class="btn" (click)="routeBack()">Back</button> 
+    </div>
+
+  </div>
+
+
 </div>

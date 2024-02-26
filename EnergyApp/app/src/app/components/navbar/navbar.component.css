@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz@9..40&display=swap');
 nav
 {
     width: 100%;
@@ -11,6 +11,7 @@ nav
     padding: 0 25px;
     color: whitesmoke;
     font-family: 'Poppins', sans-serif;
+
     position: fixed;
     top: 0;
 }
@@ -28,6 +29,9 @@ nav
     display: flex;
     justify-content: center;
     align-items: center;
+
+
+
 }
 
 #Menu
@@ -36,4 +40,8 @@ nav
     display: flex;
     justify-content: end;
     font-size: 18px;
+}
+
+h1, h2{
+    font-family: 'Poppins', sans-serif;
 }
