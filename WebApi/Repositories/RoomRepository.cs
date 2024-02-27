@@ -69,8 +69,8 @@ namespace WebApi.Repositories
             // find meters that has the roomId of the parameter
 
             var metersInRoom = await _context.EnergyMeters
-                .Where(x => x.RoomId == roomId)
-                .ToListAsync();
+                .Where(x => x.RoomId == roomId).OrderBy(x => x.Name)
+                .ToListAsync() ?? throw new Exception("No meters found");
 
             // then find the meter data of each meter and store in a list of meterDataDto
 
@@ -95,6 +95,7 @@ namespace WebApi.Repositories
 
             foreach (var meter in metersInRoom)
             {
+
                 var meterData = await _context.EnergyData
                     .Where(x => x.EnergyMeterId == meter.Id && x.DateTime >= start && x.DateTime <= end)
                     .OrderByDescending(x => x.DateTime)
@@ -109,8 +110,13 @@ namespace WebApi.Repositories
                         .OrderByDescending(x => x.DateTime)
                         .FirstOrDefaultAsync();
 
-                    if(meterDataWasZero == null)
-                        meterDataWasZero.AccumulatedValue = 0;
+
+                    // if no data was found in a table,
+                    // then the accumulated value should be set to 0 to avoid null reference exception
+                    meterDataWasZero ??= new EnergyData
+                    {
+                        AccumulatedValue = 0
+                    };
 
                     subMeters.Add(new MeterDataDto
                     {
@@ -151,6 +157,8 @@ namespace WebApi.Repositories
                 MainMeter = mainMeter,
                 SubMeters = subMeters
             };
+
+
         }
 
 
