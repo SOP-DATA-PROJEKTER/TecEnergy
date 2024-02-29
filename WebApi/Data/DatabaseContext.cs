@@ -18,8 +18,15 @@ namespace WebApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<EnergyMeter>()
+                .HasOne(e => e.Room)
+                .WithMany(r => r.EnergyMeters)
+                .HasForeignKey(e => e.RoomId);
 
-
+            modelBuilder.Entity<EnergyData>()
+                .HasOne(e => e.EnergyMeter)
+                .WithMany(m => m.EnergyDatas)
+                .HasForeignKey(e => e.EnergyMeterId);
 
         }
 
