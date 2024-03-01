@@ -19,7 +19,7 @@ namespace WebApi
 
             //SKP Room connectionstring
             builder.Services.AddDbContext<DatabaseContext>(
-                     o => o.UseSqlServer("Data Source=192.168.21.7,1433;Initial Catalog=EnergyTestJonas;User ID=Admin;Password=Tec420;TrustServerCertificate=True"));
+                     o => o.UseSqlServer("Data Source=.;Initial Catalog=EnergyTestJonas;User ID=TecAdmin;Password=Tec420;TrustServerCertificate=True"));
 
 
             // configure user secrets:
