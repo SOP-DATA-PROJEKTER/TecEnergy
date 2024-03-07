@@ -29,7 +29,7 @@ namespace WebApi.Repositories
 
 
             var result = await _context.DailyAccumulations
-                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Month == date.Month)
+                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Month == date.Month && x.DateTime.Year == date.Year)
                 .OrderBy(x => x.DateTime)
                 .ToListAsync() ?? throw new Exception("No data found");
 
@@ -81,7 +81,7 @@ namespace WebApi.Repositories
             // get all data for the given id as a list of years and the data for the whole year. starting at year 2023.
 
             var result = await _context.DailyAccumulations
-                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Year >= 2023)
+                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Year >= 2020)
                 .ToListAsync() ?? throw new Exception("No data found");
 
             return result.GroupBy(x => x.DateTime.Year)

@@ -69,8 +69,9 @@ namespace WebApi.Repositories
             // find meters that has the roomId of the parameter
 
             var metersInRoom = await _context.EnergyMeters
-                .Where(x => x.RoomId == roomId)
-                .ToListAsync();
+                .Include(x => x.EnergyDatas)
+                .Where(x => x.RoomId == roomId).OrderBy(x => x.Name)
+                .ToListAsync() ?? throw new Exception("No meters found");
 
             // then find the meter data of each meter and store in a list of meterDataDto
 
@@ -93,24 +94,37 @@ namespace WebApi.Repositories
 
             };
 
+
             foreach (var meter in metersInRoom)
             {
-                var meterData = await _context.EnergyData
-                    .Where(x => x.EnergyMeterId == meter.Id && x.DateTime >= start && x.DateTime <= end)
+
+                //var meterData = await _context.EnergyData
+                //    .Where(x => x.EnergyMeterId == meter.Id && x.DateTime >= start && x.DateTime <= end)
+                //    .OrderByDescending(x => x.DateTime)
+                //    .ToListAsync();
+
+
+                var meterData = meter.EnergyDatas
+                    .Where(x => x.DateTime >= start && x.DateTime <= end)
                     .OrderByDescending(x => x.DateTime)
-                    .ToListAsync();
+                    .ToList();
 
                 // handle no values from meterdata (no data from the last 60 seconds)
                 if (meterData.Count == 0)
                 {
                     // since there is no meterData we have to get the last accumulated value from the meter look at all time, instead of last 60 seconds
-                    var meterDataWasZero = await _context.EnergyData
+                    var meterDataWasZero = meter.EnergyDatas
                         .Where(x => x.EnergyMeterId == meter.Id)
                         .OrderByDescending(x => x.DateTime)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefault();
 
-                    if(meterDataWasZero == null)
-                        meterDataWasZero.AccumulatedValue = 0;
+
+                    // if no data was found in a table,
+                    // then the accumulated value should be set to 0 to avoid null reference exception
+                    meterDataWasZero ??= new EnergyData
+                    {
+                        AccumulatedValue = 0
+                    };
 
                     subMeters.Add(new MeterDataDto
                     {
@@ -151,6 +165,8 @@ namespace WebApi.Repositories
                 MainMeter = mainMeter,
                 SubMeters = subMeters
             };
+
+
         }
 
 

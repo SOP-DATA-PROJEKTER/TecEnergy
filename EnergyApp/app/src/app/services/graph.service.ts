@@ -12,7 +12,7 @@ export class GraphService {
   constructor(private http: HttpClient) { }
 
 
-  url : string = "http://192.168.21.7:2050/api/Graph"
+  url : string = "http://192.168.5.133:2050/api/Graph"
   // url : string = "https://localhost:7227/api/Graph"
 
 

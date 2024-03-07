@@ -26,7 +26,8 @@ namespace WebApi.Controllers
             {
                 try
                 {
-                    return Ok(await _graphRepository.GetDailyAsyncFromRoomId(meterId, Date));
+                    var result = await _graphRepository.GetDailyAsyncFromRoomId(meterId, Date);
+                    return Ok(result.OrderBy(x => x.Date));
                 }
                 catch (Exception ex)
                 {
