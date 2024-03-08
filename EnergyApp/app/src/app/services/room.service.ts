@@ -9,7 +9,7 @@ import { RoomData } from '../models/RoomData';
 })
 export class RoomService {
 
-  url : string = "http://192.168.21.7:2050/api/Room/"
+  url : string = "http://192.168.5.133:2050/api/Room/"
 
   constructor(private http: HttpClient) { }
 

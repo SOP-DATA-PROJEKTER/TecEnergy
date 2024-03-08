@@ -29,7 +29,7 @@ namespace WebApi.Repositories
 
 
             var result = await _context.DailyAccumulations
-                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Month == date.Month)
+                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Month == date.Month && x.DateTime.Year == date.Year)
                 .OrderBy(x => x.DateTime)
                 .ToListAsync() ?? throw new Exception("No data found");
 
@@ -89,7 +89,7 @@ namespace WebApi.Repositories
                 .FirstOrDefaultAsync() ?? throw new Exception("No data found");
 
             var result = await _context.DailyAccumulations
-                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Year >= 2023)
+                .Where(x => x.EnergyMeterId == meterId && x.DateTime.Year >= 2020)
                 .ToListAsync() ?? throw new Exception("No data found");
 
             return result.GroupBy(x => x.DateTime.Year)
