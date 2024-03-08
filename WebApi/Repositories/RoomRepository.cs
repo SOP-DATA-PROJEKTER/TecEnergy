@@ -140,7 +140,14 @@ namespace WebApi.Repositories
                     continue;
                 }
 
-                double realtime = meterData.Count * 60f / 1000f;
+                // the speedometer goes to 60 at max
+                // but we have a max count of 125 in the meterData
+                // so we have to multiply the count by 0.48 to get the real time
+                // 125 * x = 60
+                // x = 60 / 125
+                // x = 0.48
+
+                double realtime = meterData.Count * 0.48;
 
 
                 subMeters.Add(new MeterDataDto

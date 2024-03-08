@@ -47,11 +47,11 @@ const int builtInBtn = 34; // bultin button to simmulate impulse
 
 
 // define functions
-void impulseDetected1();
-void impulseDetected2();
-void impulseDetected3();
-void impulseDetected4();
-void buttonTest();
+void IRAM_ATTR impulseDetected1();
+void IRAM_ATTR impulseDetected2();
+void IRAM_ATTR impulseDetected3();
+void IRAM_ATTR impulseDetected4();
+void IRAM_ATTR buttonTest();
 
 void queueDataHandling(void *pvParameters);
 void sendToApi(void *pvParameters);
@@ -163,34 +163,34 @@ bool setupInterrupts(){
 
 // Interrupt functions
 
-void impulseDetected1() {
+void IRAM_ATTR impulseDetected1() {
   int meter = 0;
   xQueueSendFromISR(dataQueue, &meter, 0);
 
 }
 
 
-void impulseDetected2() {
+void IRAM_ATTR impulseDetected2() {
   int meter = 1;
   xQueueSendFromISR(dataQueue, &meter, 0);
 
 }
 
 
-void impulseDetected3() {
+void IRAM_ATTR impulseDetected3() {
   int meter = 2;
   xQueueSendFromISR(dataQueue, &meter, 0);
 
 }
 
 
-void impulseDetected4() {
+void IRAM_ATTR impulseDetected4() {
   int meter = 3;
   xQueueSendFromISR(dataQueue, &meter, 0);
 
 }
 
-void buttonTest(){
+void IRAM_ATTR buttonTest(){
   int meter = 0;
   xQueueSendFromISR(dataQueue, &meter, 0);
 }
