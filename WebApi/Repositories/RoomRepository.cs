@@ -140,14 +140,10 @@ namespace WebApi.Repositories
                     continue;
                 }
 
-                // the speedometer goes to 60 at max
-                // but we have a max count of 125 in the meterData
-                // so we have to multiply the count by 0.48 to get the real time
-                // 125 * x = 60
-                // x = 60 / 125
-                // x = 0.48
-
-                double realtime = meterData.Count * 0.48;
+                // realtime is Kw/h
+                // we find the avg impulses in a minute (since we get data for a 60seconds)
+                // we divide 3600 by the avg impulses in a minute to get watt/hour
+                double realtime = Math.Round((3600.0 / (meterData.Count / 60.0)) / 1000.0, 2);
 
 
                 subMeters.Add(new MeterDataDto

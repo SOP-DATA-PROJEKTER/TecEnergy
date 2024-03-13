@@ -2,6 +2,7 @@
 #include <SD_MMC.h>
 #include <HTTPClient.h>
 #include <ETH.h> 
+
 #include <ArduinoJson.h> // need to install this library ArduinoJson by Benoit Blanchon
 
 // Define Structs
@@ -22,6 +23,7 @@ dataStruct meters[] = {
 // Define Variables
 xQueueHandle dataQueue;
 SemaphoreHandle_t sdCardMutex;
+volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
 // int accumulation = 0;
 
 // const char* apiUrl = "http://192.168.5.132:2050/api/EnergyData/Test"; // Jonas IIS Api
@@ -165,34 +167,51 @@ bool setupInterrupts(){
 
 void IRAM_ATTR impulseDetected1() {
   int meter = 0;
-  xQueueSendFromISR(dataQueue, &meter, 0);
-
+  if(millis() - lastDebounceTime[meter] >= 80)
+  {
+    xQueueSendFromISR(dataQueue, &meter, 0);
+    lastDebounceTime[meter] = millis();
+  }
 }
 
 
 void IRAM_ATTR impulseDetected2() {
   int meter = 1;
-  xQueueSendFromISR(dataQueue, &meter, 0);
-
+  if(millis() - lastDebounceTime[meter] >= 80)
+  {
+    xQueueSendFromISR(dataQueue, &meter, 0);
+    lastDebounceTime[meter] = millis();
+  }
 }
 
 
 void IRAM_ATTR impulseDetected3() {
   int meter = 2;
-  xQueueSendFromISR(dataQueue, &meter, 0);
-
+  if(millis() - lastDebounceTime[meter] >= 80)
+  {
+    xQueueSendFromISR(dataQueue, &meter, 0);
+    lastDebounceTime[meter] = millis();
+  }
 }
 
 
 void IRAM_ATTR impulseDetected4() {
   int meter = 3;
-  xQueueSendFromISR(dataQueue, &meter, 0);
+  if(millis() - lastDebounceTime[meter] >= 80)
+  {
+    xQueueSendFromISR(dataQueue, &meter, 0);
+    lastDebounceTime[meter] = millis();
+  }
 
 }
 
 void IRAM_ATTR buttonTest(){
   int meter = 0;
-  xQueueSendFromISR(dataQueue, &meter, 0);
+  if(millis() - lastDebounceTime[meter] >= 80)
+  {
+    xQueueSendFromISR(dataQueue, &meter, 0);
+    lastDebounceTime[meter] = millis();
+  }
 }
 
 
