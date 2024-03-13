@@ -262,10 +262,10 @@ void queueDataHandling(void *pvParameters){
       // give mutex
       xSemaphoreGive(sdCardMutex);
 
-      Serial.print(meters[meterIndex].meterId);
-      Serial.print(",");
-      Serial.print(meters[meterIndex].accumulatedValue);
-      Serial.println();
+      // Serial.print(meters[meterIndex].meterId);
+      // Serial.print(",");
+      // Serial.print(meters[meterIndex].accumulatedValue);
+      // Serial.println();
 
       // data is removed from queue on recieve
     }
@@ -278,11 +278,12 @@ void queueDataHandling(void *pvParameters){
 }
 
 
+
 void sendToApi(void *pvParameters){
   vTaskDelay(10000 / portTICK_PERIOD_MS);
   while(1)
   {
-    Serial.println("sendToApi Started");
+    // Serial.println("sendToApi Started");
 
     // take mutex
                       // mutex     // max delay
@@ -322,8 +323,9 @@ void sendToApi(void *pvParameters){
 
       // Add data to the JSON document
       JsonDocument jsonDocument;
-      jsonDocument["EnergyMeterID"] = name;
-      jsonDocument["AccumulatedValue"] = value.toInt();
+      jsonDocument["meterId"] = name;
+      jsonDocument["accumulatedValue"] = value.toInt();
+
 
       String temp;
       serializeJson(jsonDocument, temp);
@@ -335,7 +337,7 @@ void sendToApi(void *pvParameters){
     }
 
     payload += "]";
-
+    // Serial.println(payload);
     HTTPClient http;
       
     // send data to api
@@ -359,7 +361,7 @@ void sendToApi(void *pvParameters){
       file = SD_MMC.open(filename, FILE_WRITE);
       if(file)
       {
-        file.println("EnergyMeterID,AccumulatedValue");
+        file.println("meterId,accumulatedValue");
       }
       file.close();  
     }
