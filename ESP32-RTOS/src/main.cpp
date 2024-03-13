@@ -13,11 +13,12 @@ typedef struct dataStruct {
 } dataStruct;
 
 dataStruct meters[] = {
-  {"CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB", 0},
-  {"Meter2", 0},
-  {"Meter3", 0},
-  {"Meter4", 0}
+  {"EB8D4250-D3E1-4302-A9A9-526BC223FD6E", 0}, // meter 1
+  {"6424A2EE-2C46-4486-B8D9-7931CC6269C2", 0}, // meter 2
+  {"BFE517CB-5A23-4786-B535-A733059FA959", 0}, // meter 3
+  {"3946301E-1C59-4EE5-87FA-F8246F1DBEF1", 0}  // meter 4
 };
+
 
 
 // Define Variables
@@ -27,8 +28,8 @@ volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
 // int accumulation = 0;
 
 // const char* apiUrl = "http://192.168.5.132:2050/api/EnergyData/Test"; // Jonas IIS Api
-const char* apiUrl = "http://192.168.21.7:2050/api/EnergyData"; // Virtuel Server SKP
-// const char* apiUrl = "http://10.233.134.112:2050/api/EnergyData"; // energymeter room laptop server
+// const char* apiUrl = "http://192.168.21.7:2050/api/EnergyData"; // Virtuel Server SKP
+const char* apiUrl = "http://10.233.134.113:2050/api/EnergyData"; // energymeter room laptop server
 
 const char* filename = "/EnergyData.csv";
 
@@ -68,7 +69,7 @@ void setup() {
 
   Serial.begin(115200);
 
-  pinMode(impulsePin1, INPUT); // sets pin to input
+  pinMode(impulsePin1, INPUT_PULLDOWN); // sets pin to input
   pinMode(impulsePin2, INPUT);
   pinMode(impulsePin3, INPUT);
   pinMode(impulsePin4, INPUT);
@@ -130,7 +131,7 @@ bool setupSdCard(){
   // check if sd card file exists
   // if it does not exist create it
 
-  // SD_MMC.remove(filename);
+  SD_MMC.remove(filename);
 
   if(!SD_MMC.exists(filename))
   {
