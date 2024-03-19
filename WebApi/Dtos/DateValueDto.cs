@@ -3,6 +3,6 @@
     public class DateValueDto
     {
         public DateOnly Date { get; set; }
-        public long AccumulatedValue { get; set; }
+        public double AccumulatedValue { get; set; }
     }
 }

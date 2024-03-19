@@ -40,7 +40,7 @@ namespace WebApi.Repositories
                 DateValueDto dto = new()
                 {
                     Date = DateOnly.FromDateTime(item.DateTime),
-                    AccumulatedValue = item.AccumulatedValue
+                    AccumulatedValue = item.AccumulatedValue / 1000.0
                 };
                 data.Add(dto);
             }
@@ -71,7 +71,7 @@ namespace WebApi.Repositories
                 .Select(x => new DateValueDto
                 {
                     Date = new DateOnly(date.Year, x.Key, 1),
-                    AccumulatedValue = x.Max(x => x.AccumulatedValue)
+                    AccumulatedValue = x.Max(x => x.AccumulatedValue) / 1000.0
                 }).ToList();
         }
 
@@ -97,7 +97,7 @@ namespace WebApi.Repositories
                 .Select(x => new DateValueDto
                 {
                     Date = new DateOnly(x.Key, 1, 1),
-                    AccumulatedValue = x.Max(x => x.AccumulatedValue)
+                    AccumulatedValue = x.Max(x => x.AccumulatedValue * 1.0) / 1000.0
                 }).ToList();
         }
 
@@ -122,7 +122,7 @@ namespace WebApi.Repositories
                     var existing = data.FirstOrDefault(x => x.Date == item.Date);
                     if(existing != null)
                     {
-                        existing.AccumulatedValue += item.AccumulatedValue;
+                        existing.AccumulatedValue += item.AccumulatedValue / 1000.0;
                     }
                     else
                     {
@@ -161,7 +161,7 @@ namespace WebApi.Repositories
                     var existing = data.FirstOrDefault(x => x.Date.Month == item.Date.Month);
                     if (existing != null)
                     {
-                        existing.AccumulatedValue += item.AccumulatedValue;
+                        existing.AccumulatedValue += item.AccumulatedValue / 1000.0;
                     }
                     else
                     {
@@ -200,7 +200,7 @@ namespace WebApi.Repositories
                     var existing = data.FirstOrDefault(x => x.Date.Year == item.Date.Year);
                     if (existing != null)
                     {
-                        existing.AccumulatedValue += item.AccumulatedValue;
+                        existing.AccumulatedValue += item.AccumulatedValue / 1000.0;
                     }
                     else
                     {
