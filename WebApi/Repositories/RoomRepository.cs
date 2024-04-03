@@ -140,7 +140,10 @@ namespace WebApi.Repositories
                     continue;
                 }
 
-                double realtime = meterData.Count * 60f / 1000f;
+                // realtime is Kw/h
+                // we find the avg impulses in a minute (since we get data for a 60seconds)
+                // we divide 3600 by the avg impulses in a minute to get watt/hour
+                double realtime = Math.Round((3600.0 / (meterData.Count / 60.0)) / 1000.0, 2);
 
 
                 subMeters.Add(new MeterDataDto

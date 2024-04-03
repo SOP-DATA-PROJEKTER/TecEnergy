@@ -40,7 +40,7 @@ namespace WebApi.Repositories
                 DateValueDto dto = new()
                 {
                     Date = DateOnly.FromDateTime(item.DateTime),
-                    AccumulatedValue = item.AccumulatedValue
+                    AccumulatedValue = item.AccumulatedValue / 1000.0
                 };
                 data.Add(dto);
             }
@@ -71,7 +71,7 @@ namespace WebApi.Repositories
                 .Select(x => new DateValueDto
                 {
                     Date = new DateOnly(date.Year, x.Key, 1),
-                    AccumulatedValue = x.Max(x => x.AccumulatedValue)
+                    AccumulatedValue = x.Max(x => x.AccumulatedValue) / 1000.0
                 }).ToList();
         }
 
@@ -79,6 +79,14 @@ namespace WebApi.Repositories
         public async Task<ICollection<DateValueDto>> GetYearlyAsync(Guid meterId)
         {
             // get all data for the given id as a list of years and the data for the whole year. starting at year 2023.
+
+            // change to get the first entry's year and the compare to that year instead of 2023
+
+            // get first entry's year
+            var firstEntry = await _context.DailyAccumulations
+                .Where(x => x.EnergyMeterId == meterId)
+                .OrderByDescending(x => x.DateTime)
+                .FirstOrDefaultAsync() ?? throw new Exception("No data found");
 
             var result = await _context.DailyAccumulations
                 .Where(x => x.EnergyMeterId == meterId && x.DateTime.Year >= 2020)
@@ -89,7 +97,7 @@ namespace WebApi.Repositories
                 .Select(x => new DateValueDto
                 {
                     Date = new DateOnly(x.Key, 1, 1),
-                    AccumulatedValue = x.Max(x => x.AccumulatedValue)
+                    AccumulatedValue = x.Max(x => x.AccumulatedValue * 1.0) / 1000.0
                 }).ToList();
         }
 
@@ -114,7 +122,7 @@ namespace WebApi.Repositories
                     var existing = data.FirstOrDefault(x => x.Date == item.Date);
                     if(existing != null)
                     {
-                        existing.AccumulatedValue += item.AccumulatedValue;
+                        existing.AccumulatedValue += item.AccumulatedValue / 1000.0;
                     }
                     else
                     {
@@ -153,7 +161,7 @@ namespace WebApi.Repositories
                     var existing = data.FirstOrDefault(x => x.Date.Month == item.Date.Month);
                     if (existing != null)
                     {
-                        existing.AccumulatedValue += item.AccumulatedValue;
+                        existing.AccumulatedValue += item.AccumulatedValue / 1000.0;
                     }
                     else
                     {
@@ -192,7 +200,7 @@ namespace WebApi.Repositories
                     var existing = data.FirstOrDefault(x => x.Date.Year == item.Date.Year);
                     if (existing != null)
                     {
-                        existing.AccumulatedValue += item.AccumulatedValue;
+                        existing.AccumulatedValue += item.AccumulatedValue / 1000.0;
                     }
                     else
                     {
