@@ -42,8 +42,8 @@ volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
 
 // const char* apiUrl = "http://192.168.5.132:2050/api/EnergyData/Test"; // Jonas IIS Api
 // const char *apiUrl = "http://192.168.21.7:2050/api/EnergyData"; // Virtuel Server SKP
-// const char *apiUrl = "http://10.233.134.104:2050/api/EnergyData"; // energymeter room laptop server
-const char *apiUrl = "http://192.168.5.131:5252/api/EnergyData"; // Local PC
+//const char *apiUrl = "http://192.168.5.131:5252/api/EnergyData"; // Local PC
+ const char *apiUrl = "http://10.233.134.113:2050/api/EnergyData"; // energymeter room laptop server
 
 const char *filename = "/EnergyData.csv";
 
