@@ -22,9 +22,8 @@ namespace WebApi
             //         o => o.UseSqlServer("Data Source=192.168.21.7,1433;Initial Catalog=EnergyTestJonas;User ID=Admin;Password=Tec420;TrustServerCertificate=True"));
 
             //awareness room refactored
-            builder.Services.AddDbContext<DatabaseContext>(
-                     o => o.UseSqlServer("Data Source=.;Initial Catalog=EnergyTest;User ID=TecAdmin;Password=Tec420;TrustServerCertificate=True"));
-
+            //builder.Services.AddDbContext<DatabaseContext>(
+            //         o => o.UseSqlServer("Data Source=.;Initial Catalog=EnergyTest;User ID=TecAdmin;Password=Tec420;TrustServerCertificate=True"));
 
             // configure user secrets:
             // 1. use: " dotnet user-secrets init " to initialize secrets for the project (remember to cd into the correct project)
@@ -40,6 +39,18 @@ namespace WebApi
 
             //builder.Services.AddDbContext<DatabaseContext>(
             //    o => o.UseSqlServer(conn));
+
+
+            // Gets connectionstring from appsettings.json
+            // The connectionstring is selected by the key "SelectedConnectionString"
+            // To change the connectionstring, change the value of "SelectedConnectionString"
+            // You can add/remove connectionstrings, without having to recompile the project.
+            // Just edit the appsettings.json file from windows explorer.
+
+            string? connectionString = builder.Configuration.GetConnectionString(builder.Configuration["SelectedConnectionString"]);
+
+            builder.Services.AddDbContext<DatabaseContext>(options =>
+                options.UseSqlServer(connectionString));
 
             builder.Services.AddCors(options =>
             {
