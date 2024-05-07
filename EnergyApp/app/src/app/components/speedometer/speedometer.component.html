@@ -5,9 +5,9 @@
         </div>
     </div>
     <div #Display id="Display">
-        <h2 tooltip tooltipText="Nuværende forbrug" [ngStyle]="getFontSize(1)">{{Data.realTime.toLocaleString()}}</h2>
+        <h2 tooltip tooltipText="Nuværende forbrug" [ngStyle]="getFontSize(1)">{{Data.realTime.toFixed(2).toLocaleString()}} W</h2>
         <div [ngStyle]="getLineHeight()"  id="Line"></div>
-        <h3 tooltip tooltipText="Accumuleret forbrug" [ngStyle]="getFontSize(4)">{{Data.accumulated.toLocaleString()}}</h3>
+        <h3 tooltip tooltipText="Accumuleret forbrug" [ngStyle]="getFontSize(4)">{{(Data.accumulated / 1000).toLocaleString()}} kWh</h3>
     </div>
     <h1 id="Name" [ngStyle]="getFontSize(3)">{{Data.name}}</h1>
 </div> 
