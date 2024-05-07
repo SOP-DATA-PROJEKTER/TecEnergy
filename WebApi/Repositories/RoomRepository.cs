@@ -9,6 +9,7 @@ namespace WebApi.Repositories
     public class RoomRepository : IRoomRepository
     {
         private readonly DatabaseContext _context;
+        private readonly double JoulesPerImpulse = 3600.0;
 
 
         public RoomRepository(DatabaseContext context)
@@ -66,22 +67,22 @@ namespace WebApi.Repositories
 
         public async Task<RoomDataDto> GetRoomDataAsync(Guid roomId)
         {
-            // find meters that has the roomId of the parameter
-
             var metersInRoom = await _context.EnergyMeters
                 .Include(x => x.EnergyDatas)
-                .Where(x => x.RoomId == roomId).OrderBy(x => x.Name)
-                .ToListAsync() ?? throw new Exception("No meters found");
+                .Where(x => x.RoomId == roomId)
+                .OrderBy(x => x.Name)
+                .ToListAsync();
 
-            // then find the meter data of each meter and store in a list of meterDataDto
+            if (metersInRoom == null || metersInRoom.Count == 0)
+            {
+                throw new Exception("No meters found");
+            }
 
-            DateTime start = DateTime.Now;
-            var end = start;
-            start = start.AddSeconds(-60);
+            DateTime end = DateTime.Now;
+            DateTime start = end.AddSeconds(-60);
+
             await Console.Out.WriteLineAsync("start: " + start);
             await Console.Out.WriteLineAsync("end: " + end);
-
-
 
             List<MeterDataDto> subMeters = [];
             MeterDataDto mainMeter = new()
@@ -91,76 +92,53 @@ namespace WebApi.Repositories
                 RealTime = 0,
                 Accumulated = 0,
                 IsConnected = true
-
             };
-
 
             foreach (var meter in metersInRoom)
             {
-
-                //var meterData = await _context.EnergyData
-                //    .Where(x => x.EnergyMeterId == meter.Id && x.DateTime >= start && x.DateTime <= end)
-                //    .OrderByDescending(x => x.DateTime)
-                //    .ToListAsync();
-
-
                 var meterData = meter.EnergyDatas
                     .Where(x => x.DateTime >= start && x.DateTime <= end)
-                    .OrderByDescending(x => x.DateTime)
+                    .OrderBy(x => x.DateTime)
                     .ToList();
 
-                // handle no values from meterdata (no data from the last 60 seconds)
                 if (meterData.Count == 0)
                 {
-                    // since there is no meterData we have to get the last accumulated value from the meter look at all time, instead of last 60 seconds
-                    var meterDataWasZero = meter.EnergyDatas
-                        .Where(x => x.EnergyMeterId == meter.Id)
+                    // If no data within the time window, use the latest available data
+                    var latestMeterData = meter.EnergyDatas
                         .OrderByDescending(x => x.DateTime)
                         .FirstOrDefault();
 
-
-                    // if no data was found in a table,
-                    // then the accumulated value should be set to 0 to avoid null reference exception
-                    meterDataWasZero ??= new EnergyData
+                    if (latestMeterData != null)
                     {
-                        AccumulatedValue = 0
-                    };
+                        subMeters.Add(new MeterDataDto
+                        {
+                            Id = meter.Id,
+                            Name = meter.Name,
+                            RealTime = 0,
+                            Accumulated = latestMeterData.AccumulatedValue,
+                            IsConnected = true
+                        });
 
-                    subMeters.Add(new MeterDataDto
-                    {
-                        Id = meter.Id,
-                        Name = meter.Name,
-                        RealTime = 0,
-                        Accumulated = meterDataWasZero.AccumulatedValue,
-                        IsConnected = true
-                    });
-                    // break the loop and continue to the next meter
+                        mainMeter.Accumulated += latestMeterData.AccumulatedValue;
+                    }
 
-                    mainMeter.Accumulated += meterDataWasZero.AccumulatedValue;
-                    continue;
+                    continue; // Skip further processing for this meter
                 }
 
-                // realtime is Kw/h
-                // we find the avg impulses in a minute (since we get data for a 60seconds)
-                // we divide 3600 by the avg impulses in a minute to get watt/hour
-                double realtime = Math.Round((3600.0 / (meterData.Count / 60.0)) / 1000.0, 2);
-
+                // Calculate current wattage based on impulses and timestamps
+                double currentWattage = CalculateCurrentWattage(meterData);
 
                 subMeters.Add(new MeterDataDto
                 {
                     Id = meter.Id,
                     Name = meter.Name,
-                    RealTime = realtime,
-                    Accumulated = meterData.First().AccumulatedValue,
+                    RealTime = currentWattage,
+                    Accumulated = meterData.Last().AccumulatedValue,
                     IsConnected = true
                 });
 
-                mainMeter.RealTime += realtime; // the same as getting all the counts of meterData and multiplying it by 60 and dividing by 1000,
-                                                // but here we are just adding the realtime of each meter resulting in the same value
-                mainMeter.Accumulated += meterData.First().AccumulatedValue;
-
-
-
+                mainMeter.RealTime += currentWattage;
+                mainMeter.Accumulated += meterData.Last().AccumulatedValue;
             }
 
             return new RoomDataDto
@@ -168,10 +146,37 @@ namespace WebApi.Repositories
                 MainMeter = mainMeter,
                 SubMeters = subMeters
             };
-
-
         }
 
+        // Calculate current wattage based on impulses and timestamps
+        //Power(W) = Time between Pulses(s) / Energy per Pulse(J)
+        //​
+        private double CalculateCurrentWattage(List<EnergyData> energyData)
+        {
+            if (energyData.Count < 2 || energyData.Any(data => data == null))
+                return 0.0;
 
+            var lastTwoDataPoints = energyData.TakeLast(2).ToList();
+
+            double impulsesPerSecond = CalculateImpulsesPerSecond(lastTwoDataPoints);
+
+            return impulsesPerSecond * JoulesPerImpulse;
+        }
+
+        // Calculate impulses per second based on the first and last data point
+        private double CalculateImpulsesPerSecond(List<EnergyData> dataPoints)
+        {
+            var validDataPoints = dataPoints.Where(data => data != null).ToList();
+
+            if (validDataPoints.Count < 2)
+                return 0.0;
+
+            TimeSpan timeDifference = validDataPoints.Last().DateTime - validDataPoints.First().DateTime;
+
+            if (timeDifference <= TimeSpan.Zero)
+                return 0.0;
+
+            return (validDataPoints.Last().AccumulatedValue - validDataPoints.First().AccumulatedValue) / timeDifference.TotalSeconds;
+        }
     }
 }

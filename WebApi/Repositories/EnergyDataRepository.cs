@@ -24,7 +24,7 @@ namespace WebApi.Repositories
                 {
                     EnergyMeterId = data.MeterId,
                     AccumulatedValue = data.AccumulatedValue,
-                    DateTime = DateTime.Now
+                    DateTime = DateTime.Parse(data.DateTime),
                 };
 
                 await _context.EnergyData.AddAsync(energyData);
