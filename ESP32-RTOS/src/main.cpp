@@ -268,7 +268,7 @@ void queueDataHandling(void *pvParameters)
       // write data to sd card
 
       // Setup datetime
-      String datetime = rtc.getTime("%Y-%m-%d %H:%M:%S") + "." + String(rtc.getMicros(), 7);
+      String datetime = rtc.getTime("%Y-%m-%d %H:%M:%S") + "." + String(rtc.getMillis());
 
       file.print(meters[meterIndex].meterId);
       file.print(",");
