@@ -149,8 +149,7 @@ namespace WebApi.Repositories
         }
 
         // Calculate current wattage based on impulses and timestamps
-        //Power(W) = Time between Pulses(s) / Energy per Pulse(J)
-        //​
+        // Power(W) = Energy per Pulse(J) / Time between Pulses(s)
         private double CalculateCurrentWattage(List<EnergyData> energyData)
         {
             if (energyData.Count < 2 || energyData.Any(data => data == null))
@@ -160,10 +159,11 @@ namespace WebApi.Repositories
 
             double impulsesPerSecond = CalculateImpulsesPerSecond(lastTwoDataPoints);
 
+            // Joules per impulse is 3600 since the meter measures in kWh
             return impulsesPerSecond * JoulesPerImpulse;
         }
 
-        // Calculate impulses per second based on the first and last data point
+        // Finds the time difference between the first and last timestamp
         private double CalculateImpulsesPerSecond(List<EnergyData> dataPoints)
         {
             var validDataPoints = dataPoints.Where(data => data != null).ToList();
