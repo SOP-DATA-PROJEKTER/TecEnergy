@@ -2,24 +2,14 @@
 #include <SD_MMC.h>
 #include <HTTPClient.h>
 #include <ETH.h>
-
-#include <ArduinoJson.h> // need to install this library ArduinoJson by Benoit Blanchon
-// Define Structs
-
+#include <ArduinoJson.h>
 #include <esp_vfs_fat.h>
+#include <esp_sntp.h>
 
-// lib for getting time from NTP
-#include <NTPClient.h>
-// lib used alongside NTPClient to get time
-#include <ESP32Time.h>
+// Define Constants for SNTP
+const char *sntpServer = "pool.ntp.org";
 
-// Define Constants for NTP
-const char *ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = 3600;  // GMT +1
-const int daylightOffset_sec = 0; // Daylight saving time
-
-ESP32Time rtc(gmtOffset_sec); // offset in seconds GMT+1
-
+// Define Structs
 typedef struct dataStruct
 {
   const char *meterId;
@@ -28,113 +18,87 @@ typedef struct dataStruct
 } dataStruct;
 
 dataStruct meters[] = {
-    {"EB8D4250-D3E1-4302-A9A9-526BC223FD6E", 0}, // meter 1
-    {"6424A2EE-2C46-4486-B8D9-7931CC6269C2", 0}, // meter 2
-    {"BFE517CB-5A23-4786-B535-A733059FA959", 0}, // meter 3
-    {"3946301E-1C59-4EE5-87FA-F8246F1DBEF1", 0}  // meter 4
+    {"00000000-1C59-4EE5-87FA-F8246F1DBEF1", 0, ""}, // Btn Test
+    {"00000001-D3E1-4302-A9A9-526BC223FD6E", 0, ""}, // meter 01
+    {"00000002-2C46-4486-B8D9-7931CC6269C2", 0, ""}, // meter 02
+    {"00000003-5A23-4786-B535-A733059FA959", 0, ""}, // meter 03
+    {"00000004-1C59-4EE5-87FA-F8246F1DBEF1", 0, ""}  // meter 04
 };
 
 // Define Variables
 xQueueHandle dataQueue;
 SemaphoreHandle_t sdCardMutex;
-volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
-// int accumulation = 0;
+volatile unsigned long lastDebounceTime[5] = {0, 0, 0, 0, 0};
+volatile bool pulseDetected[5] = {false, false, false, false, false};
+const int debounceTime = 400;
 
-// const char* apiUrl = "http://192.168.5.132:2050/api/EnergyData/Test"; // Jonas IIS Api
-// const char *apiUrl = "http://192.168.21.7:2050/api/EnergyData"; // Virtuel Server SKP
-//const char *apiUrl = "http://192.168.5.131:5252/api/EnergyData"; // Local PC
+// Define Constants
  const char *apiUrl = "http://10.233.134.113:2050/api/EnergyData"; // energymeter room laptop server
+//const char *apiUrl = "http://192.168.5.131:5252/api/EnergyData"; // Local PC
 
 const char *filename = "/EnergyData.csv";
 
 // Define the pins
+const int builtInBtn = 34;  // built-in button to simulate impulse
 const int impulsePin1 = 16; // Impulse pin
 const int impulsePin2 = 32; // Impulse pin
 const int impulsePin3 = 33; // Impulse pin
 const int impulsePin4 = 36; // Impulse pin
 
-const int builtInBtn = 34; // bultin button to simmulate impulse
-
-// Define the meter ids
-// const char* meterId1 = "CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB";
-// const char* meterId2 = "222";
-// const char* meterId3 = "333";
-// const char* meterId4 = "444";
-
-// define functions
-void IRAM_ATTR impulseDetected1();
-void IRAM_ATTR impulseDetected2();
-void IRAM_ATTR impulseDetected3();
-void IRAM_ATTR impulseDetected4();
+// Function prototypes
+void IRAM_ATTR impulseDetected(int meter);
 void IRAM_ATTR buttonTest();
 
 void queueDataHandling(void *pvParameters);
 void sendToApi(void *pvParameters);
+void updateDatetime(int index);
 
 bool setupSdCard();
 bool setupMutex();
 bool setupInterrupts();
 
-// setup starts here
+// Setup starts here
 void setup()
 {
-
   Serial.begin(115200);
-
-  pinMode(impulsePin1, INPUT_PULLDOWN); // sets pin to input
-  pinMode(impulsePin2, INPUT);
-  pinMode(impulsePin3, INPUT);
-  pinMode(impulsePin4, INPUT);
-  pinMode(builtInBtn, PULLDOWN);
-
+  pinMode(impulsePin1, INPUT_PULLDOWN);
+  pinMode(impulsePin2, INPUT_PULLDOWN);
+  pinMode(impulsePin3, INPUT_PULLDOWN);
+  pinMode(impulsePin4, INPUT_PULLDOWN);
+  pinMode(builtInBtn, INPUT_PULLDOWN);
   ETH.begin();
-
   setupSdCard();
-
   setupMutex();
-
   dataQueue = xQueueCreate(20, sizeof(int *));
-
   setupInterrupts();
-
-  attachInterrupt(builtInBtn, buttonTest, FALLING);
-
-  xTaskCreate(               // create a new rtos  task
-      queueDataHandling,     // the name of what function will run
-      "Queue Data Handling", // the name of the task
-      4096,                  // the stack size of the task
-      NULL,                  // the parameter passed to the task
-      1,                     // the priority of the task
-      NULL                   // the task handle
-  );
-
-  xTaskCreate(
-      sendToApi,
-      "Api Call",
-      4096,
-      NULL,
-      2,
-      NULL);
+  xTaskCreate(queueDataHandling, "Queue Data Handling", 4096, NULL, 2, NULL);
+  xTaskCreate(sendToApi, "Api Call", 4096, NULL, 1, NULL);
 
   Serial.println("Setup done");
 
-  // Sets the time, using ESP32Time library and NTP
-  rtc.setTime(00, 00, 12, 1, 1, 2000); // 1 Jan 2000 12:00:00
+  // Initialize the SNTP service
+  sntp_setoperatingmode(SNTP_OPMODE_POLL);
+  sntp_setservername(0, sntpServer);
+  sntp_init();
 
-  /*---------set with NTP---------------*/
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  // Wait for time to be set
   struct tm timeinfo;
-  if (getLocalTime(&timeinfo))
+  Serial.println("Trying to get time from NTP server.");
+  while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET)
   {
-    rtc.setTimeStruct(timeinfo);
+    Serial.print(".");
+    delay(2000);
   }
-}
+  Serial.println("\nTime synchronized with NTP server.");
 
-// setup functions
+  // Set local timezone for Copenhagen, Denmark
+  // With Daylight saving time
+  setenv("TZ", "CET-1CEST,M3.5.0/2,M10.5.0/3", 1);
+  tzset();
+}
 
 bool setupMutex()
 {
-  // create semaphore to lock sd-card access
   while (sdCardMutex == NULL)
   {
     sdCardMutex = xSemaphoreCreateMutex();
@@ -144,15 +108,8 @@ bool setupMutex()
 
 bool setupSdCard()
 {
-  // initialize sd card
-
   SD_MMC.begin();
-
-  // check if sd card file exists
-  // if it does not exist create it
-
   SD_MMC.remove(filename);
-
   if (!SD_MMC.exists(filename))
   {
     File file = SD_MMC.open(filename, FILE_WRITE);
@@ -162,139 +119,87 @@ bool setupSdCard()
     }
     file.close();
   }
-
   return true;
 }
 
 bool setupInterrupts()
 {
-  attachInterrupt(impulsePin1, impulseDetected1, RISING); // sets interrupt when pin goes from low to high
-
-  attachInterrupt(impulsePin2, impulseDetected2, RISING);
-
-  attachInterrupt(impulsePin3, impulseDetected3, RISING);
-
-  attachInterrupt(impulsePin4, impulseDetected4, RISING);
-
+  attachInterrupt(builtInBtn, buttonTest, RISING);
+  attachInterrupt(impulsePin1, []()
+                  { impulseDetected(1); }, RISING);
+  attachInterrupt(impulsePin2, []()
+                  { impulseDetected(2); }, RISING);
+  attachInterrupt(impulsePin3, []()
+                  { impulseDetected(3); }, RISING);
+  attachInterrupt(impulsePin4, []()
+                  { impulseDetected(4); }, RISING);
   return true;
 }
-
 // Interrupt functions
-
-void IRAM_ATTR impulseDetected1()
+void IRAM_ATTR impulseDetected(int meter)
 {
-  int meter = 0;
-  if (millis() - lastDebounceTime[meter] >= 80)
+  unsigned long currentMillis = millis();
+  if ((currentMillis - lastDebounceTime[meter]) >= debounceTime)
   {
-    xQueueSendFromISR(dataQueue, &meter, 0);
-    lastDebounceTime[meter] = millis();
-  }
-}
-
-void IRAM_ATTR impulseDetected2()
-{
-  int meter = 1;
-  if (millis() - lastDebounceTime[meter] >= 80)
-  {
-    xQueueSendFromISR(dataQueue, &meter, 0);
-    lastDebounceTime[meter] = millis();
-  }
-}
-
-void IRAM_ATTR impulseDetected3()
-{
-  int meter = 2;
-  if (millis() - lastDebounceTime[meter] >= 80)
-  {
-    xQueueSendFromISR(dataQueue, &meter, 0);
-    lastDebounceTime[meter] = millis();
-  }
-}
-
-void IRAM_ATTR impulseDetected4()
-{
-  int meter = 3;
-  if (millis() - lastDebounceTime[meter] >= 80)
-  {
-    xQueueSendFromISR(dataQueue, &meter, 0);
-    lastDebounceTime[meter] = millis();
+    lastDebounceTime[meter] = currentMillis;
+    xQueueSendFromISR(dataQueue, &meter, NULL);
   }
 }
 
 void IRAM_ATTR buttonTest()
 {
-  int meter = 0;
-  if (millis() - lastDebounceTime[meter] >= 80)
+  impulseDetected(0);
+}
+
+void queueDataHandling(void *pvParameters)
+{
+  int meter;
+  while (true)
   {
-    xQueueSendFromISR(dataQueue, &meter, 0);
-    lastDebounceTime[meter] = millis();
+    if (xQueueReceive(dataQueue, &meter, portMAX_DELAY))
+    {
+      updateDatetime(meter);
+      meters[meter].accumulatedValue++;
+      pulseDetected[meter] = true;
+
+      // Write to SD card
+      if (xSemaphoreTake(sdCardMutex, portMAX_DELAY))
+      {
+        File file = SD_MMC.open(filename, FILE_APPEND);
+        if (file)
+        {
+          file.printf("%s,%d,%s\n", meters[meter].meterId, meters[meter].accumulatedValue, meters[meter].datetime.c_str());
+        }
+        file.close();
+        xSemaphoreGive(sdCardMutex);
+      }
+    }
   }
 }
 
-// RTOS Functions
-// need to change if the sd_card library isn't working
-void queueDataHandling(void *pvParameters)
+void updateDatetime(int index)
 {
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-  while (1)
-  {
-    vTaskDelay(20 / portTICK_PERIOD_MS);
-    // Serial.println("QueueDataHandling Started");
+  struct timeval tv_now;
+  gettimeofday(&tv_now, NULL);
 
-    int meterIndex;
+  // Get milliseconds part
+  unsigned long milliseconds = tv_now.tv_usec / 1000;
 
-    // take mutex
-    if (xSemaphoreTake(sdCardMutex, portMAX_DELAY) != pdTRUE)
-    {
-      Serial.println("Mutex failed to be taken within max delay");
-      xSemaphoreGive(sdCardMutex);
-      return;
-    }
+  // Format datetime string with milliseconds
+  struct tm timeinfo;
+  localtime_r(&tv_now.tv_sec, &timeinfo);
 
-    if (xQueueReceive(dataQueue, &meterIndex, 0))
-    {
-      meters[meterIndex].accumulatedValue++;
+  char buffer[36];
+  snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d.%03lu",
+           timeinfo.tm_year + 1900,
+           timeinfo.tm_mon + 1,
+           timeinfo.tm_mday,
+           timeinfo.tm_hour,
+           timeinfo.tm_min,
+           timeinfo.tm_sec,
+           milliseconds);
 
-      // open sd card
-      File file = SD_MMC.open(filename, FILE_APPEND);
-
-      // check if file opened
-      if (!file)
-      {
-        Serial.println("Failed to open file for appending");
-        xSemaphoreGive(sdCardMutex);
-        return;
-      }
-      // write data to sd card
-
-      // Setup datetime
-      String datetime = rtc.getTime("%Y-%m-%d %H:%M:%S") + "." + String(rtc.getMillis());
-
-      file.print(meters[meterIndex].meterId);
-      file.print(",");
-      file.print(meters[meterIndex].accumulatedValue);
-      file.print(",");
-      file.print(datetime);
-
-      file.println();
-      // close sd card
-      file.close();
-
-      // give mutex
-      xSemaphoreGive(sdCardMutex);
-
-      // Serial.print(meters[meterIndex].meterId);
-      // Serial.print(",");
-      // Serial.print(meters[meterIndex].accumulatedValue);
-      // Serial.println();
-
-      // data is removed from queue on recieve
-    }
-    else
-    {
-      xSemaphoreGive(sdCardMutex);
-    }
-  }
+  meters[index].datetime = String(buffer);
 }
 
 void sendToApi(void *pvParameters)
@@ -398,11 +303,4 @@ void sendToApi(void *pvParameters)
 
 void loop()
 {
-  // String datetime = rtc.getTime("%Y-%m-%d %H:%M:%S");
-  // datetime += "." + String(rtc.getMicros(), 7); // Get microseconds and append
-
-  // Serial.print("Formatted time with microseconds: ");
-  // Serial.println(datetime);
-
-  // delay(1000);
 }
