@@ -1,10 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  Observable,
-  switchMap,
-  timer
-} from 'rxjs';
+import { Observable, switchMap, timer } from 'rxjs';
 import { RoomData } from '../models/RoomData';
 import { SimpleInfo } from '../models/SimpleInfo';
 
@@ -12,11 +8,12 @@ import { SimpleInfo } from '../models/SimpleInfo';
   providedIn: 'root',
 })
 export class RoomService {
-  // url: string = 'https://localhost:7227/api/Room/';
-  // url : string = "http://192.168.21.7:2050/api/Room/"
-  url: string = 'http://10.233.134.113/api/Room/';
+  // url: string = 'https://localhost:7227/api/Room/'; // Localhost
+  // url : string = "http://192.168.21.7:2050/api/Room/" // SQL Server
+  url: string = 'http://10.233.134.113/api/Room/'; // Energy Awareness Room
+  // url: string = 'http://192.168.5.131:5252/api/Room/'; // Niklas PC
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getRoomDataStream(roomId: string, intervalMs: number): Observable<RoomData> {
     return timer(0, intervalMs).pipe(

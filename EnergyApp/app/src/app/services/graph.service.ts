@@ -7,11 +7,12 @@ import { DateValue } from '../models/DateValue';
   providedIn: 'root',
 })
 export class GraphService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // url : string = "https://localhost:7227/api/Graph"
-  // url: string = 'http://192.168.21.7:2050/api/Graph';
-  url: string = 'http://10.233.134.113/api/Graph/';
+  // url : string = "https://localhost:7227/api/Graph" // Localhost
+  // url: string = 'http://192.168.21.7:2050/api/Graph'; // SQL Server
+  url: string = 'http://10.233.134.113/api/Graph/'; // Energy Awareness Room
+  // url: string = 'http://192.168.5.131:5252/api/Graph'; // Niklas PC
 
   getDailyGraphData(roomId: string, date: Date): Observable<DateValue[]> {
     return this.http.get<DateValue[]>(
