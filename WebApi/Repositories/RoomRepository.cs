@@ -160,7 +160,7 @@ namespace WebApi.Repositories
             double impulsesPerSecond = CalculateImpulsesPerSecond(lastTwoDataPoints);
 
             // Joules per impulse is 3600 since the meter measures in kWh
-            return impulsesPerSecond * JoulesPerImpulse;
+            return JoulesPerImpulse / impulsesPerSecond;
         }
 
         // Finds the time difference between the first and last timestamp
@@ -176,7 +176,7 @@ namespace WebApi.Repositories
             if (timeDifference <= TimeSpan.Zero)
                 return 0.0;
 
-            return (validDataPoints.Last().AccumulatedValue - validDataPoints.First().AccumulatedValue) / timeDifference.TotalSeconds;
+            return timeDifference.TotalSeconds;
         }
     }
 }
