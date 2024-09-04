@@ -370,3 +370,6 @@ TecEnergy\ESP32-RTOS\.vscode/.browse.c_cpp.db*
 TecEnergy\ESP32-RTOS\.vscode/c_cpp_properties.json
 TecEnergy\ESP32-RTOS\..vscode/launch.json
 TecEnergy\ESP32-RTOS\.vscode/ipch
+ESP32-RTOS/.vscode/launch.json
+ESP32-RTOS/.vscode/c_cpp_properties.json
+ESP32-RTOS/.vscode/extensions.json
