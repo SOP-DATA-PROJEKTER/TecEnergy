@@ -4,11 +4,23 @@
 #include <ETH.h> 
 
 #include <ArduinoJson.h> // need to install this library ArduinoJson by Benoit Blanchon
+#include <InfluxDbClient.h>
+#include <InfluxDbCloud.h>
+#include <time.h>
+
+
+#define TZ_INFO "CET-1CEST"
 
 // Define Structs
+typedef struct {
+  char* measurement;
+  int accumulated_value;
+  char* submeter;
+} InfluxDBData;
+
 
 typedef struct dataStruct {
-  const char* meterId;
+  char* meterId;
   int accumulatedValue;
 } dataStruct;
 
@@ -25,11 +37,23 @@ dataStruct meters[] = {
 xQueueHandle dataQueue;
 SemaphoreHandle_t sdCardMutex;
 volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
-// int accumulation = 0;
 
-// const char* apiUrl = "http://192.168.5.132:2050/api/EnergyData/Test"; // Jonas IIS Api
-// const char* apiUrl = "http://192.168.21.7:2050/api/EnergyData"; // Virtuel Server SKP
-const char* apiUrl = "http://10.233.134.113:2050/api/EnergyData"; // energymeter room laptop server
+
+const char* apiUrl = "http://10.233.134.124:8086"; // energymeter room linux-server
+// const char* apiUrl = "http://10.233.134.113:8086"; // docker container
+
+const char* token = "lbSmkkLsuP1TCqZ2gw191DmpNnRLdwOeuYHupvSJdVDlD9ocqBNLq29wZ3ltVSYup8IzIyMG7QONjJ1fnnj8lw==";
+const char* bucket = "Energy_Collection";
+const char* org = "2f3bd7bcbca2169a";
+
+InfluxDBClient client(apiUrl, org, bucket, token, InfluxDbCloud2CACert);
+Point point("Energy_Measurement");
+
+InfluxDBData data{
+  "Energy_Measurement",
+  0,
+  ""
+};
 
 const char* filename = "/EnergyData.csv";
 
@@ -39,14 +63,7 @@ const int impulsePin2 = 32; // Impulse pin
 const int impulsePin3 = 33; // Impulse pin
 const int impulsePin4 = 36; // Impulse pin
 
-const int builtInBtn = 34; // bultin button to simmulate impulse
-
-
-// Define the meter ids
-// const char* meterId1 = "CCC6C8C4-B9DB-4C8D-39D8-08DBEF4C21FB";
-// const char* meterId2 = "222";
-// const char* meterId3 = "333";
-// const char* meterId4 = "444";
+const int builtInBtn = 34; // bultin button to simmulate impulse -- testing purposes
 
 
 // define functions
@@ -58,6 +75,10 @@ void IRAM_ATTR buttonTest();
 
 void queueDataHandling(void *pvParameters);
 void sendToApi(void *pvParameters);
+void handlePoint(void *pvParameters);
+
+void writePoint(InfluxDBData data, time_t timestamp);
+void sendPoint();
 
 bool setupSdCard();
 bool setupMutex();
@@ -78,6 +99,18 @@ void setup() {
 
   ETH.begin();
 
+  // Set time via NTP
+  timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
+
+  // check for influxdb connection
+  if (client.validateConnection()) {
+    Serial.print("Connected to InfluxDB: ");
+    Serial.println(client.getServerUrl());
+  } else {
+    Serial.print("InfluxDB connection failed: ");
+    Serial.println(client.getLastErrorMessage());
+  }
+
   setupSdCard();
 
   setupMutex();
@@ -86,32 +119,41 @@ void setup() {
 
   setupInterrupts();
 
-  attachInterrupt(builtInBtn, buttonTest, FALLING);
+  // attachInterrupt(builtInBtn, buttonTest, FALLING);
 
-  xTaskCreate(                  // create a new rtos  task
-    queueDataHandling,          // the name of what function will run
-    "Queue Data Handling",      // the name of the task
-    4096,                       // the stack size of the task
-    NULL,                       // the parameter passed to the task
-    1,                          // the priority of the task
-    NULL                        // the task handle
-  );
+  // xTaskCreate(                  // create a new rtos  task
+  //   queueDataHandling,          // the name of what function will run
+  //   "Queue Data Handling",      // the name of the task
+  //   4096,                       // the stack size of the task
+  //   NULL,                       // the parameter passed to the task
+  //   1,                          // the priority of the task
+  //   NULL                        // the task handle
+  // );
 
+
+  // xTaskCreate(
+  //   sendToApi,
+  //   "Api Call",
+  //   4096,
+  //   NULL,
+  //   2,
+  //   NULL
+  // );
 
   xTaskCreate(
-    sendToApi,
-    "Api Call",
+    handlePoint,
+    "Handle Point",
     4096,
     NULL,
-    2,
+    1,
     NULL
   );
 
   Serial.println("Setup done");
 }
 
-// setup functions
 
+// setup functions
 bool setupMutex(){
   // create semaphore to lock sd-card access
   while(sdCardMutex == NULL)
@@ -162,11 +204,13 @@ bool setupInterrupts(){
 }
 
 
-
-
 // Interrupt functions
 
+// interrupt function for when an impulse is detected
+// debounce time to avoid noise
+// sends data to queue on interrupt
 void IRAM_ATTR impulseDetected1() {
+  // index of meter
   int meter = 0;
   if(millis() - lastDebounceTime[meter] >= 80)
   {
@@ -206,6 +250,8 @@ void IRAM_ATTR impulseDetected4() {
 
 }
 
+
+// for testing purposes
 void IRAM_ATTR buttonTest(){
   int meter = 0;
   if(millis() - lastDebounceTime[meter] >= 80)
@@ -262,10 +308,6 @@ void queueDataHandling(void *pvParameters){
       // give mutex
       xSemaphoreGive(sdCardMutex);
 
-      // Serial.print(meters[meterIndex].meterId);
-      // Serial.print(",");
-      // Serial.print(meters[meterIndex].accumulatedValue);
-      // Serial.println();
 
       // data is removed from queue on recieve
     }
@@ -276,7 +318,6 @@ void queueDataHandling(void *pvParameters){
   }
 
 }
-
 
 
 void sendToApi(void *pvParameters){
@@ -369,12 +410,61 @@ void sendToApi(void *pvParameters){
     // give mutex
     xSemaphoreGive(sdCardMutex);
 
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(50000 / portTICK_PERIOD_MS);
 
   }
+}
+
+
+void IRAM_ATTR handlePoint(void *pvParameters){
+  vTaskDelay(10000 / portTICK_PERIOD_MS);
+  while(1)
+  {
+    int meterIndex;
+    if(xQueueReceive(dataQueue, &meterIndex, 0))
+    {
+      data.accumulated_value = ++meters[meterIndex].accumulatedValue;
+      data.submeter = meters[meterIndex].meterId;
+
+      writePoint(data);
+      sendPoint();
+
+
+    }
+
+    
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+  }
+}
+
+
+void writePoint(InfluxDBData data, time_t timestamp = NULL){
+  if(timestamp != NULL){
+    point.setTime(timestamp);
+  }
+  point.clearFields();
+  point.clearTags();
+
+  point.addTag("submeter", data.submeter);
+  point.addField("accumulated_value", data.accumulated_value);
+
+}
+
+
+void sendPoint(){
+
+  if(client.writePoint(point)){
+    Serial.println("Write point success");
+  } else {
+    Serial.println("Write point failed");
+    client.getLastErrorMessage();
+  }
+
+  Serial.println(client.pointToLineProtocol(point));
 }
 
 
 void loop(){
 
 }
+
