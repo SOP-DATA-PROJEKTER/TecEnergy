@@ -3,7 +3,7 @@
 #include <HTTPClient.h>
 #include <ETH.h> 
 
-#include <ArduinoJson.h> // need to install this library ArduinoJson by Benoit Blanchon
+#include <ArduinoJson.h> // need to install this library ArduinoJson by Benoit Blanchona
 #include <InfluxDbClient.h>
 #include <InfluxDbCloud.h>
 #include <time.h>
@@ -42,7 +42,7 @@ volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
 const char* apiUrl = "http://10.233.134.124:8086"; // energymeter room linux-server
 // const char* apiUrl = "http://10.233.134.113:8086"; // docker container
 
-const char* token = "lbSmkkLsuP1TCqZ2gw191DmpNnRLdwOeuYHupvSJdVDlD9ocqBNLq29wZ3ltVSYup8IzIyMG7QONjJ1fnnj8lw==";
+const char* token = "zSqu6E02_DpdgoLzn2XuXOfQNR-icgor9drqCRt0XrB3mvzG9zAzCQEHIGynyUd2Spi67qPOb0OXubDHkLgKKA=="; // token for linux-server
 const char* bucket = "Energy_Collection";
 const char* org = "2f3bd7bcbca2169a";
 
