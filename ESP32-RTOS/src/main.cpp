@@ -77,7 +77,7 @@ void queueDataHandling(void *pvParameters);
 void sendToApi(void *pvParameters);
 void handlePoint(void *pvParameters);
 
-void writePoint(InfluxDBData data, time_t timestamp);
+void writePoint(InfluxDBData data);
 void sendPoint();
 
 bool setupSdCard();
@@ -438,10 +438,8 @@ void IRAM_ATTR handlePoint(void *pvParameters){
 }
 
 
-void writePoint(InfluxDBData data, time_t timestamp = NULL){
-  if(timestamp != NULL){
-    point.setTime(timestamp);
-  }
+void writePoint(InfluxDBData data){
+
   point.clearFields();
   point.clearTags();
 
