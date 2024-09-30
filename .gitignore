@@ -381,3 +381,10 @@ ESP32-RTOS/.vscode/extensions.json
 .vscode/launch.json
 .vscode/ipch
 /ESP32-RTOS/.vscode
+
+
+\ESP32-RTOS\.pio
+\ESP32-RTOS\.vscode/.browse.c_cpp.db*
+\ESP32-RTOS\.vscode/c_cpp_properties.json
+\ESP32-RTOS\.vscode/launch.json
+\ESP32-RTOS\.vscode/ipch

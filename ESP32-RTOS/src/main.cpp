@@ -16,6 +16,9 @@
 
 #define TZ_INFO "CET-1CEST"
 
+AsyncWebServer server(80);
+
+
 // Define Structs
 typedef struct {
   char* measurement;
@@ -98,7 +101,7 @@ void setupRtosTasks();
 void setupAccessMode();
 bool setupWithWifi();
 void setupWithEthernet();
-void setupConfig();
+bool setupConfig();
 void initLittleFS();
 
 // setup starts here
@@ -115,7 +118,11 @@ void setup() {
   initLittleFS();
 
   // read from littlefs to get values in config.json
-  setupConfig();
+  if(!setupConfig()){
+    // go into access point mode 
+    setupAccessMode();
+    return;
+  }
 
   // if wifiMode is true, use wifi if not use ETH
   if (config.wifiMode)
@@ -123,7 +130,9 @@ void setup() {
     // if setup with wifi fails, start access point mode
     if (!setupWithWifi())
     {
+      Serial.println("Failed to connect to wifi");
       setupAccessMode();
+      return;
     }
   } 
   else {
@@ -205,14 +214,14 @@ void setupAccessMode(){
 
   // assume no or empty config file / values
   // start in access mode
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP("EnergyMeter", "passw0rd");
+  // WiFi.mode(WIFI_AP);
+  WiFi.softAP("EnergyMeter", NULL);
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(IP);
 
+
   // start webserver
-  AsyncWebServer server(80);
 
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -287,6 +296,9 @@ void setupAccessMode(){
           config.meterId[3], p->value().c_str();
         }        
       }
+
+
+      request->send(200, "text/plain", "Configuration saved, ESP will restart");
       // convert the config to json
       JsonDocument confDoc;
       confDoc["wifiMode"] = config.wifiMode;
@@ -313,8 +325,7 @@ void setupAccessMode(){
 
       serializeJson(confDoc, configFile);
       configFile.close();
-
-      request->send(200, "text/plain", "Configuration saved, ESP will restart");
+      Serial.println("Restarting ESP");
       delay(3000);
       ESP.restart();
 
@@ -326,7 +337,7 @@ void setupAccessMode(){
 }
 
 
-void setupConfig(){
+bool setupConfig(){
 
   File configFile = LittleFS.open(configFilename, "r");
 
@@ -334,7 +345,7 @@ void setupConfig(){
   if (!configFile || configFile.size() == 0)
   {
     setupAccessMode();
-    return;
+    return false;
   }
 
   if(!configFile){
@@ -365,6 +376,8 @@ void setupConfig(){
   config.meterId[3] = doc["meterId4"].as<String>();
 
   configFile.close();
+
+  return true;
   
 }
 
