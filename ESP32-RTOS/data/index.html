@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 Configuration-Mode</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="./styles.css">
+</head>
+<body>
+  <div class="topnav">
+    <h1>ESP32 Configuration-Mode</h1>
+  </div>
+  <div class="content">
+    <div class="card-grid">
+      <div class="card">
+        <form action="/" method="POST">
+
+          <div class="form-group">
+            <div class="labels">
+              <label for="wifiMode">Connect to WiFi?</label>
+            </div>
+            <div class="inputs">
+              <select id="wifiMode" name="wifiMode">
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="wifi-fields" class="wifi-fields">
+            <div class="form-group">
+              <div class="labels">
+                <label for="ssid">SSID:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="ssid" name="ssid">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="labels">
+                <label for="password">WiFi Password:</label>
+              </div>
+              <div class="inputs">
+                <input type="password" id="password" name="password">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="labels">
+                <label for="ip">IP Address:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="ip" name="ip">
+              </div>  
+            </div>
+            <div class="form-group">
+              <div class="labels">
+                <label for="gateway">Gateway Address:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="gateway" name="gateway">
+              </div>
+            </div>
+          </div>
+
+          <div id="conf-fields" class="conf-fields">
+
+            <div class="form-group">
+              <div class="labels">
+                <label for="conf">ApiUrl:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="ApiUrl" name="ApiUrl">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="labels">
+                <label for="conf">Token:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="Token" name="Token">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="labels">
+                <label for="conf">Bucket:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="Bucket" name="Bucket">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="labels">
+                <label for="conf">Organization:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="Organization" name="Organization">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <div class="labels">
+                <label for="conf">Room Number:</label>
+              </div>
+              <div class="inputs">
+                <input type="text" id="RoomNumber" name="RoomNumber">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="labels">
+                <label for="conf">Submeters:</label>
+              </div>
+              <div class="inputs">
+                <div class="inputs-list">
+                  <input type="text" id="Submeter1" name="Submeter1">
+                  <input type="text" id="Submeter2" name="Submeter2">
+                  <input type="text" id="Submeter3" name="Submeter3">
+                  <input type="text" id="Submeter4" name="Submeter4">
+                </div>
+              </div>
+            </div>
+
+            <div class="submit-button">
+              <input type ="submit" value ="Submit">
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle visibility of WiFi fields based on WiFi toggle
+    document.getElementById('wifiMode').addEventListener('change', function() {
+        var wifiEnabled = this.value === 'true';
+        document.getElementById('wifi-fields').style.display = wifiEnabled ? 'block' : 'none';
+    });
+
+    // Ensure proper display on page load based on initial value
+    window.onload = function() {
+        var wifiEnabled = document.getElementById('wifiMode').value === 'true';
+        document.getElementById('wifi-fields').style.display = wifiEnabled ? 'block' : 'none';
+    };
+  </script>
+
+</body>
+</html>

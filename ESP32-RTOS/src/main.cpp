@@ -3,6 +3,11 @@
 #include <HTTPClient.h>
 #include <ETH.h> 
 
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncTCP.h>
+#include "LittleFS.h"
+
 #include <ArduinoJson.h> // need to install this library ArduinoJson by Benoit Blanchona
 #include <InfluxDbClient.h>
 #include <InfluxDbCloud.h>
@@ -15,12 +20,19 @@
 typedef struct {
   char* measurement;
   int accumulated_value;
-  char* submeter;
+  String submeterId;
+  String roomId;
 } InfluxDBData;
 
+InfluxDBData data{
+  "Energy_Measurement",
+  0,
+  "",
+  ""
+};
 
 typedef struct dataStruct {
-  char* meterId;
+  String meterId;
   int accumulatedValue;
 } dataStruct;
 
@@ -31,7 +43,22 @@ dataStruct meters[] = {
   {"3946301E-1C59-4EE5-87FA-F8246F1DBEF1", 0}  // meter 4
 };
 
+struct ConfigurationStruct{
+  bool wifiMode;
+  String ssid;
+  String password;
+  String ip;
+  String subnet;
+  String gateway;
+  String apiUrl;
+  String token;
+  String bucket;
+  String org;
+  String roomId;
+  String meterId[4];
+};
 
+ConfigurationStruct config;
 
 // Define Variables
 xQueueHandle dataQueue;
@@ -39,23 +66,11 @@ SemaphoreHandle_t sdCardMutex;
 volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
 
 
-const char* apiUrl = "http://10.233.134.124:8086"; // energymeter room linux-server
-// const char* apiUrl = "http://10.233.134.113:8086"; // docker container
-
-const char* token = "zSqu6E02_DpdgoLzn2XuXOfQNR-icgor9drqCRt0XrB3mvzG9zAzCQEHIGynyUd2Spi67qPOb0OXubDHkLgKKA=="; // token for linux-server
-const char* bucket = "Energy_Collection";
-const char* org = "2f3bd7bcbca2169a";
-
-InfluxDBClient client(apiUrl, org, bucket, token, InfluxDbCloud2CACert);
+const String apiUrl = "";
+InfluxDBClient influxClient;
 Point point("Energy_Measurement");
 
-InfluxDBData data{
-  "Energy_Measurement",
-  0,
-  ""
-};
-
-const char* filename = "/EnergyData.csv";
+const String configFilename = "/config.json";
 
 // Define the pins
 const int impulsePin1 = 16; // Impulse pin
@@ -65,7 +80,6 @@ const int impulsePin4 = 36; // Impulse pin
 
 const int builtInBtn = 34; // bultin button to simmulate impulse -- testing purposes
 
-
 // define functions
 void IRAM_ATTR impulseDetected1();
 void IRAM_ATTR impulseDetected2();
@@ -73,17 +87,19 @@ void IRAM_ATTR impulseDetected3();
 void IRAM_ATTR impulseDetected4();
 void IRAM_ATTR buttonTest();
 
-void queueDataHandling(void *pvParameters);
-void sendToApi(void *pvParameters);
 void handlePoint(void *pvParameters);
 
 void writePoint(InfluxDBData data);
 void sendPoint();
 
-bool setupSdCard();
-bool setupMutex();
+InfluxDBClient setupInfluxDbClient();
 bool setupInterrupts();
-
+void setupRtosTasks();
+void setupAccessMode();
+bool setupWithWifi();
+void setupWithEthernet();
+void setupConfig();
+void initLittleFS();
 
 // setup starts here
 void setup() {
@@ -96,49 +112,281 @@ void setup() {
   pinMode(impulsePin4, INPUT);
   pinMode(builtInBtn, PULLDOWN);
 
+  initLittleFS();
 
-  ETH.begin();
+  // read from littlefs to get values in config.json
+  setupConfig();
 
+  // if wifiMode is true, use wifi if not use ETH
+  if (config.wifiMode)
+  {
+    // if setup with wifi fails, start access point mode
+    if (!setupWithWifi())
+    {
+      setupAccessMode();
+    }
+  } 
+  else {
+    setupWithEthernet();
+  }
+  
   // Set time via NTP
   timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
 
-  // check for influxdb connection
-  if (client.validateConnection()) {
-    Serial.print("Connected to InfluxDB: ");
-    Serial.println(client.getServerUrl());
-  } else {
-    Serial.print("InfluxDB connection failed: ");
-    Serial.println(client.getLastErrorMessage());
-  }
+  influxClient = setupInfluxDbClient();
 
-  setupSdCard();
-
-  setupMutex();
-
-  dataQueue = xQueueCreate(20, sizeof(int*));
+  dataQueue = xQueueCreate(200, sizeof(int*));
 
   setupInterrupts();
 
+  setupRtosTasks();
+
   // attachInterrupt(builtInBtn, buttonTest, FALLING);
 
-  // xTaskCreate(                  // create a new rtos  task
-  //   queueDataHandling,          // the name of what function will run
-  //   "Queue Data Handling",      // the name of the task
-  //   4096,                       // the stack size of the task
-  //   NULL,                       // the parameter passed to the task
-  //   1,                          // the priority of the task
-  //   NULL                        // the task handle
-  // );
+  
+  Serial.println("Setup done");
+}
 
 
-  // xTaskCreate(
-  //   sendToApi,
-  //   "Api Call",
-  //   4096,
-  //   NULL,
-  //   2,
-  //   NULL
-  // );
+// setup functions
+void initLittleFS() {
+  if (!LittleFS.begin(true)) {
+    Serial.println("An error has occurred while mounting LittleFS");
+  }
+  Serial.println("LittleFS mounted successfully");
+}
+
+
+bool setupWithWifi(){
+  // run after setupConfig()
+  // should be called if wifiMode is true
+  // should have values from config.json inside config struct
+
+  // start by getting values from config struct
+  IPAddress localIP;
+  localIP.fromString(config.ip);
+  IPAddress gateway;
+  gateway.fromString(config.gateway);
+  IPAddress subnet;
+  subnet.fromString(config.subnet);
+
+  // configure wifi
+
+  WiFi.mode(WIFI_STA);
+  if(!WiFi.config(localIP, gateway, subnet)){
+    Serial.println("STA Failed to configure");
+    return false;
+  }
+  
+  if(WiFi.begin(config.ssid, config.password)){
+    Serial.println("STA Failed to configure");
+    return false;
+  }
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
+
+  Serial.println("Connected to WiFi");
+  Serial.println(WiFi.localIP());
+
+  return true;
+}
+
+
+void setupWithEthernet(){
+  ETH.begin();
+}
+
+
+void setupAccessMode(){
+
+  // assume no or empty config file / values
+  // start in access mode
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP("EnergyMeter", "passw0rd");
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(IP);
+
+  // start webserver
+  AsyncWebServer server(80);
+
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/index.html", "text/html");
+  });
+
+  server.serveStatic("/", LittleFS, "/");
+
+  server.on("/", HTTP_POST, [](AsyncWebServerRequest *request){
+    int params = request->params();
+    for(int i=0;i<params;i++){
+      const AsyncWebParameter* p = request->getParam(i);
+      if(p->isPost()){
+        Serial.print("POST: ");
+        if(p->name() == "wifiMode"){
+          config.wifiMode = p->value().toInt();
+        }
+        if (p->name() == "ssid")
+        {
+          config.ssid, p->value().c_str();
+        }
+        if (p->name() == "password")
+        {
+          config.password, p->value().c_str();
+        }
+        if (p->name() == "ip")
+        {
+          config.ip, p->value().c_str();
+        }
+        if (p->name() == "subnet")
+        {
+          config.subnet, p->value().c_str();
+        }
+        if (p->name() == "gateway")
+        {
+          config.gateway, p->value().c_str();
+        }
+        if (p->name() == "apiUrl")
+        {
+          config.apiUrl, p->value().c_str();
+        }
+        if (p->name() == "token")
+        {
+          config.token, p->value().c_str();
+        }
+        if (p->name() == "bucket")
+        {
+          config.bucket, p->value().c_str();
+        }
+        if (p->name() == "org")
+        {
+          config.org, p->value().c_str();
+        }
+        if (p->name() == "roomId")
+        {
+          config.roomId, p->value().c_str();
+        }
+        if (p->name() == "meterId1")
+        {
+          config.meterId[0], p->value().c_str();
+        }
+        if (p->name() == "meterId2")
+        {
+          config.meterId[1], p->value().c_str();
+        }
+        if (p->name() == "meterId3")
+        {
+          config.meterId[2], p->value().c_str();
+        }
+        if (p->name() == "meterId4")
+        {
+          config.meterId[3], p->value().c_str();
+        }        
+      }
+      // convert the config to json
+      JsonDocument confDoc;
+      confDoc["wifiMode"] = config.wifiMode;
+      confDoc["ssid"] = config.ssid;
+      confDoc["password"] = config.password;
+      confDoc["ip"] = config.ip;
+      confDoc["subnet"] = config.subnet;
+      confDoc["gateway"] = config.gateway;
+      confDoc["apiUrl"] = config.apiUrl;
+      confDoc["token"] = config.token;
+      confDoc["bucket"] = config.bucket;
+      confDoc["org"] = config.org;
+      confDoc["roomId"] = config.roomId;
+      confDoc["meterId1"] = config.meterId[0];
+      confDoc["meterId2"] = config.meterId[1];
+      confDoc["meterId3"] = config.meterId[2];
+      confDoc["meterId4"] = config.meterId[3];
+
+      // write to config.json
+      File configFile = LittleFS.open(configFilename, "w");
+      if(!configFile){
+        Serial.println("Failed to open config file for writing");
+      }
+
+      serializeJson(confDoc, configFile);
+      configFile.close();
+
+      request->send(200, "text/plain", "Configuration saved, ESP will restart");
+      delay(3000);
+      ESP.restart();
+
+    }
+  });
+
+  server.begin();
+
+}
+
+
+void setupConfig(){
+
+  File configFile = LittleFS.open(configFilename, "r");
+
+  // if file doesn't exist or is empty run setupAccessMode() to get values from user
+  if (!configFile || configFile.size() == 0)
+  {
+    setupAccessMode();
+    return;
+  }
+
+  if(!configFile){
+    Serial.println("Failed to open config file");
+  }
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, configFile);
+
+  if(error){
+    Serial.println("Failed to read file, using default configuration");
+  }
+
+  config.wifiMode = doc["wifiMode"].as<bool>();
+  config.ssid = doc["ssid"].as<String>();
+  config.password = doc["password"].as<String>();
+  config.ip = doc["ip"].as<String>();
+  config.subnet = doc["subnet"].as<String>();
+  config.gateway = doc["gateway"].as<String>();
+  config.apiUrl = doc["apiUrl"].as<String>();
+  config.token = doc["token"].as<String>();
+  config.bucket = doc["bucket"].as<String>();
+  config.org = doc["org"].as<String>();
+  config.roomId = doc["roomId"].as<String>();
+  config.meterId[0] = doc["meterId1"].as<String>();
+  config.meterId[1] = doc["meterId2"].as<String>();
+  config.meterId[2] = doc["meterId3"].as<String>();
+  config.meterId[3] = doc["meterId4"].as<String>();
+
+  configFile.close();
+  
+}
+
+
+InfluxDBClient setupInfluxDbClient(){
+
+  InfluxDBClient client(config.apiUrl, config.org, config.bucket, config.token, InfluxDbCloud2CACert);
+  
+  // check for influxdb connection
+  if (influxClient.validateConnection()) {
+    Serial.print("Connected to InfluxDB: ");
+    Serial.println(influxClient.getServerUrl());
+  } else {
+    Serial.print("InfluxDB connection failed: ");
+    Serial.println(influxClient.getLastErrorMessage());
+  }
+
+  return client;
+}
+
+
+void setupRtosTasks(){
 
   xTaskCreate(
     handlePoint,
@@ -148,44 +396,6 @@ void setup() {
     1,
     NULL
   );
-
-  Serial.println("Setup done");
-}
-
-
-// setup functions
-bool setupMutex(){
-  // create semaphore to lock sd-card access
-  while(sdCardMutex == NULL)
-  {
-    sdCardMutex = xSemaphoreCreateMutex();
-  }
-  return true;
-}
-
-
-bool setupSdCard(){
-   // initialize sd card
-
-  SD_MMC.begin();
-
-
-  // check if sd card file exists
-  // if it does not exist create it
-
-  SD_MMC.remove(filename);
-
-  if(!SD_MMC.exists(filename))
-  {
-    File file = SD_MMC.open(filename, FILE_WRITE);
-    if(file)
-    {
-      file.println("EnergyMeterID,AccumulatedValue");
-    }
-    file.close();
-  }
-
-  return true;
 
 }
 
@@ -263,159 +473,6 @@ void IRAM_ATTR buttonTest(){
 
 
 // RTOS Functions
-// need to change if the sd_card library isn't working
-void queueDataHandling(void *pvParameters){
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-  while(1)
-  {
-    vTaskDelay(20 / portTICK_PERIOD_MS);
-    // Serial.println("QueueDataHandling Started");
-
-    int meterIndex;
-
-    // take mutex
-    if(xSemaphoreTake(sdCardMutex, portMAX_DELAY) != pdTRUE){
-      Serial.println("Mutex failed to be taken within max delay");
-      xSemaphoreGive(sdCardMutex);
-      return;
-    }
-
-
-    if(xQueueReceive(dataQueue, &meterIndex, 0))
-    {
-      meters[meterIndex].accumulatedValue++;
-
-      // open sd card
-      File file = SD_MMC.open(filename, FILE_APPEND);
-
-      // check if file opened
-      if(!file){
-        Serial.println("Failed to open file for appending");
-        xSemaphoreGive(sdCardMutex);
-        return;
-
-      }
-      // write data to sd card
-    
-      file.print(meters[meterIndex].meterId);
-      file.print(",");
-      file.print(meters[meterIndex].accumulatedValue);
-
-      file.println();
-      // close sd card
-      file.close();
-
-      // give mutex
-      xSemaphoreGive(sdCardMutex);
-
-
-      // data is removed from queue on recieve
-    }
-    else{
-      xSemaphoreGive(sdCardMutex);
-    }
-
-  }
-
-}
-
-
-void sendToApi(void *pvParameters){
-  vTaskDelay(10000 / portTICK_PERIOD_MS);
-  while(1)
-  {
-    // Serial.println("sendToApi Started");
-
-    // take mutex
-                      // mutex     // max delay
-    if(xSemaphoreTake(sdCardMutex, portMAX_DELAY) != pdTRUE){
-      Serial.println("Mutex failed to be taken within max delay");
-      xSemaphoreGive(sdCardMutex);
-      return;
-    }
-
-    // read file from sd card
-    File file = SD_MMC.open(filename, FILE_READ);
-
-    if(!file){
-      xSemaphoreGive(sdCardMutex);
-      return;
-    }
-
-    // Skip the first line (header)
-    if (file.available()) {
-      file.readStringUntil('\n');
-    }
-
-    int httpResponseCode = 0;
-
-    if(file.available()){
-
-
-    String payload = "[";
-
-    while (file.available()) {
-      String line = file.readStringUntil('\n');
-      Serial.println(line);
-
-      // Split the CSV line into values
-      String name = line.substring(0, line.indexOf(','));
-      String value = line.substring(line.indexOf(',') + 1);
-
-      // Add data to the JSON document
-      JsonDocument jsonDocument;
-      jsonDocument["meterId"] = name;
-      jsonDocument["accumulatedValue"] = value.toInt();
-
-
-      String temp;
-      serializeJson(jsonDocument, temp);
-      payload += temp;
-      if (file.available())
-      {
-        payload += ",";
-      }
-    }
-
-    payload += "]";
-    // Serial.println(payload);
-    HTTPClient http;
-      
-    // send data to api
-    http.begin(apiUrl);
-    http.addHeader("Content-Type", "application/json");
-
-    httpResponseCode = http.POST(payload);
-
-    Serial.println(httpResponseCode);
-
-    // close http.client
-    http.end();
-
-    }
-
-    // close file
-    file.close();
-    if(httpResponseCode == 204)
-    {
-      // overwrite file
-      file = SD_MMC.open(filename, FILE_WRITE);
-      if(file)
-      {
-        file.println("meterId,accumulatedValue");
-      }
-      file.close();  
-    }
-    
-    // give mutex
-    xSemaphoreGive(sdCardMutex);
-
-    vTaskDelay(50000 / portTICK_PERIOD_MS);
-
-  }
-}
-
-
 void IRAM_ATTR handlePoint(void *pvParameters){
   vTaskDelay(10000 / portTICK_PERIOD_MS);
   while(1)
@@ -424,7 +481,7 @@ void IRAM_ATTR handlePoint(void *pvParameters){
     if(xQueueReceive(dataQueue, &meterIndex, 0))
     {
       data.accumulated_value = ++meters[meterIndex].accumulatedValue;
-      data.submeter = meters[meterIndex].meterId;
+      data.submeterId = meters[meterIndex].meterId;
 
       writePoint(data);
       sendPoint();
@@ -438,27 +495,27 @@ void IRAM_ATTR handlePoint(void *pvParameters){
 }
 
 
-void writePoint(InfluxDBData data){
+void writePoint(InfluxDBData localData){
 
   point.clearFields();
   point.clearTags();
 
-  point.addTag("submeter", data.submeter);
-  point.addField("accumulated_value", data.accumulated_value);
+  point.addTag("submeter", localData.submeterId);
+  point.addField("accumulated_value", localData.accumulated_value);
 
 }
 
 
 void sendPoint(){
 
-  if(client.writePoint(point)){
+  if(influxClient.writePoint(point)){
     Serial.println("Write point success");
   } else {
     Serial.println("Write point failed");
-    client.getLastErrorMessage();
+    influxClient.getLastErrorMessage();
   }
 
-  Serial.println(client.pointToLineProtocol(point));
+  Serial.println(influxClient.pointToLineProtocol(point));
 }
 
 

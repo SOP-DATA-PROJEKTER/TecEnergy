@@ -380,3 +380,4 @@ ESP32-RTOS/.vscode/extensions.json
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+/ESP32-RTOS/.vscode
