@@ -16,13 +16,24 @@
 
 #define TZ_INFO "CET-1CEST"
 
-AsyncWebServer server(80);
 
+AsyncWebServer server(80);
+// NAO-Wifi
+// NaoPassword
+// 192.168.1.27
+// 192.168.1.1
+// http://10.233.134.124:8086
+// G1R_pTOe4u5_jA8Q9uQwcfeVTgakaXYn4NJSB1f0y8I4QEypG8y7lBQPH1uLXeXoeP8FFi7x-vqwxCixzBtccw==
+// Energy_Collection
+// TecEnergy
+// E131
+// Meter1
+// Meter2
 
 // Define Structs
 typedef struct {
   char* measurement;
-  int accumulated_value;
+  int value;
   String submeterId;
   String roomId;
 } InfluxDBData;
@@ -34,25 +45,11 @@ InfluxDBData data{
   ""
 };
 
-typedef struct dataStruct {
-  String meterId;
-  int accumulatedValue;
-} dataStruct;
-
-dataStruct meters[] = {
-  {"EB8D4250-D3E1-4302-A9A9-526BC223FD6E", 0}, // meter 1
-  {"6424A2EE-2C46-4486-B8D9-7931CC6269C2", 0}, // meter 2
-  {"BFE517CB-5A23-4786-B535-A733059FA959", 0}, // meter 3
-  {"3946301E-1C59-4EE5-87FA-F8246F1DBEF1", 0}  // meter 4
-};
 
 struct ConfigurationStruct{
   bool wifiMode;
   String ssid;
   String password;
-  String ip;
-  String subnet;
-  String gateway;
   String apiUrl;
   String token;
   String bucket;
@@ -88,9 +85,11 @@ void IRAM_ATTR impulseDetected1();
 void IRAM_ATTR impulseDetected2();
 void IRAM_ATTR impulseDetected3();
 void IRAM_ATTR impulseDetected4();
-void IRAM_ATTR buttonTest();
+
 
 void handlePoint(void *pvParameters);
+void checkButtonTask(void *pvParameters);
+
 
 void writePoint(InfluxDBData data);
 void sendPoint();
@@ -113,7 +112,7 @@ void setup() {
   pinMode(impulsePin2, INPUT);
   pinMode(impulsePin3, INPUT);
   pinMode(impulsePin4, INPUT);
-  pinMode(builtInBtn, PULLDOWN);
+  pinMode(builtInBtn, INPUT);
 
   initLittleFS();
 
@@ -140,18 +139,15 @@ void setup() {
   }
   
   // Set time via NTP
-  timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
+  timeSync(TZ_INFO, "0.europe.pool.ntp.org", "1.europe.pool.ntp.org");
 
   influxClient = setupInfluxDbClient();
 
-  dataQueue = xQueueCreate(200, sizeof(int*));
+  dataQueue = xQueueCreate(20, sizeof(int*));
 
   setupInterrupts();
 
   setupRtosTasks();
-
-  // attachInterrupt(builtInBtn, buttonTest, FALLING);
-
   
   Serial.println("Setup done");
 }
@@ -172,30 +168,34 @@ bool setupWithWifi(){
   // should have values from config.json inside config struct
 
   // start by getting values from config struct
-  IPAddress localIP;
-  localIP.fromString(config.ip);
-  IPAddress gateway;
-  gateway.fromString(config.gateway);
-  IPAddress subnet;
-  subnet.fromString(config.subnet);
+  WiFi.mode(WIFI_STA);
 
   // configure wifi
 
-  WiFi.mode(WIFI_STA);
-  if(!WiFi.config(localIP, gateway, subnet)){
+  if(!WiFi.config(0u, 0u, 0u)){
     Serial.println("STA Failed to configure");
-    return false;
   }
-  
-  if(WiFi.begin(config.ssid, config.password)){
-    Serial.println("STA Failed to configure");
-    return false;
-  }
+
+
+
+  WiFi.begin(config.ssid, config.password);
+  Serial.println("Connecting to WiFi...");
+
+  unsigned long currentMillis = millis();
+  unsigned long previousMillis = 0;
+  previousMillis = currentMillis;
+
 
   while (WiFi.status() != WL_CONNECTED)
   {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
+    currentMillis = millis();
+    if (currentMillis - previousMillis >= 10000)
+    {
+      Serial.println("Failed to connect to WiFi");
+      return false;
+    }
+    delay(100);
+    Serial.print(".");
   }
 
   Serial.println("Connected to WiFi");
@@ -217,11 +217,12 @@ void setupAccessMode(){
   // WiFi.mode(WIFI_AP);
   WiFi.softAP("EnergyMeter", NULL);
   IPAddress IP = WiFi.softAPIP();
+  // print SSID and IP address
+  Serial.print("AP SSID: ");
+  Serial.println(WiFi.softAPSSID());
   Serial.print("AP IP address: ");
   Serial.println(IP);
 
-
-  // start webserver
 
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -232,104 +233,76 @@ void setupAccessMode(){
 
   server.on("/", HTTP_POST, [](AsyncWebServerRequest *request){
     int params = request->params();
+    Serial.println(params);
     for(int i=0;i<params;i++){
       const AsyncWebParameter* p = request->getParam(i);
-      if(p->isPost()){
+      if (p->isPost()) {
         Serial.print("POST: ");
-        if(p->name() == "wifiMode"){
-          config.wifiMode = p->value().toInt();
-        }
-        if (p->name() == "ssid")
-        {
-          config.ssid, p->value().c_str();
-        }
-        if (p->name() == "password")
-        {
-          config.password, p->value().c_str();
-        }
-        if (p->name() == "ip")
-        {
-          config.ip, p->value().c_str();
-        }
-        if (p->name() == "subnet")
-        {
-          config.subnet, p->value().c_str();
-        }
-        if (p->name() == "gateway")
-        {
-          config.gateway, p->value().c_str();
-        }
-        if (p->name() == "apiUrl")
-        {
-          config.apiUrl, p->value().c_str();
-        }
-        if (p->name() == "token")
-        {
-          config.token, p->value().c_str();
-        }
-        if (p->name() == "bucket")
-        {
-          config.bucket, p->value().c_str();
-        }
-        if (p->name() == "org")
-        {
-          config.org, p->value().c_str();
-        }
-        if (p->name() == "roomId")
-        {
-          config.roomId, p->value().c_str();
-        }
-        if (p->name() == "meterId1")
-        {
-          config.meterId[0], p->value().c_str();
-        }
-        if (p->name() == "meterId2")
-        {
-          config.meterId[1], p->value().c_str();
-        }
-        if (p->name() == "meterId3")
-        {
-          config.meterId[2], p->value().c_str();
-        }
-        if (p->name() == "meterId4")
-        {
-          config.meterId[3], p->value().c_str();
-        }        
+        Serial.println(p->name().c_str());
+        Serial.println(p->value().c_str());
+
+        if (p->name() == "wifiMode") {
+            config.wifiMode = p->value().equalsIgnoreCase("true"); // Convert to boolean
+        } else if (p->name() == "ssid") {
+            config.ssid = p->value().c_str();
+        } else if (p->name() == "password") {
+            config.password = p->value().c_str();
+        } else if (p->name() == "ApiUrl") {
+            config.apiUrl = p->value().c_str();
+        } else if (p->name() == "Token") {
+            config.token = p->value().c_str();
+        } else if (p->name() == "Bucket") {
+            config.bucket = p->value().c_str();
+        } else if (p->name() == "Organization") {
+            config.org = p->value().c_str();
+        } else if (p->name() == "RoomNumber") {
+            config.roomId = p->value().c_str();
+        } else if (p->name() == "Submeter1") {
+            config.meterId[0] = p->value().c_str();
+        } else if (p->name() == "Submeter2") {
+            config.meterId[1] = p->value().c_str();
+        } else if (p->name() == "Submeter3") {
+            config.meterId[2] = p->value().c_str();
+        } else if (p->name() == "Submeter4") {
+            config.meterId[3] = p->value().c_str();
+        }     
       }
 
 
-      request->send(200, "text/plain", "Configuration saved, ESP will restart");
-      // convert the config to json
-      JsonDocument confDoc;
-      confDoc["wifiMode"] = config.wifiMode;
-      confDoc["ssid"] = config.ssid;
-      confDoc["password"] = config.password;
-      confDoc["ip"] = config.ip;
-      confDoc["subnet"] = config.subnet;
-      confDoc["gateway"] = config.gateway;
-      confDoc["apiUrl"] = config.apiUrl;
-      confDoc["token"] = config.token;
-      confDoc["bucket"] = config.bucket;
-      confDoc["org"] = config.org;
-      confDoc["roomId"] = config.roomId;
-      confDoc["meterId1"] = config.meterId[0];
-      confDoc["meterId2"] = config.meterId[1];
-      confDoc["meterId3"] = config.meterId[2];
-      confDoc["meterId4"] = config.meterId[3];
-
-      // write to config.json
-      File configFile = LittleFS.open(configFilename, "w");
-      if(!configFile){
-        Serial.println("Failed to open config file for writing");
-      }
-
-      serializeJson(confDoc, configFile);
-      configFile.close();
-      Serial.println("Restarting ESP");
-      delay(3000);
-      ESP.restart();
-
+      
     }
+
+    request->send(200, "text/plain", "Configuration saved, ESP will restart");
+
+    delay(3000);
+
+    // convert the config to json
+    JsonDocument confDoc;
+    confDoc["wifiMode"] = config.wifiMode;
+    confDoc["ssid"] = config.ssid;
+    confDoc["password"] = config.password;
+    confDoc["apiUrl"] = config.apiUrl;
+    confDoc["token"] = config.token;
+    confDoc["bucket"] = config.bucket;
+    confDoc["org"] = config.org;
+    confDoc["roomId"] = config.roomId;
+    confDoc["meterId1"] = config.meterId[0];
+    confDoc["meterId2"] = config.meterId[1];
+    confDoc["meterId3"] = config.meterId[2];
+    confDoc["meterId4"] = config.meterId[3];
+
+    // write to config.json
+    File configFile = LittleFS.open(configFilename, "w");
+    if(!configFile){
+      Serial.println("Failed to open config file for writing");
+    }
+
+    serializeJson(confDoc, configFile);
+    configFile.close();
+    Serial.println("Restarting ESP");
+    delay(3000);
+    ESP.restart();
+
   });
 
   server.begin();
@@ -362,11 +335,8 @@ bool setupConfig(){
   config.wifiMode = doc["wifiMode"].as<bool>();
   config.ssid = doc["ssid"].as<String>();
   config.password = doc["password"].as<String>();
-  config.ip = doc["ip"].as<String>();
-  config.subnet = doc["subnet"].as<String>();
-  config.gateway = doc["gateway"].as<String>();
   config.apiUrl = doc["apiUrl"].as<String>();
-  config.token = doc["token"].as<String>();
+  config.token =  doc["token"].as<String>();
   config.bucket = doc["bucket"].as<String>();
   config.org = doc["org"].as<String>();
   config.roomId = doc["roomId"].as<String>();
@@ -374,6 +344,12 @@ bool setupConfig(){
   config.meterId[1] = doc["meterId2"].as<String>();
   config.meterId[2] = doc["meterId3"].as<String>();
   config.meterId[3] = doc["meterId4"].as<String>();
+
+  // if api url is empty or "" run setupAccessMode() to get values from user
+  if(config.apiUrl == ""){
+    setupAccessMode();
+    return false;
+  }
 
   configFile.close();
 
@@ -385,14 +361,14 @@ bool setupConfig(){
 InfluxDBClient setupInfluxDbClient(){
 
   InfluxDBClient client(config.apiUrl, config.org, config.bucket, config.token, InfluxDbCloud2CACert);
-  
-  // check for influxdb connection
-  if (influxClient.validateConnection()) {
+
+  if (client.validateConnection()) {
     Serial.print("Connected to InfluxDB: ");
-    Serial.println(influxClient.getServerUrl());
+    Serial.println(client.getServerUrl());
   } else {
     Serial.print("InfluxDB connection failed: ");
-    Serial.println(influxClient.getLastErrorMessage());
+    Serial.println(client.getLastErrorMessage());
+
   }
 
   return client;
@@ -404,11 +380,20 @@ void setupRtosTasks(){
   xTaskCreate(
     handlePoint,
     "Handle Point",
-    4096,
+    8192,
     NULL,
     1,
     NULL
   );
+
+  // xTaskCreate(
+  //   checkButtonTask,
+  //   "Check Button",
+  //   4096,
+  //   NULL,
+  //   2,
+  //   NULL
+  // );
 
 }
 
@@ -474,31 +459,20 @@ void IRAM_ATTR impulseDetected4() {
 }
 
 
-// for testing purposes
-void IRAM_ATTR buttonTest(){
-  int meter = 0;
-  if(millis() - lastDebounceTime[meter] >= 80)
-  {
-    xQueueSendFromISR(dataQueue, &meter, 0);
-    lastDebounceTime[meter] = millis();
-  }
-}
-
-
 // RTOS Functions
-void IRAM_ATTR handlePoint(void *pvParameters){
+void handlePoint(void *pvParameters){
   vTaskDelay(10000 / portTICK_PERIOD_MS);
   while(1)
   {
     int meterIndex;
     if(xQueueReceive(dataQueue, &meterIndex, 0))
     {
-      data.accumulated_value = ++meters[meterIndex].accumulatedValue;
-      data.submeterId = meters[meterIndex].meterId;
+      data.value = 1;
+      data.submeterId = config.meterId[meterIndex];
+      data.roomId = config.roomId;
 
       writePoint(data);
       sendPoint();
-
 
     }
 
@@ -514,7 +488,7 @@ void writePoint(InfluxDBData localData){
   point.clearTags();
 
   point.addTag("submeter", localData.submeterId);
-  point.addField("accumulated_value", localData.accumulated_value);
+  point.addField("value", localData.value);
 
 }
 
@@ -533,6 +507,42 @@ void sendPoint(){
 
 
 void loop(){
+}
 
+
+void checkButtonTask(void * paramter) {
+  vTaskDelay(200 / portTICK_PERIOD_MS);
+  while (true)
+  {
+
+    if (digitalRead(builtInBtn) == LOW) {
+      // suspend other tasks
+      vTaskSuspendAll();
+
+      // stop interrupts
+      detachInterrupt(impulsePin1);
+      detachInterrupt(impulsePin2);
+      detachInterrupt(impulsePin3);
+      detachInterrupt(impulsePin4);
+
+      Serial.println("Button pressed, resetting config...");
+      
+      // Delete the config file
+      if (LittleFS.exists(configFilename)) {
+        LittleFS.remove(configFilename);
+        Serial.println("Config file deleted");
+      } else {
+        Serial.println("Config file does not exist");
+      }
+      
+      // Wait a bit before restarting
+      delay(1000);
+      
+      // Restart the ESP32
+      ESP.restart();
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+  }
 }
 
