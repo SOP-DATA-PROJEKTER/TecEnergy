@@ -14,7 +14,8 @@
 #include <time.h>
 
 
-#define TZ_INFO "CET-1CEST"
+// #define TZ_INFO "CET-1CEST"
+#define TZ_INFO "UTC2"
 
 
 AsyncWebServer server(80);
@@ -22,7 +23,7 @@ AsyncWebServer server(80);
 // NaoPassword
 // 192.168.1.27
 // 192.168.1.1
-// http://10.233.134.124:8086
+// http://10.233.134.109:8086
 // G1R_pTOe4u5_jA8Q9uQwcfeVTgakaXYn4NJSB1f0y8I4QEypG8y7lBQPH1uLXeXoeP8FFi7x-vqwxCixzBtccw==
 // Energy_Collection
 // TecEnergy
@@ -33,29 +34,28 @@ AsyncWebServer server(80);
 // Define Structs
 typedef struct {
   char* measurement;
-  int value;
+  int impulse;
   String submeterId;
   String roomId;
 } InfluxDBData;
 
-InfluxDBData data{
-  "Energy_Measurement",
-  0,
-  "",
-  ""
-};
-
+// InfluxDBData data{
+//   "Energy_Measurement",
+//   0,
+//   "",
+//   ""
+// };
 
 struct ConfigurationStruct{
   bool wifiMode;
-  String ssid;
-  String password;
-  String apiUrl;
-  String token;
-  String bucket;
-  String org;
-  String roomId;
-  String meterId[4];
+  char* ssid;
+  char* password;
+  char* apiUrl;
+  char* token;
+  char* bucket;
+  char* org;
+  char* roomId;
+  char* meterId[4];
 };
 
 ConfigurationStruct config;
@@ -65,10 +65,9 @@ xQueueHandle dataQueue;
 SemaphoreHandle_t sdCardMutex;
 volatile unsigned long lastDebounceTime[4] = {0, 0, 0, 0};
 
-
-const String apiUrl = "";
 InfluxDBClient influxClient;
 Point point("Energy_Measurement");
+
 
 const String configFilename = "/config.json";
 
@@ -78,7 +77,7 @@ const int impulsePin2 = 32; // Impulse pin
 const int impulsePin3 = 33; // Impulse pin
 const int impulsePin4 = 36; // Impulse pin
 
-const int builtInBtn = 34; // bultin button to simmulate impulse -- testing purposes
+const int builtInBtn = 34; // bultin button to reset
 
 // define functions
 void IRAM_ATTR impulseDetected1();
@@ -86,15 +85,15 @@ void IRAM_ATTR impulseDetected2();
 void IRAM_ATTR impulseDetected3();
 void IRAM_ATTR impulseDetected4();
 
+void IRAM_ATTR buttonTest();
+void checkButtonTask(void *pvParameters);
+void handleButtonPress(void *pvParameters);
 
 void handlePoint(void *pvParameters);
-void checkButtonTask(void *pvParameters);
 
+void sendPoint(int meterIndex);
 
-void writePoint(InfluxDBData data);
-void sendPoint();
-
-InfluxDBClient setupInfluxDbClient();
+void setupInfluxDbClient();
 bool setupInterrupts();
 void setupRtosTasks();
 void setupAccessMode();
@@ -103,22 +102,29 @@ void setupWithEthernet();
 bool setupConfig();
 void initLittleFS();
 
+char* copyString(const String& str);
+void freeConfig();
+
 // setup starts here
 void setup() {
 
   Serial.begin(115200);
 
-  pinMode(impulsePin1, INPUT_PULLDOWN); // sets pin to input
-  pinMode(impulsePin2, INPUT);
-  pinMode(impulsePin3, INPUT);
-  pinMode(impulsePin4, INPUT);
-  pinMode(builtInBtn, INPUT);
+  // pinMode(impulsePin1, INPUT_PULLDOWN); // sets pin to input
+  // pinMode(impulsePin2, INPUT_PULLDOWN);
+  // pinMode(impulsePin3, INPUT_PULLDOWN);
+  // pinMode(impulsePin4, INPUT_PULLDOWN);
+  pinMode(builtInBtn, PULLDOWN);
 
   initLittleFS();
 
+  // for debugging
+  // setupAccessMode();
+  // return;
+
   // read from littlefs to get values in config.json
   if(!setupConfig()){
-    // go into access point mode 
+    // go into accesspoint mode 
     setupAccessMode();
     return;
   }
@@ -126,7 +132,7 @@ void setup() {
   // if wifiMode is true, use wifi if not use ETH
   if (config.wifiMode)
   {
-    // if setup with wifi fails, start access point mode
+    // if setup with wifi fails, start accesspoint mode
     if (!setupWithWifi())
     {
       Serial.println("Failed to connect to wifi");
@@ -139,9 +145,12 @@ void setup() {
   }
   
   // Set time via NTP
-  timeSync(TZ_INFO, "0.europe.pool.ntp.org", "1.europe.pool.ntp.org");
+  // timeSync(TZ_INFO, "0.europe.pool.ntp.org", "1.europe.pool.ntp.org");
+  timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
 
-  influxClient = setupInfluxDbClient();
+  delay(200);
+
+  setupInfluxDbClient();
 
   dataQueue = xQueueCreate(20, sizeof(int*));
 
@@ -150,6 +159,9 @@ void setup() {
   setupRtosTasks();
   
   Serial.println("Setup done");
+
+  Serial.println(ESP.getFreeHeap());
+
 }
 
 
@@ -244,32 +256,42 @@ void setupAccessMode(){
         if (p->name() == "wifiMode") {
             config.wifiMode = p->value().equalsIgnoreCase("true"); // Convert to boolean
         } else if (p->name() == "ssid") {
-            config.ssid = p->value().c_str();
+            free(config.ssid);
+            config.ssid = copyString(p->value());
         } else if (p->name() == "password") {
-            config.password = p->value().c_str();
+            free(config.password);
+            config.password = copyString(p->value());
         } else if (p->name() == "ApiUrl") {
-            config.apiUrl = p->value().c_str();
+            free(config.apiUrl);
+            config.apiUrl = copyString(p->value());
         } else if (p->name() == "Token") {
-            config.token = p->value().c_str();
+            free(config.token);
+            config.token = copyString(p->value());
         } else if (p->name() == "Bucket") {
-            config.bucket = p->value().c_str();
+            free(config.bucket);
+            config.bucket = copyString(p->value());
         } else if (p->name() == "Organization") {
-            config.org = p->value().c_str();
+            free(config.org);
+            config.org = copyString(p->value());
         } else if (p->name() == "RoomNumber") {
-            config.roomId = p->value().c_str();
+            free(config.roomId);
+            config.roomId = copyString(p->value());
         } else if (p->name() == "Submeter1") {
-            config.meterId[0] = p->value().c_str();
+            free(config.meterId[0]);
+            config.meterId[0] = copyString(p->value());
         } else if (p->name() == "Submeter2") {
-            config.meterId[1] = p->value().c_str();
+            free(config.meterId[1]);
+            config.meterId[1] = copyString(p->value());
         } else if (p->name() == "Submeter3") {
-            config.meterId[2] = p->value().c_str();
+            free(config.meterId[2]);
+            config.meterId[2] = copyString(p->value());
         } else if (p->name() == "Submeter4") {
-            config.meterId[3] = p->value().c_str();
+            free(config.meterId[3]);
+            config.meterId[3] = copyString(p->value());
         }     
+    
       }
 
-
-      
     }
 
     request->send(200, "text/plain", "Configuration saved, ESP will restart");
@@ -332,18 +354,35 @@ bool setupConfig(){
     Serial.println("Failed to read file, using default configuration");
   }
 
+
   config.wifiMode = doc["wifiMode"].as<bool>();
-  config.ssid = doc["ssid"].as<String>();
-  config.password = doc["password"].as<String>();
-  config.apiUrl = doc["apiUrl"].as<String>();
-  config.token =  doc["token"].as<String>();
-  config.bucket = doc["bucket"].as<String>();
-  config.org = doc["org"].as<String>();
-  config.roomId = doc["roomId"].as<String>();
-  config.meterId[0] = doc["meterId1"].as<String>();
-  config.meterId[1] = doc["meterId2"].as<String>();
-  config.meterId[2] = doc["meterId3"].as<String>();
-  config.meterId[3] = doc["meterId4"].as<String>();
+  config.ssid = copyString(doc["ssid"].as<String>());
+  config.password = copyString(doc["password"].as<String>());
+  config.apiUrl = copyString("http://192.168.1.26:8086");  // copyString(doc["apiUrl"].as<char*>());
+  config.token = "qzwvdxVyxy0bKfvvYD0o8_sUPyis8hNFI4CDtRLdB4VcMnhbbDmLxp-ZYaM_1xPChBPUHyooBq3WOXzuxcxxvQ==";
+  config.bucket = "Energy_Collection";
+  config.org = "0abeb7a850e0a023";
+  // config.apiUrl = copyString(doc["apiUrl"].as<char*>());
+  // config.token = copyString(doc["token"].as<String>());
+  // config.bucket = copyString(doc["bucket"].as<String>());
+  // config.org = copyString(doc["org"].as<String>());
+  config.roomId = copyString(doc["roomId"].as<String>());
+  config.meterId[0] = copyString(doc["meterId1"].as<String>());
+  config.meterId[1] = copyString(doc["meterId2"].as<String>());
+  config.meterId[2] = copyString(doc["meterId3"].as<String>());
+  config.meterId[3] = copyString(doc["meterId4"].as<String>());
+
+  if (!config.ssid || !config.password || !config.apiUrl || !config.token || !config.bucket || !config.org || !config.roomId) {
+      Serial.println("Memory allocation error!");
+  }
+
+
+  // print the doc
+  // prettyfi
+  serializeJsonPretty(doc, Serial);
+
+  // data.roomId = config.roomId;
+
 
   // if api url is empty or "" run setupAccessMode() to get values from user
   if(config.apiUrl == ""){
@@ -358,20 +397,25 @@ bool setupConfig(){
 }
 
 
-InfluxDBClient setupInfluxDbClient(){
+void setupInfluxDbClient(){
 
-  InfluxDBClient client(config.apiUrl, config.org, config.bucket, config.token, InfluxDbCloud2CACert);
+  influxClient = InfluxDBClient(config.apiUrl, config.org, config.bucket, config.token, InfluxDbCloud2CACert);
 
-  if (client.validateConnection()) {
+  if (influxClient.validateConnection()) {
     Serial.print("Connected to InfluxDB: ");
-    Serial.println(client.getServerUrl());
+    Serial.println(influxClient.getServerUrl());
   } else {
     Serial.print("InfluxDB connection failed: ");
-    Serial.println(client.getLastErrorMessage());
+    Serial.println(influxClient.getLastErrorMessage());
+
+    delay(3000);
+    ESP.restart();
 
   }
 
-  return client;
+  // Serial.print("Influx client address in setup: ");
+  // Serial.println((uint32_t)influxClient);
+
 }
 
 
@@ -380,6 +424,15 @@ void setupRtosTasks(){
   xTaskCreate(
     handlePoint,
     "Handle Point",
+    8192,
+    NULL,
+    2,
+    NULL
+  );
+
+  xTaskCreate(
+    handleButtonPress,
+    "Handle Button",
     8192,
     NULL,
     1,
@@ -399,13 +452,15 @@ void setupRtosTasks(){
 
 
 bool setupInterrupts(){
-  attachInterrupt(impulsePin1, impulseDetected1, RISING); // sets interrupt when pin goes from low to high
+  // attachInterrupt(impulsePin1, impulseDetected1, RISING); // sets interrupt when pin goes from low to high
 
-  attachInterrupt(impulsePin2, impulseDetected2, RISING);
+  // attachInterrupt(impulsePin2, impulseDetected2, RISING);
 
-  attachInterrupt(impulsePin3, impulseDetected3, RISING); 
+  // attachInterrupt(impulsePin3, impulseDetected3, RISING); 
     
-  attachInterrupt(impulsePin4, impulseDetected4, RISING);
+  // attachInterrupt(impulsePin4, impulseDetected4, RISING);
+
+  attachInterrupt(builtInBtn, buttonTest, FALLING);
   
 
   return true;
@@ -461,52 +516,57 @@ void IRAM_ATTR impulseDetected4() {
 
 // RTOS Functions
 void handlePoint(void *pvParameters){
-  vTaskDelay(10000 / portTICK_PERIOD_MS);
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
   while(1)
   {
     int meterIndex;
     if(xQueueReceive(dataQueue, &meterIndex, 0))
     {
-      data.value = 1;
-      data.submeterId = config.meterId[meterIndex];
-      data.roomId = config.roomId;
 
-      writePoint(data);
-      sendPoint();
+      sendPoint(meterIndex);
 
     }
-
     
-    vTaskDelay(20 / portTICK_PERIOD_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }
 
 
-void writePoint(InfluxDBData localData){
+void sendPoint(int meterIndex){
 
   point.clearFields();
   point.clearTags();
 
-  point.addTag("submeter", localData.submeterId);
-  point.addField("value", localData.value);
+  point.addTag("submeter", config.meterId[meterIndex]);
+  point.addTag("room", config.roomId);
+  point.addField("impulse", 1);
 
-}
 
-
-void sendPoint(){
+  if (!influxClient.validateConnection()) {
+    Serial.println("InfluxDB connection lost!");
+    Serial.println(influxClient.getLastErrorMessage());
+    return;  // Return early if the connection is lost
+  }
+  else{
+    Serial.println("InfluxDB connection still valid");
+  }
 
   if(influxClient.writePoint(point)){
     Serial.println("Write point success");
-  } else {
+  } 
+  else{
     Serial.println("Write point failed");
-    influxClient.getLastErrorMessage();
+    Serial.println(influxClient.getLastErrorMessage());
   }
 
   Serial.println(influxClient.pointToLineProtocol(point));
+
 }
 
 
+
 void loop(){
+
 }
 
 
@@ -544,5 +604,57 @@ void checkButtonTask(void * paramter) {
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
   }
+}
+
+
+volatile bool buttonPressed = false;
+
+
+void IRAM_ATTR buttonTest(){
+    buttonPressed = true;  // Set a flag instead of handling millis() here
+}
+
+
+void handleButtonPress(void *pvParameters){
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
+  int meter = 0;
+  int *meterPointer = &meter;
+  while (true)
+  {
+    if(buttonPressed) {
+        buttonPressed = false;
+ 
+        if(millis() - lastDebounceTime[meter] >= 80) {
+            xQueueSend(dataQueue, meterPointer, 0); 
+            lastDebounceTime[meter] = millis();
+        }
+      }
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+  }
+  
+}
+
+
+char* copyString(const String& str) {
+    char* buffer = (char*)malloc(str.length() + 1);  // Allocate memory
+    if (buffer) {
+        strcpy(buffer, str.c_str());  // Copy String to char*
+    }
+    return buffer;  // Return pointer to the allocated memory
+}
+
+
+void freeConfig() {
+    if (config.ssid) free(config.ssid);
+    if (config.password) free(config.password);
+    if (config.apiUrl) free(config.apiUrl);
+    if (config.token) free(config.token);
+    if (config.bucket) free(config.bucket);
+    if (config.org) free(config.org);
+    if (config.roomId) free(config.roomId);
+
+    for (int i = 0; i < 4; i++) {
+        if (config.meterId[i]) free(config.meterId[i]);
+    }
 }
 
