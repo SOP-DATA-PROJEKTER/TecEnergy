@@ -19,17 +19,6 @@
 
 
 AsyncWebServer server(80);
-// NAO-Wifi
-// NaoPassword
-// 192.168.1.27
-// 192.168.1.1
-// http://10.233.134.109:8086
-// G1R_pTOe4u5_jA8Q9uQwcfeVTgakaXYn4NJSB1f0y8I4QEypG8y7lBQPH1uLXeXoeP8FFi7x-vqwxCixzBtccw==
-// Energy_Collection
-// TecEnergy
-// E131
-// Meter1
-// Meter2
 
 // Define Structs
 typedef struct {
@@ -38,13 +27,6 @@ typedef struct {
   String submeterId;
   String roomId;
 } InfluxDBData;
-
-// InfluxDBData data{
-//   "Energy_Measurement",
-//   0,
-//   "",
-//   ""
-// };
 
 struct ConfigurationStruct{
   bool wifiMode;
@@ -86,7 +68,6 @@ void IRAM_ATTR impulseDetected3();
 void IRAM_ATTR impulseDetected4();
 
 void IRAM_ATTR buttonTest();
-void checkButtonTask(void *pvParameters);
 void handleButtonPress(void *pvParameters);
 
 void handlePoint(void *pvParameters);
@@ -110,17 +91,13 @@ void setup() {
 
   Serial.begin(115200);
 
-  // pinMode(impulsePin1, INPUT_PULLDOWN); // sets pin to input
-  // pinMode(impulsePin2, INPUT_PULLDOWN);
-  // pinMode(impulsePin3, INPUT_PULLDOWN);
-  // pinMode(impulsePin4, INPUT_PULLDOWN);
+  pinMode(impulsePin1, INPUT_PULLDOWN); // sets pin to input
+  pinMode(impulsePin2, INPUT_PULLDOWN);
+  pinMode(impulsePin3, INPUT_PULLDOWN);
+  pinMode(impulsePin4, INPUT_PULLDOWN);
   pinMode(builtInBtn, PULLDOWN);
 
   initLittleFS();
-
-  // for debugging
-  // setupAccessMode();
-  // return;
 
   // read from littlefs to get values in config.json
   if(!setupConfig()){
@@ -145,7 +122,6 @@ void setup() {
   }
   
   // Set time via NTP
-  // timeSync(TZ_INFO, "0.europe.pool.ntp.org", "1.europe.pool.ntp.org");
   timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
 
   delay(200);
@@ -160,7 +136,6 @@ void setup() {
   
   Serial.println("Setup done");
 
-  Serial.println(ESP.getFreeHeap());
 
 }
 
@@ -358,14 +333,10 @@ bool setupConfig(){
   config.wifiMode = doc["wifiMode"].as<bool>();
   config.ssid = copyString(doc["ssid"].as<String>());
   config.password = copyString(doc["password"].as<String>());
-  config.apiUrl = copyString("http://192.168.1.26:8086");  // copyString(doc["apiUrl"].as<char*>());
-  config.token = "qzwvdxVyxy0bKfvvYD0o8_sUPyis8hNFI4CDtRLdB4VcMnhbbDmLxp-ZYaM_1xPChBPUHyooBq3WOXzuxcxxvQ==";
-  config.bucket = "Energy_Collection";
-  config.org = "0abeb7a850e0a023";
-  // config.apiUrl = copyString(doc["apiUrl"].as<char*>());
-  // config.token = copyString(doc["token"].as<String>());
-  // config.bucket = copyString(doc["bucket"].as<String>());
-  // config.org = copyString(doc["org"].as<String>());
+  config.apiUrl = copyString(doc["apiUrl"].as<char*>());
+  config.token = copyString(doc["token"].as<String>());
+  config.bucket = copyString(doc["bucket"].as<String>());
+  config.org = copyString(doc["org"].as<String>());
   config.roomId = copyString(doc["roomId"].as<String>());
   config.meterId[0] = copyString(doc["meterId1"].as<String>());
   config.meterId[1] = copyString(doc["meterId2"].as<String>());
@@ -380,8 +351,6 @@ bool setupConfig(){
   // print the doc
   // prettyfi
   serializeJsonPretty(doc, Serial);
-
-  // data.roomId = config.roomId;
 
 
   // if api url is empty or "" run setupAccessMode() to get values from user
@@ -413,9 +382,6 @@ void setupInfluxDbClient(){
 
   }
 
-  // Serial.print("Influx client address in setup: ");
-  // Serial.println((uint32_t)influxClient);
-
 }
 
 
@@ -439,26 +405,19 @@ void setupRtosTasks(){
     NULL
   );
 
-  // xTaskCreate(
-  //   checkButtonTask,
-  //   "Check Button",
-  //   4096,
-  //   NULL,
-  //   2,
-  //   NULL
-  // );
+
 
 }
 
 
 bool setupInterrupts(){
-  // attachInterrupt(impulsePin1, impulseDetected1, RISING); // sets interrupt when pin goes from low to high
+  attachInterrupt(impulsePin1, impulseDetected1, RISING); // sets interrupt when pin goes from low to high
 
-  // attachInterrupt(impulsePin2, impulseDetected2, RISING);
+  attachInterrupt(impulsePin2, impulseDetected2, RISING);
 
-  // attachInterrupt(impulsePin3, impulseDetected3, RISING); 
+  attachInterrupt(impulsePin3, impulseDetected3, RISING); 
     
-  // attachInterrupt(impulsePin4, impulseDetected4, RISING);
+  attachInterrupt(impulsePin4, impulseDetected4, RISING);
 
   attachInterrupt(builtInBtn, buttonTest, FALLING);
   
@@ -519,7 +478,7 @@ void handlePoint(void *pvParameters){
   vTaskDelay(1000 / portTICK_PERIOD_MS);
   while(1)
   {
-    int meterIndex;
+    int meterIndex = 0;
     if(xQueueReceive(dataQueue, &meterIndex, 0))
     {
 
@@ -565,18 +524,20 @@ void sendPoint(int meterIndex){
 
 
 
-void loop(){
+volatile bool buttonPressed = false;
 
+
+void IRAM_ATTR buttonTest(){
+    buttonPressed = true;  // Set a flag instead of handling millis() here
 }
 
 
-void checkButtonTask(void * paramter) {
-  vTaskDelay(200 / portTICK_PERIOD_MS);
+void handleButtonPress(void *pvParameters){
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
   while (true)
   {
-
-    if (digitalRead(builtInBtn) == LOW) {
-      // suspend other tasks
+    if(buttonPressed) {
+        // suspend other tasks
       vTaskSuspendAll();
 
       // stop interrupts
@@ -600,36 +561,8 @@ void checkButtonTask(void * paramter) {
       
       // Restart the ESP32
       ESP.restart();
-
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-  }
-}
-
-
-volatile bool buttonPressed = false;
-
-
-void IRAM_ATTR buttonTest(){
-    buttonPressed = true;  // Set a flag instead of handling millis() here
-}
-
-
-void handleButtonPress(void *pvParameters){
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-  int meter = 0;
-  int *meterPointer = &meter;
-  while (true)
-  {
-    if(buttonPressed) {
-        buttonPressed = false;
- 
-        if(millis() - lastDebounceTime[meter] >= 80) {
-            xQueueSend(dataQueue, meterPointer, 0); 
-            lastDebounceTime[meter] = millis();
-        }
       }
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(50000 / portTICK_PERIOD_MS);
   }
   
 }
@@ -658,3 +591,7 @@ void freeConfig() {
     }
 }
 
+
+void loop(){
+
+}
